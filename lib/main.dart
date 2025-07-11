@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:material_color_utilities/material_color_utilities.dart';
+import 'package:todo_aeo/pages/todo_page.dart';
+import 'package:todo_aeo/tests/database_initializer.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   final CorePalette? palette = await DynamicColorPlugin.getCorePalette();
+
+  await DatabaseInitializer.initializeWithSampleData();
 
   runApp(ToDo(palette: palette,));
 }
@@ -51,7 +55,7 @@ class _ToDoHomeFrameState extends State<ToDoHomeFrame> {
         actions: [IconButton(onPressed: () {}, icon: Icon(Icons.menu, color: colorScheme.onPrimary,))],
         backgroundColor: colorScheme.primary,
       ),
-      body: Center(child: Text("This is Body.")),
+      body: TodoPage(),
     );
   }
 }
