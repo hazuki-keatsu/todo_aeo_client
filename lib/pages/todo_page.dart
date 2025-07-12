@@ -12,24 +12,23 @@ class TodoPage extends StatefulWidget {
 
 class _TodoPageState extends State<TodoPage> {
   List<Todo>? todos;
+  List<Map<String, dynamic>>? categories;
   bool isLoading = true;
+  int? selectedCategoryId; // null表示显示所有todos
+  String selectedCategoryName = "全部";
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
     super.initState();
-    _loadTodos();
+    _loadData();
   }
 
-  // 加载动画
-  Future<void> _loadTodos() async {
+  // 加载所有数据
+  Future<void> _loadData() async {
     try {
-      final loadedTodos = await DatabaseQuery.instance.getAllTodos();
+      await Future.wait([_loadTodos(), _loadCategories()]);
       setState(() {
-        todos = List.generate(
-          loadedTodos.length,
-          (i) => Todo.fromMap(loadedTodos[i]),
-        );
         isLoading = false;
       });
     } catch (e) {
@@ -37,6 +36,47 @@ class _TodoPageState extends State<TodoPage> {
         isLoading = false;
       });
     }
+  }
+
+  // 加载todos
+  Future<void> _loadTodos() async {
+    List<Map<String, dynamic>> loadedTodos;
+
+    if (selectedCategoryId == null) {
+      loadedTodos = await DatabaseQuery.instance.getAllTodos();
+    } else if (selectedCategoryId == -1) {
+      // -1 表示未分类
+      loadedTodos = await DatabaseQuery.instance.getUncategorizedTodos();
+    } else {
+      loadedTodos = await DatabaseQuery.instance.getTodosByCategory(
+        selectedCategoryId!,
+      );
+    }
+
+    setState(() {
+      todos = List.generate(
+        loadedTodos.length,
+        (i) => Todo.fromMap(loadedTodos[i]),
+      );
+    });
+  }
+
+  // 加载分类
+  Future<void> _loadCategories() async {
+    final loadedCategories = await DatabaseQuery.instance.getAllCategories();
+    setState(() {
+      categories = loadedCategories;
+    });
+  }
+
+  // 选择分类
+  void _selectCategory(int? categoryId, String categoryName) {
+    setState(() {
+      selectedCategoryId = categoryId;
+      selectedCategoryName = categoryName;
+    });
+    _loadTodos();
+    Navigator.pop(context); // 关闭侧边栏
   }
 
   // 完成数据的本地同步
@@ -58,6 +98,27 @@ class _TodoPageState extends State<TodoPage> {
     }
   }
 
+  // 颜色解析
+  Color _parseColor(String? colorString) {
+    if (colorString == null || colorString.isEmpty) {
+      return Theme.of(context).colorScheme.primary;
+    }
+
+    // 检查是否是有效的十六进制颜色格式
+    if (colorString.startsWith('#') && colorString.length == 7) {
+      try {
+        return Color(
+          int.parse(colorString.substring(1), radix: 16) + 0xFF000000,
+        );
+      } catch (e) {
+        return Theme.of(context).colorScheme.primary;
+      }
+    }
+
+    // 如果不是十六进制格式，返回默认颜色
+    return Theme.of(context).colorScheme.primary;
+  }
+
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
@@ -68,7 +129,7 @@ class _TodoPageState extends State<TodoPage> {
       key: _scaffoldKey,
       appBar: AppBar(
         title: Text(
-          'Todo',
+          selectedCategoryName,
           style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
         ),
         actions: <Widget>[
@@ -112,7 +173,9 @@ class _TodoPageState extends State<TodoPage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             DrawerHeader(
-              decoration: BoxDecoration(color: Theme.of(context).colorScheme.secondaryContainer),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.secondaryContainer,
+              ),
               child: Column(
                 children: [
                   RichText(
@@ -172,7 +235,80 @@ class _TodoPageState extends State<TodoPage> {
                 ],
               ),
             ),
-            // 在此处建立分类列表
+            // 分类列表
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // 全部todos
+                    ListTile(
+                      leading: Icon(Icons.list),
+                      title: Text("全部"),
+                      selected: selectedCategoryId == null,
+                      onTap: () => _selectCategory(null, "全部"),
+                      selectedColor: Theme.of(context).colorScheme.primary,
+                      selectedTileColor: Theme.of(context).colorScheme.surfaceContainer,
+                    ),
+                    // 未分类todos
+                    ListTile(
+                      leading: Icon(Icons.label_off),
+                      title: Text("未分类"),
+                      selected: selectedCategoryId == -1,
+                      onTap: () => _selectCategory(-1, "未分类"),
+                      selectedColor: Theme.of(context).colorScheme.primary,
+                      selectedTileColor: Theme.of(context).colorScheme.surfaceContainer,
+                    ),
+                    if (categories != null && categories!.isNotEmpty) ...[
+                      Divider(),
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        child: Text(
+                          "分类",
+                          style: Theme.of(context).textTheme.titleSmall
+                              ?.copyWith(
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                        ),
+                      ),
+                      ...categories!.map((category) {
+                        final isSelected = selectedCategoryId == category['id'];
+                        return ListTile(
+                          leading: Container(
+                            width: 24,
+                            height: 24,
+                            decoration: BoxDecoration(
+                              color: category['color'] != null
+                                  ? _parseColor(category['color'])
+                                  : Theme.of(context).colorScheme.primary,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          title: Text(category['name']),
+                          selected: isSelected,
+                          selectedColor: Theme.of(context).colorScheme.primary,
+                          selectedTileColor: Theme.of(context).colorScheme.surfaceContainer,
+                          onTap: () =>
+                              _selectCategory(category['id'], category['name']),
+                        );
+                      }),
+                    ],
+                    Divider(),
+                    ListTile(
+                      leading: Icon(Icons.add),
+                      title: Text("添加分类"),
+                      onTap: () {
+                        // TODO: 添加分类功能
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
       ),

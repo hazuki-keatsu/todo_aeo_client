@@ -2,6 +2,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 // Sqflite操作封装
+// TODO: 修改数据返回方式，按时间优先和完成度优先
 
 class DatabaseQuery {
   static final DatabaseQuery _instance = DatabaseQuery._internal();
@@ -23,6 +24,16 @@ class DatabaseQuery {
   }
 
   Future _createDB(Database db, int version) async {
+    // 创建categories表
+    await db.execute('''
+      CREATE TABLE categories(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        color TEXT,
+        createdAt TEXT NOT NULL
+      )
+    ''');
+    
     // 创建todos表
     await db.execute('''
       CREATE TABLE todos(
@@ -30,8 +41,10 @@ class DatabaseQuery {
         title TEXT NOT NULL,
         description TEXT,
         isCompleted INTEGER NOT NULL DEFAULT 0,
+        categoryId INTEGER,
         createdAt TEXT NOT NULL,
-        finishingAt TEXT NOT NULL
+        finishingAt TEXT NOT NULL,
+        FOREIGN KEY (categoryId) REFERENCES categories (id) ON DELETE SET NULL
       )
     ''');
     
@@ -81,5 +94,106 @@ class DatabaseQuery {
       {'key': key, 'value': value},
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
+  }
+
+  // Category操作
+  Future<List<Map<String, dynamic>>> getAllCategories() async {
+    final db = await instance.database;
+    return await db.query('categories', orderBy: 'createdAt DESC');
+  }
+
+  Future<int> insertCategory(Map<String, dynamic> row) async {
+    final db = await instance.database;
+    return await db.insert('categories', row);
+  }
+
+  Future<int> updateCategory(Map<String, dynamic> row) async {
+    final db = await instance.database;
+    final id = row['id'];
+    return await db.update('categories', row, where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<int> deleteCategory(int id) async {
+    final db = await instance.database;
+    // 删除分类时，将该分类下的todos的categoryId设为null
+    await db.update('todos', {'categoryId': null}, where: 'categoryId = ?', whereArgs: [id]);
+    return await db.delete('categories', where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<Map<String, dynamic>?> getCategoryById(int id) async {
+    final db = await instance.database;
+    final result = await db.query('categories', where: 'id = ?', whereArgs: [id]);
+    return result.isNotEmpty ? result.first : null;
+  }
+
+  // 获取指定分类下的todos
+  Future<List<Map<String, dynamic>>> getTodosByCategory(int categoryId) async {
+    final db = await instance.database;
+    return await db.query('todos', where: 'categoryId = ?', whereArgs: [categoryId], orderBy: 'createdAt DESC');
+  }
+
+  // 获取未分类的todos
+  Future<List<Map<String, dynamic>>> getUncategorizedTodos() async {
+    final db = await instance.database;
+    return await db.query('todos', where: 'categoryId IS NULL', orderBy: 'createdAt DESC');
+  }
+
+  // 获取todos及其分类信息
+  Future<List<Map<String, dynamic>>> getTodosWithCategory() async {
+    final db = await instance.database;
+    return await db.rawQuery('''
+      SELECT 
+        t.*,
+        c.name as categoryName,
+        c.color as categoryColor
+      FROM todos t
+      LEFT JOIN categories c ON t.categoryId = c.id
+      ORDER BY t.createdAt DESC
+    ''');
+  }
+
+  // 清空所有数据但保留表结构
+  Future<void> clearAllData() async {
+    final db = await instance.database;
+    
+    // 开始事务，确保所有操作要么全部成功，要么全部失败
+    await db.transaction((txn) async {
+      // 清空todos表
+      await txn.delete('todos');
+      
+      // 清空categories表
+      await txn.delete('categories');
+      
+      // 清空settings表
+      await txn.delete('settings');
+      
+      // 重置自增ID（可选）
+      await txn.delete('sqlite_sequence', where: 'name IN (?, ?, ?)', 
+          whereArgs: ['todos', 'categories', 'settings']);
+    });
+  }
+
+  // 单独清空todos表
+  Future<void> clearTodos() async {
+    final db = await instance.database;
+    await db.delete('todos');
+    // 重置自增ID（可选）
+    await db.delete('sqlite_sequence', where: 'name = ?', whereArgs: ['todos']);
+  }
+
+  // 单独清空categories表
+  Future<void> clearCategories() async {
+    final db = await instance.database;
+    await db.delete('categories');
+    // 重置自增ID（可选）
+    await db.delete('sqlite_sequence', where: 'name = ?', whereArgs: ['categories']);
+  }
+
+  // 单独清空settings表
+  Future<void> clearSettings() async {
+    final db = await instance.database;
+    await db.delete('settings');
+    // 重置自增ID（可选）
+    await db.delete('sqlite_sequence', where: 'name = ?', whereArgs: ['settings']);
   }
 }
