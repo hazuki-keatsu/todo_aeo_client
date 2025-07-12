@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:todo_aeo/functions/database_query.dart';
 import 'package:todo_aeo/widgets/todo_tile.dart';
 import 'package:todo_aeo/modules/todo.dart';
+import 'package:todo_aeo/modules/category.dart';
 
 class TodoPage extends StatefulWidget {
   const TodoPage({super.key});
@@ -12,7 +13,7 @@ class TodoPage extends StatefulWidget {
 
 class _TodoPageState extends State<TodoPage> {
   List<Todo>? todos;
-  List<Map<String, dynamic>>? categories;
+  List<Category>? categories;
   bool isLoading = true;
   int? selectedCategoryId; // null表示显示所有todos
   String selectedCategoryName = "全部";
@@ -65,7 +66,10 @@ class _TodoPageState extends State<TodoPage> {
   Future<void> _loadCategories() async {
     final loadedCategories = await DatabaseQuery.instance.getAllCategories();
     setState(() {
-      categories = loadedCategories;
+      categories = List.generate(
+        loadedCategories.length,
+        (i) => Category.fromMap(loadedCategories[i]),
+      );
     });
   }
 
@@ -275,24 +279,24 @@ class _TodoPageState extends State<TodoPage> {
                         ),
                       ),
                       ...categories!.map((category) {
-                        final isSelected = selectedCategoryId == category['id'];
+                        final isSelected = selectedCategoryId == category.id;
                         return ListTile(
                           leading: Container(
                             width: 24,
                             height: 24,
                             decoration: BoxDecoration(
-                              color: category['color'] != null
-                                  ? _parseColor(category['color'])
+                              color: category.color != null
+                                  ? _parseColor(category.color)
                                   : Theme.of(context).colorScheme.primary,
                               shape: BoxShape.circle,
                             ),
                           ),
-                          title: Text(category['name']),
+                          title: Text(category.name),
                           selected: isSelected,
                           selectedColor: Theme.of(context).colorScheme.primary,
                           selectedTileColor: Theme.of(context).colorScheme.surfaceContainer,
                           onTap: () =>
-                              _selectCategory(category['id'], category['name']),
+                              _selectCategory(category.id, category.name),
                         );
                       }),
                     ],
