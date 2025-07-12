@@ -4,6 +4,10 @@ import 'package:todo_aeo/widgets/todo_tile.dart';
 import 'package:todo_aeo/modules/todo.dart';
 import 'package:todo_aeo/modules/category.dart';
 
+// TODO: 每次修改ToDo的完成情况时对List进行重建，重新进行排序，使用Hero动画
+// TODO: 添加ToDo删除时的动画
+
+
 class TodoPage extends StatefulWidget {
   const TodoPage({super.key});
 
@@ -123,6 +127,140 @@ class _TodoPageState extends State<TodoPage> {
     return Theme.of(context).colorScheme.primary;
   }
 
+  Future<void> _showAddCategoryDialog(BuildContext context) async {
+    String categoryName = '';
+    String selectedColor = '#3B82F6'; // 默认蓝色
+
+    final List<String> predefinedColors = [
+      '#3B82F6', // 蓝色
+      '#10B981', // 绿色
+      '#F59E0B', // 橙色
+      '#EF4444', // 红色
+      '#8B5CF6', // 紫色
+      '#06B6D4', // 青色
+      '#84CC16', // 青绿色
+      '#F97316', // 橙红色
+    ];
+
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text('添加新的分类'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // 分类名称输入框
+                  TextField(
+                    decoration: InputDecoration(
+                      labelText: '分类名称',
+                      border: OutlineInputBorder(),
+                      hintText: '请输入分类名称',
+                    ),
+                    onChanged: (value) {
+                      categoryName = value;
+                    },
+                    autofocus: true,
+                  ),
+                  SizedBox(height: 16),
+                  // 颜色选择
+                  Text('选择颜色', style: Theme.of(context).textTheme.titleSmall),
+                  SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: predefinedColors.map((color) {
+                      final isSelected = selectedColor == color;
+                      return GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            selectedColor = color;
+                          });
+                        },
+                        child: Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: _parseColor(color),
+                            shape: BoxShape.circle,
+                            border: isSelected
+                                ? Border.all(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary,
+                                    width: 3,
+                                  )
+                                : null,
+                          ),
+                          child: isSelected
+                              ? Icon(Icons.check, color: Colors.white, size: 20)
+                              : null,
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ],
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: Text('取消'),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+                TextButton(
+                  child: Text('确定'),
+                  onPressed: () async {
+                    if (categoryName.trim().isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('请输入分类名称'),
+                          behavior: SnackBarBehavior.floating,
+                        ),
+                      );
+                      return;
+                    }
+
+                    try {
+                      // 添加分类到数据库
+                      await DatabaseQuery.instance.insertCategory({
+                        'name': categoryName.trim(),
+                        'color': selectedColor,
+                        'createdAt': DateTime.now().toIso8601String(),
+                      });
+
+                      // 重新加载分类数据
+                      await _loadCategories();
+
+                      Navigator.pop(context);
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('分类添加成功'),
+                          behavior: SnackBarBehavior.floating,
+                        ),
+                      );
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('添加分类失败: $e'),
+                          behavior: SnackBarBehavior.floating,
+                        ),
+                      );
+                    }
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
@@ -157,6 +295,8 @@ class _TodoPageState extends State<TodoPage> {
         tooltip: "添加一个Todo",
         child: Icon(Icons.add),
       ),
+      floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       body: ListView.builder(
         itemCount: todos?.length ?? 0,
         itemBuilder: (context, index) {
@@ -252,7 +392,9 @@ class _TodoPageState extends State<TodoPage> {
                       selected: selectedCategoryId == null,
                       onTap: () => _selectCategory(null, "全部"),
                       selectedColor: Theme.of(context).colorScheme.primary,
-                      selectedTileColor: Theme.of(context).colorScheme.surfaceContainer,
+                      selectedTileColor: Theme.of(
+                        context,
+                      ).colorScheme.surfaceContainer,
                     ),
                     // 未分类todos
                     ListTile(
@@ -261,7 +403,9 @@ class _TodoPageState extends State<TodoPage> {
                       selected: selectedCategoryId == -1,
                       onTap: () => _selectCategory(-1, "未分类"),
                       selectedColor: Theme.of(context).colorScheme.primary,
-                      selectedTileColor: Theme.of(context).colorScheme.surfaceContainer,
+                      selectedTileColor: Theme.of(
+                        context,
+                      ).colorScheme.surfaceContainer,
                     ),
                     if (categories != null && categories!.isNotEmpty) ...[
                       Divider(),
@@ -294,7 +438,9 @@ class _TodoPageState extends State<TodoPage> {
                           title: Text(category.name),
                           selected: isSelected,
                           selectedColor: Theme.of(context).colorScheme.primary,
-                          selectedTileColor: Theme.of(context).colorScheme.surfaceContainer,
+                          selectedTileColor: Theme.of(
+                            context,
+                          ).colorScheme.surfaceContainer,
                           onTap: () =>
                               _selectCategory(category.id, category.name),
                         );
@@ -305,8 +451,8 @@ class _TodoPageState extends State<TodoPage> {
                       leading: Icon(Icons.add),
                       title: Text("添加分类"),
                       onTap: () {
-                        // TODO: 添加分类功能
                         Navigator.pop(context);
+                        _showAddCategoryDialog(context);
                       },
                     ),
                   ],
