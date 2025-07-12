@@ -3,6 +3,8 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:material_color_utilities/material_color_utilities.dart';
 import 'package:todo_aeo/pages/todo_page.dart';
 import 'package:todo_aeo/tests/database_initializer.dart';
+import 'package:todo_aeo/pages/calendar_page.dart';
+import 'package:todo_aeo/pages/settings_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -11,7 +13,7 @@ void main() async {
 
   await DatabaseInitializer.initializeWithSampleData();
 
-  runApp(ToDo(palette: palette,));
+  runApp(ToDo(palette: palette));
 }
 
 class ToDo extends StatelessWidget {
@@ -22,13 +24,13 @@ class ToDo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: ToDoHomeFrame(title: "ToDo"),
+      home: ToDoHomeFrame(title: "ToDo Aeo"),
       title: "ToDo",
       theme: ThemeData(
         useMaterial3: true,
-        colorScheme: palette != null 
-          ? ColorScheme.fromSeed(seedColor: Color(palette!.primary.get(40)))
-          : null,
+        colorScheme: palette != null
+            ? ColorScheme.fromSeed(seedColor: Color(palette!.primary.get(40)))
+            : null,
       ),
       debugShowCheckedModeBanner: false,
     );
@@ -38,24 +40,42 @@ class ToDo extends StatelessWidget {
 class ToDoHomeFrame extends StatefulWidget {
   final String title;
 
-  const ToDoHomeFrame({super.key,required this.title});
+  const ToDoHomeFrame({super.key, required this.title});
 
   @override
   State<StatefulWidget> createState() => _ToDoHomeFrameState();
 }
 
 class _ToDoHomeFrameState extends State<ToDoHomeFrame> {
+  int _selectedIndex = 0;
+
+  final List<Widget> _pages = [TodoPage(), CalendarPage(), SettingsPage()];
+
   @override
   Widget build(BuildContext context) {
-    var colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: colorScheme.surface,
-      appBar: AppBar(
-        title: Text(widget.title, style: TextStyle(color: colorScheme.onPrimary)),
-        actions: [IconButton(onPressed: () {}, icon: Icon(Icons.menu, color: colorScheme.onPrimary,))],
-        backgroundColor: colorScheme.primary,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      body: _pages[_selectedIndex],
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _selectedIndex,
+        onDestinationSelected: (int index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+        },
+        indicatorShape: RoundedRectangleBorder(
+          borderRadius: BorderRadiusGeometry.circular(12),
+        ),
+        destinations: const <Widget>[
+          NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
+          NavigationDestination(
+            icon: Icon(Icons.calendar_month),
+            label: 'Calendar',
+          ),
+          NavigationDestination(icon: Icon(Icons.settings), label: 'Settings'),
+        ],
       ),
-      body: TodoPage(),
     );
   }
 }
