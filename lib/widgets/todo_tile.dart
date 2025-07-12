@@ -9,7 +9,7 @@ class TodoTile extends StatefulWidget {
     required this.description,
     required this.isCompleted,
     required this.createdAt,
-    required this.updatedAt,
+    required this.finishingAt,
     required this.updateCompetedFunction,
   });
 
@@ -18,7 +18,7 @@ class TodoTile extends StatefulWidget {
   final String description;
   final int isCompleted;
   final DateTime createdAt;
-  final DateTime updatedAt;
+  final DateTime finishingAt;
   final Function(bool, int) updateCompetedFunction;
 
   @override
@@ -49,11 +49,11 @@ class _TodoTileState extends State<TodoTile> {
       padding: EdgeInsetsGeometry.all(4),
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.primaryContainer,
+          color: isCompleted ? Theme.of(context).colorScheme.primaryContainer : Theme.of(context).colorScheme.errorContainer,
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.2),
+              color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.2),
               offset: Offset(0, 1),
               blurRadius: 1,
               spreadRadius: 0.5,
@@ -73,7 +73,7 @@ class _TodoTileState extends State<TodoTile> {
                   Text(
                     widget.title,
                     style: TextStyle(
-                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      color: isCompleted ? Theme.of(context).colorScheme.onPrimaryContainer : Theme.of(context).colorScheme.onErrorContainer,
                       fontWeight: FontWeight.w700,
                       fontSize: 20
                     ),
@@ -98,7 +98,7 @@ class _TodoTileState extends State<TodoTile> {
                       ),
                       Spacer(flex: 3,),
                       Text(
-                        "完成：${widget.updatedAt.year}-${widget.updatedAt.month}-${widget.updatedAt.day} ${widget.updatedAt.hour}:${widget.updatedAt.minute}",
+                        "完成：${widget.finishingAt.year}-${widget.finishingAt.month}-${widget.finishingAt.day} ${widget.finishingAt.hour}:${widget.finishingAt.minute}",
                         style: TextStyle(
                           color: Theme.of(
                             context,

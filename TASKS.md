@@ -131,7 +131,7 @@ type Task struct {
     Favorite    bool      `json:"favorite"`
     CategoryID  int       `json:"categoryId"`
     CreatedAt   time.Time `json:"createdAt"`
-    UpdatedAt   time.Time `json:"updatedAt"`
+    UpdatedAt   time.Time `json:"finishingAt"`
 }
 ```
 
@@ -142,7 +142,7 @@ type Category struct {
     ID        int       `json:"id"`
     Name      string    `json:"name"`
     CreatedAt time.Time `json:"createdAt"`
-    UpdatedAt time.Time `json:"updatedAt"`
+    UpdatedAt time.Time `json:"finishingAt"`
 }
 ```
 
@@ -155,7 +155,7 @@ type User struct {
     Email     string    `json:"email"`
     Password  string    `json:"password"`
     CreatedAt time.Time `json:"createdAt"`
-    UpdatedAt time.Time `json:"updatedAt"`
+    UpdatedAt time.Time `json:"finishingAt"`
 }
 ```
 

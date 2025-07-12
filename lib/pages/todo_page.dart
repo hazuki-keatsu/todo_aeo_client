@@ -101,7 +101,7 @@ class _TodoPageState extends State<TodoPage> {
             description: todos![index].description ?? "",
             isCompleted: todos![index].isCompleted == true ? 1 : 0,
             createdAt: todos![index].createdAt,
-            updatedAt: todos![index].updatedAt,
+            finishingAt: todos![index].finishingAt,
             updateCompetedFunction: _updateCompleted,
           );
         },
@@ -112,7 +112,7 @@ class _TodoPageState extends State<TodoPage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             DrawerHeader(
-              decoration: BoxDecoration(color: Theme.of(context).colorScheme.primaryContainer),
+              decoration: BoxDecoration(color: Theme.of(context).colorScheme.secondaryContainer),
               child: Column(
                 children: [
                   RichText(
@@ -125,7 +125,7 @@ class _TodoPageState extends State<TodoPage> {
                             fontWeight: FontWeight.bold,
                             color: Theme.of(
                               context,
-                            ).colorScheme.onPrimaryContainer,
+                            ).colorScheme.onSecondaryContainer,
                           ),
                         ),
                         TextSpan(
@@ -158,7 +158,7 @@ class _TodoPageState extends State<TodoPage> {
                   Text(
                     "A nice day meets you!",
                     style: TextStyle(
-                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      color: Theme.of(context).colorScheme.onSecondaryContainer,
                       fontWeight: FontWeight.w400,
                       fontSize: 18,
                       fontFamily: "cursive",

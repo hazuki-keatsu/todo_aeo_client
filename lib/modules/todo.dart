@@ -4,7 +4,7 @@ class Todo {
   final String? description;
   final bool isCompleted;
   final DateTime createdAt;
-  final DateTime updatedAt;
+  final DateTime finishingAt;
 
   Todo({
     this.id,
@@ -12,7 +12,7 @@ class Todo {
     this.description,
     this.isCompleted = false,
     required this.createdAt,
-    required this.updatedAt,
+    required this.finishingAt,
   });
 
   // 从数据库 Map 创建 Todo 对象
@@ -23,7 +23,7 @@ class Todo {
       description: map['description'] as String?,
       isCompleted: (map['isCompleted'] as int) == 1,
       createdAt: DateTime.parse(map['createdAt'] as String),
-      updatedAt: DateTime.parse(map['updatedAt'] as String),
+      finishingAt: DateTime.parse(map['finishingAt'] as String),
     );
   }
 
@@ -35,7 +35,7 @@ class Todo {
       'description': description,
       'isCompleted': isCompleted ? 1 : 0,
       'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt.toIso8601String(),
+      'finishingAt': finishingAt.toIso8601String(),
     };
   }
 }

@@ -31,7 +31,7 @@ class DatabaseQuery {
         description TEXT,
         isCompleted INTEGER NOT NULL DEFAULT 0,
         createdAt TEXT NOT NULL,
-        updatedAt TEXT NOT NULL
+        finishingAt TEXT NOT NULL
       )
     ''');
     

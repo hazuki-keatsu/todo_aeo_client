@@ -18,21 +18,21 @@ class DatabaseInitializer {
         'description': '完成 Todo 应用开发',
         'isCompleted': 0,
         'createdAt': DateTime.now().toIso8601String(),
-        'updatedAt': DateTime.now().toIso8601String(),
+        'finishingAt': DateTime.now().toIso8601String(),
       },
       {
         'title': '买菜',
         'description': '购买今晚晚餐的食材',
         'isCompleted': 0,
         'createdAt': DateTime.now().subtract(Duration(hours: 1)).toIso8601String(),
-        'updatedAt': DateTime.now().subtract(Duration(hours: 1)).toIso8601String(),
+        'finishingAt': DateTime.now().subtract(Duration(hours: 1)).toIso8601String(),
       },
       {
         'title': '锻炼身体',
         'description': '跑步 30 分钟',
         'isCompleted': 1,
         'createdAt': DateTime.now().subtract(Duration(days: 1)).toIso8601String(),
-        'updatedAt': DateTime.now().subtract(Duration(hours: 2)).toIso8601String(),
+        'finishingAt': DateTime.now().subtract(Duration(hours: 2)).toIso8601String(),
       },
     ];
     
