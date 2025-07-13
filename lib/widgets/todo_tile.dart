@@ -49,7 +49,7 @@ class _TodoTileState extends State<TodoTile> {
       padding: EdgeInsetsGeometry.all(4),
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: isCompleted ? Theme.of(context).colorScheme.primaryContainer : Theme.of(context).colorScheme.errorContainer,
+          color: isCompleted ? Theme.of(context).colorScheme.errorContainer : Theme.of(context).colorScheme.primaryContainer,
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
