@@ -98,6 +98,7 @@ class _TodoPageState extends State<TodoPage> {
           selectedCategoryName,
           style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
         ),
+        automaticallyImplyLeading: false,
         actions: <Widget>[
           Tooltip(
             message: "Todo 分组",
@@ -129,8 +130,12 @@ class _TodoPageState extends State<TodoPage> {
           builder: (context) {
             // 使用TodosSort进行分组
             final completionGroups = TodosSort.todosCompletion(todos);
-            final completedTodos = TodosSort.todosSortByFinishingTime(completionGroups[0]);
-            final uncompletedTodos = TodosSort.todosSortByFinishingTime(completionGroups[1]);
+            final completedTodos = TodosSort.todosSortByFinishingTime(
+              completionGroups[0],
+            );
+            final uncompletedTodos = TodosSort.todosSortByFinishingTime(
+              completionGroups[1],
+            );
 
             return SingleChildScrollView(
               child: Column(
@@ -142,10 +147,11 @@ class _TodoPageState extends State<TodoPage> {
                       padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                       child: Text(
                         '未完成 (${uncompletedTodos.length})',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.primary,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(
+                              color: Theme.of(context).colorScheme.primary,
+                              fontWeight: FontWeight.bold,
+                            ),
                       ),
                     ),
                     ListView.builder(
@@ -154,20 +160,17 @@ class _TodoPageState extends State<TodoPage> {
                       itemCount: uncompletedTodos.length,
                       itemBuilder: (context, index) {
                         final todo = uncompletedTodos[index];
-                        return Hero(
-                          tag: 'todo_${todo.id}_uncompleted',
-                          child: Material(
-                            type: MaterialType.transparency,
-                            child: TodoTile(
-                              key: ValueKey('uncompleted_${todo.id}'),
-                              id: todo.id,
-                              title: todo.title,
-                              description: todo.description ?? "",
-                              isCompleted: todo.isCompleted == true ? 1 : 0,
-                              createdAt: todo.createdAt,
-                              finishingAt: todo.finishingAt ?? DateTime.now(),
-                              updateCompetedFunction: _updateCompleted,
-                            ),
+                        return Material(
+                          type: MaterialType.transparency,
+                          child: TodoTile(
+                            key: ValueKey('uncompleted_${todo.id}'),
+                            id: todo.id,
+                            title: todo.title,
+                            description: todo.description ?? "",
+                            isCompleted: todo.isCompleted == true ? 1 : 0,
+                            createdAt: todo.createdAt,
+                            finishingAt: todo.finishingAt ?? DateTime.now(),
+                            updateCompetedFunction: _updateCompleted,
                           ),
                         );
                       },
@@ -175,15 +178,16 @@ class _TodoPageState extends State<TodoPage> {
                   ],
                   // 已完成的todos
                   if (completedTodos.isNotEmpty) ...[
-                    SizedBox(height: 16),
+                    if (uncompletedTodos.isNotEmpty) SizedBox(height: 16),
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                       child: Text(
                         '已完成 (${completedTodos.length})',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.outline,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(
+                              color: Theme.of(context).colorScheme.outline,
+                              fontWeight: FontWeight.bold,
+                            ),
                       ),
                     ),
                     ListView.builder(
@@ -192,20 +196,17 @@ class _TodoPageState extends State<TodoPage> {
                       itemCount: completedTodos.length,
                       itemBuilder: (context, index) {
                         final todo = completedTodos[index];
-                        return Hero(
-                          tag: 'todo_${todo.id}_completed',
-                          child: Material(
-                            type: MaterialType.transparency,
-                            child: TodoTile(
-                              key: ValueKey('completed_${todo.id}'),
-                              id: todo.id,
-                              title: todo.title,
-                              description: todo.description ?? "",
-                              isCompleted: todo.isCompleted == true ? 1 : 0,
-                              createdAt: todo.createdAt,
-                              finishingAt: todo.finishingAt ?? DateTime.now(),
-                              updateCompetedFunction: _updateCompleted,
-                            ),
+                        return Material(
+                          type: MaterialType.transparency,
+                          child: TodoTile(
+                            key: ValueKey('completed_${todo.id}'),
+                            id: todo.id,
+                            title: todo.title,
+                            description: todo.description ?? "",
+                            isCompleted: todo.isCompleted == true ? 1 : 0,
+                            createdAt: todo.createdAt,
+                            finishingAt: todo.finishingAt ?? DateTime.now(),
+                            updateCompetedFunction: _updateCompleted,
                           ),
                         );
                       },
@@ -226,9 +227,12 @@ class _TodoPageState extends State<TodoPage> {
                             SizedBox(height: 16),
                             Text(
                               '暂无待办事项',
-                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                color: Theme.of(context).colorScheme.outline,
-                              ),
+                              style: Theme.of(context).textTheme.titleMedium
+                                  ?.copyWith(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.outline,
+                                  ),
                             ),
                           ],
                         ),

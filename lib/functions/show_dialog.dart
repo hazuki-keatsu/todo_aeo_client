@@ -380,6 +380,31 @@ class ShowDialog {
     );
   }
 
+  static void showDeleteConfirmDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('确认删除'),
+          content: Text('确定要删除这个待办事项吗？'),
+          actions: [
+            TextButton(
+              child: Text('取消'),
+              onPressed: () => Navigator.pop(context),
+            ),
+            TextButton(
+              child: Text('删除', style: TextStyle(color: Colors.red)),
+              onPressed: () {
+                Navigator.pop(context);
+                // TODO: 实现删除逻辑
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   // 颜色解析
   static Color parseColor(String? colorString, BuildContext context) {
     if (colorString == null || colorString.isEmpty) {

@@ -1,5 +1,5 @@
 class Todo {
-  final int? id;
+  final int id;
   final String title;
   final String? description;
   final bool isCompleted;
@@ -8,7 +8,7 @@ class Todo {
   final DateTime? finishingAt;
 
   Todo({
-    this.id,
+    required this.id,
     required this.title,
     this.description,
     this.isCompleted = false,
@@ -20,7 +20,7 @@ class Todo {
   // 从数据库 Map 创建 Todo 对象
   factory Todo.fromMap(Map<String, dynamic> map) {
     return Todo(
-      id: map['id'] as int?,
+      id: map['id'] as int,
       title: map['title'] as String,
       description: map['description'] as String?,
       isCompleted: (map['isCompleted'] as int) == 1,
