@@ -18,8 +18,8 @@ class TodoTile extends StatefulWidget {
   final String description;
   final int isCompleted;
   final DateTime createdAt;
-  final DateTime finishingAt;
-  final Function(bool, int) updateCompetedFunction;
+  final DateTime? finishingAt;
+  final Function(bool, int?) updateCompetedFunction;
 
   @override
   State<TodoTile> createState() => _TodoTileState();
@@ -37,9 +37,7 @@ class _TodoTileState extends State<TodoTile> {
   void checkboxClick(bool value) {
     setState(() {
       isCompleted = value;
-      if (widget.id != null) {
-        widget.updateCompetedFunction(value, widget.id!);
-      }
+      widget.updateCompetedFunction(value, widget.id);
     });
   }
 
@@ -49,7 +47,7 @@ class _TodoTileState extends State<TodoTile> {
       padding: EdgeInsetsGeometry.all(4),
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: isCompleted ? Theme.of(context).colorScheme.errorContainer : Theme.of(context).colorScheme.primaryContainer,
+          color: isCompleted ? Theme.of(context).colorScheme.surfaceContainer : Theme.of(context).colorScheme.primaryContainer,
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
@@ -73,7 +71,7 @@ class _TodoTileState extends State<TodoTile> {
                   Text(
                     widget.title,
                     style: TextStyle(
-                      color: isCompleted ? Theme.of(context).colorScheme.onPrimaryContainer : Theme.of(context).colorScheme.onErrorContainer,
+                      color: isCompleted ? Theme.of(context).colorScheme.onSurface : Theme.of(context).colorScheme.onPrimaryContainer,
                       fontWeight: FontWeight.w700,
                       fontSize: 20
                     ),
@@ -97,14 +95,15 @@ class _TodoTileState extends State<TodoTile> {
                         ),
                       ),
                       Spacer(flex: 3,),
-                      Text(
-                        "完成：${widget.finishingAt.year}-${widget.finishingAt.month}-${widget.finishingAt.day} ${widget.finishingAt.hour}:${widget.finishingAt.minute}",
-                        style: TextStyle(
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.onPrimaryFixedVariant,
+                      if (widget.finishingAt != null)
+                        Text(
+                          "完成：${widget.finishingAt!.year}-${widget.finishingAt!.month}-${widget.finishingAt!.day} ${widget.finishingAt!.hour}:${widget.finishingAt!.minute}",
+                          style: TextStyle(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onPrimaryFixedVariant,
+                          ),
                         ),
-                      ),
                       Spacer(flex: 1,)
                     ],
                   ),

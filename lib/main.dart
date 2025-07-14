@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:material_color_utilities/material_color_utilities.dart';
+import 'package:provider/provider.dart';
 import 'package:todo_aeo/pages/todo_page.dart';
 import 'package:todo_aeo/tests/database_initializer.dart';
 import 'package:todo_aeo/pages/calendar_page.dart';
 import 'package:todo_aeo/pages/settings_page.dart';
+import 'package:todo_aeo/providers/todo_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,16 +25,19 @@ class ToDo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: ToDoHomeFrame(title: "ToDo Aeo"),
-      title: "ToDo",
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: palette != null
-            ? ColorScheme.fromSeed(seedColor: Color(palette!.primary.get(40)))
-            : null,
+    return ChangeNotifierProvider(
+      create: (context) => TodoProvider(),
+      child: MaterialApp(
+        home: ToDoHomeFrame(title: "ToDo Aeo"),
+        title: "ToDo",
+        theme: ThemeData(
+          useMaterial3: true,
+          colorScheme: palette != null
+              ? ColorScheme.fromSeed(seedColor: Color(palette!.primary.get(40)))
+              : null,
+        ),
+        debugShowCheckedModeBanner: false,
       ),
-      debugShowCheckedModeBanner: false,
     );
   }
 }
@@ -50,6 +55,15 @@ class _ToDoHomeFrameState extends State<ToDoHomeFrame> {
   int _selectedIndex = 0;
 
   final List<Widget> _pages = [TodoPage(), CalendarPage(), SettingsPage()];
+
+  @override
+  void initState() {
+    super.initState();
+    // 延迟初始化Provider数据，避免阻塞UI
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<TodoProvider>().init();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

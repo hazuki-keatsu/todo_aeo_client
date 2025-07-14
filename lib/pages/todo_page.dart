@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:todo_aeo/functions/database_query.dart';
+import 'package:provider/provider.dart';
 import 'package:todo_aeo/widgets/todo_tile.dart';
 import 'package:todo_aeo/modules/todo.dart';
 import 'package:todo_aeo/modules/category.dart';
+import 'package:todo_aeo/providers/todo_provider.dart';
 
 // TODO: 每次修改ToDo的完成情况时对List进行重建，重新进行排序，使用Hero动画
 // TODO: 添加ToDo删除时的动画
@@ -15,65 +16,54 @@ class TodoPage extends StatefulWidget {
 }
 
 class _TodoPageState extends State<TodoPage> {
-  List<Todo>? todos;
-  List<Category>? categories;
-  bool isLoading = true;
   int? selectedCategoryId; // null表示显示所有todos
   String selectedCategoryName = "全部";
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
-  void initState() {
-    super.initState();
-    _loadData();
-  }
+  Widget build(BuildContext context) {
+    return Consumer<TodoProvider>(
+      builder: (context, todoProvider, child) {
+        if (todoProvider.isLoading) {
+          return Scaffold(
+            key: _scaffoldKey,
+            appBar: AppBar(title: Text(selectedCategoryName)),
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
 
-  // 加载所有数据
-  Future<void> _loadData() async {
-    try {
-      await Future.wait([_loadTodos(), _loadCategories()]);
-      setState(() {
-        isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        isLoading = false;
-      });
-    }
-  }
+        if (todoProvider.error != null) {
+          return Scaffold(
+            key: _scaffoldKey,
+            appBar: AppBar(title: Text(selectedCategoryName)),
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('加载失败: ${todoProvider.error}'),
+                  SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                      todoProvider.clearError();
+                      todoProvider.refresh();
+                    },
+                    child: Text('重试'),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
 
-  // 加载todos
-  Future<void> _loadTodos() async {
-    List<Map<String, dynamic>> loadedTodos;
+        final todos = selectedCategoryId == null
+            ? todoProvider.todos ?? []
+            : todoProvider.getTodosByCategory(selectedCategoryId);
 
-    if (selectedCategoryId == null) {
-      loadedTodos = await DatabaseQuery.instance.getAllTodos();
-    } else if (selectedCategoryId == -1) {
-      // -1 表示未分类
-      loadedTodos = await DatabaseQuery.instance.getUncategorizedTodos();
-    } else {
-      loadedTodos = await DatabaseQuery.instance.getTodosByCategory(
-        selectedCategoryId!,
-      );
-    }
+        final categories = todoProvider.categories ?? [];
 
-    setState(() {
-      todos = List.generate(
-        loadedTodos.length,
-        (i) => Todo.fromMap(loadedTodos[i]),
-      );
-    });
-  }
-
-  // 加载分类
-  Future<void> _loadCategories() async {
-    final loadedCategories = await DatabaseQuery.instance.getAllCategories();
-    setState(() {
-      categories = List.generate(
-        loadedCategories.length,
-        (i) => Category.fromMap(loadedCategories[i]),
-      );
-    });
+        return _buildTodoPage(context, todos, categories, todoProvider);
+      },
+    );
   }
 
   // 选择分类
@@ -82,27 +72,15 @@ class _TodoPageState extends State<TodoPage> {
       selectedCategoryId = categoryId;
       selectedCategoryName = categoryName;
     });
-    _loadTodos();
     Navigator.pop(context); // 关闭侧边栏
   }
 
   // 完成数据的本地同步
   void _updateCompleted(bool value, int? id) {
-    try {
-      if (id == null) {
-        throw "empty id error";
-      }
-      final todoDatabaseInstance = DatabaseQuery.instance;
+    if (id == null) return;
 
-      setState(() {
-        todoDatabaseInstance.updateTodo({
-          'id': id,
-          'isCompleted': value == true ? 1 : 0,
-        });
-      });
-    } catch (e) {
-      print(e);
-    }
+    final provider = context.read<TodoProvider>();
+    provider.toggleTodoCompletion(id);
   }
 
   // 颜色解析
@@ -126,7 +104,10 @@ class _TodoPageState extends State<TodoPage> {
     return Theme.of(context).colorScheme.primary;
   }
 
-  Future<void> _showAddTodoDialog(BuildContext context) async {
+  Future<void> _showAddTodoDialog(
+    BuildContext context,
+    TodoProvider provider,
+  ) async {
     String todoName = '';
     String todoDescription = '';
     int? selectedCategoryId;
@@ -134,6 +115,7 @@ class _TodoPageState extends State<TodoPage> {
 
     // 保存主页面的context
     final scaffoldContext = context;
+    final categories = provider.categories ?? [];
 
     return showDialog<void>(
       context: context,
@@ -165,7 +147,7 @@ class _TodoPageState extends State<TodoPage> {
                         labelText: '待办事项描述(可选)',
                         border: OutlineInputBorder(),
                         hintText: '请输入待办事项描述',
-                        alignLabelWithHint: true
+                        alignLabelWithHint: true,
                       ),
                       maxLines: 3,
                       onChanged: (value) {
@@ -192,8 +174,8 @@ class _TodoPageState extends State<TodoPage> {
                             value: null,
                             child: Text('  无分类'),
                           ),
-                          if (categories != null)
-                            ...categories!.map((category) {
+                          if (categories.isNotEmpty)
+                            ...categories.map((category) {
                               return DropdownMenuItem<int?>(
                                 value: category.id,
                                 child: Row(
@@ -251,7 +233,9 @@ class _TodoPageState extends State<TodoPage> {
                           vertical: 16,
                         ),
                         decoration: BoxDecoration(
-                          border: Border.all(color: Theme.of(context).hintColor),
+                          border: Border.all(
+                            color: Theme.of(context).hintColor,
+                          ),
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Row(
@@ -311,10 +295,7 @@ class _TodoPageState extends State<TodoPage> {
                       };
 
                       // 添加到数据库
-                      await DatabaseQuery.instance.insertTodo(todoData);
-
-                      // 重新加载todos
-                      await _loadTodos();
+                      await provider.addTodo(todoData);
 
                       if (dialogContext.mounted) {
                         Navigator.pop(dialogContext);
@@ -354,7 +335,11 @@ class _TodoPageState extends State<TodoPage> {
 
   Future<void> _showAddCategoryDialog(BuildContext context) async {
     String categoryName = '';
-    String selectedColor = '#3B82F6'; // 默认蓝色
+    String selectedColor = '#3B82F6';
+
+    // 保存主页面的context
+    final scaffoldContext = context;
+    final provider = context.read<TodoProvider>(); // 默认蓝色
 
     final List<String> predefinedColors = [
       '#3B82F6', // 蓝色
@@ -452,18 +437,18 @@ class _TodoPageState extends State<TodoPage> {
 
                     try {
                       // 添加分类到数据库
-                      await DatabaseQuery.instance.insertCategory({
+                      await provider.addCategory({
                         'name': categoryName.trim(),
                         'color': selectedColor,
                         'createdAt': DateTime.now().toIso8601String(),
                       });
 
-                      // 重新加载分类数据
-                      await _loadCategories();
-
                       if (dialogContext.mounted) {
                         Navigator.pop(dialogContext);
-                        ScaffoldMessenger.of(dialogContext).showSnackBar(
+                      }
+
+                      if (scaffoldContext.mounted) {
+                        ScaffoldMessenger.of(scaffoldContext).showSnackBar(
                           SnackBar(
                             content: Text('分类添加成功'),
                             behavior: SnackBarBehavior.floating,
@@ -472,7 +457,10 @@ class _TodoPageState extends State<TodoPage> {
                       }
                     } catch (e) {
                       if (dialogContext.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
+                        Navigator.pop(dialogContext);
+                      }
+                      if (scaffoldContext.mounted) {
+                        ScaffoldMessenger.of(scaffoldContext).showSnackBar(
                           SnackBar(
                             content: Text('添加分类失败: $e'),
                             behavior: SnackBarBehavior.floating,
@@ -490,12 +478,12 @@ class _TodoPageState extends State<TodoPage> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    if (isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
+  Widget _buildTodoPage(
+    BuildContext context,
+    List<Todo> todos,
+    List<Category> categories,
+    TodoProvider provider,
+  ) {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
@@ -521,177 +509,183 @@ class _TodoPageState extends State<TodoPage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          _showAddTodoDialog(context);
+          _showAddTodoDialog(context, provider);
         },
         tooltip: "添加一个Todo",
         child: Icon(Icons.add),
       ),
       floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      body: ListView.builder(
-        itemCount: todos?.length ?? 0,
-        itemBuilder: (context, index) {
-          return TodoTile(
-            id: todos![index].id,
-            title: todos![index].title,
-            description: todos![index].description ?? "",
-            isCompleted: todos![index].isCompleted == true ? 1 : 0,
-            createdAt: todos![index].createdAt,
-            finishingAt: todos![index].finishingAt,
-            updateCompetedFunction: _updateCompleted,
-          );
-        },
+      body: Padding(
+        padding: EdgeInsetsGeometry.all(8),
+        child: ListView.builder(
+          itemCount: todos.length,
+          itemBuilder: (context, index) {
+            return TodoTile(
+              id: todos[index].id,
+              title: todos[index].title,
+              description: todos[index].description ?? "",
+              isCompleted: todos[index].isCompleted == true ? 1 : 0,
+              createdAt: todos[index].createdAt,
+              finishingAt: todos[index].finishingAt ?? DateTime.now(),
+              updateCompetedFunction: _updateCompleted,
+            );
+          },
+        ),
       ),
-      endDrawer: Drawer(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            DrawerHeader(
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.secondaryContainer,
-              ),
+      endDrawer: _buildDrawer(context, categories),
+    );
+  }
+
+  Widget _buildDrawer(BuildContext context, List<Category> categories) {
+    return Drawer(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          DrawerHeader(
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.secondaryContainer,
+            ),
+            child: Column(
+              children: [
+                RichText(
+                  text: TextSpan(
+                    children: [
+                      TextSpan(
+                        text: "Todo ",
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.onSecondaryContainer,
+                        ),
+                      ),
+                      TextSpan(
+                        text: "A",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF3B82F6),
+                        ),
+                      ),
+                      TextSpan(
+                        text: "E",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF10B981),
+                        ),
+                      ),
+                      TextSpan(
+                        text: "O",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFFF59E0B),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Text(
+                  "A nice day meets you!",
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSecondaryContainer,
+                    fontWeight: FontWeight.w400,
+                    fontSize: 18,
+                    fontFamily: "cursive",
+                  ),
+                ),
+                TextButton.icon(
+                  onPressed: () {},
+                  label: Text("关于"),
+                  icon: Icon(Icons.info_outline),
+                ),
+              ],
+            ),
+          ),
+          // 分类列表
+          Expanded(
+            child: SingleChildScrollView(
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  RichText(
-                    text: TextSpan(
-                      children: [
-                        TextSpan(
-                          text: "Todo ",
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.onSecondaryContainer,
-                          ),
-                        ),
-                        TextSpan(
-                          text: "A",
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF3B82F6),
-                          ),
-                        ),
-                        TextSpan(
-                          text: "E",
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF10B981),
-                          ),
-                        ),
-                        TextSpan(
-                          text: "O",
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFFF59E0B),
-                          ),
-                        ),
-                      ],
-                    ),
+                  // 全部todos
+                  ListTile(
+                    leading: Icon(Icons.list),
+                    title: Text("全部"),
+                    selected: selectedCategoryId == null,
+                    onTap: () => _selectCategory(null, "全部"),
+                    selectedColor: Theme.of(context).colorScheme.primary,
+                    selectedTileColor: Theme.of(
+                      context,
+                    ).colorScheme.surfaceContainer,
                   ),
-                  Text(
-                    "A nice day meets you!",
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSecondaryContainer,
-                      fontWeight: FontWeight.w400,
-                      fontSize: 18,
-                      fontFamily: "cursive",
-                    ),
+                  // 未分类todos
+                  ListTile(
+                    leading: Icon(Icons.label_off),
+                    title: Text("未分类"),
+                    selected: selectedCategoryId == -1,
+                    onTap: () => _selectCategory(-1, "未分类"),
+                    selectedColor: Theme.of(context).colorScheme.primary,
+                    selectedTileColor: Theme.of(
+                      context,
+                    ).colorScheme.surfaceContainer,
                   ),
-                  TextButton.icon(
-                    onPressed: () {},
-                    label: Text("关于"),
-                    icon: Icon(Icons.info_outline),
+                  if (categories.isNotEmpty) ...[
+                    Divider(),
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                      child: Text(
+                        "分类",
+                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                    ),
+                    ...categories.map((category) {
+                      final isSelected = selectedCategoryId == category.id;
+                      return ListTile(
+                        leading: Container(
+                          width: 24,
+                          height: 24,
+                          decoration: BoxDecoration(
+                            color: category.color != null
+                                ? _parseColor(category.color)
+                                : Theme.of(context).colorScheme.primary,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        title: Text(category.name),
+                        selected: isSelected,
+                        selectedColor: Theme.of(context).colorScheme.primary,
+                        selectedTileColor: Theme.of(
+                          context,
+                        ).colorScheme.surfaceContainer,
+                        onTap: () =>
+                            _selectCategory(category.id, category.name),
+                      );
+                    }),
+                  ],
+                  Divider(),
+                  ListTile(
+                    leading: Icon(Icons.add),
+                    title: Text("添加分类"),
+                    onTap: () {
+                      Navigator.pop(context);
+                      _showAddCategoryDialog(context);
+                    },
                   ),
                 ],
               ),
             ),
-            // 分类列表
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // 全部todos
-                    ListTile(
-                      leading: Icon(Icons.list),
-                      title: Text("全部"),
-                      selected: selectedCategoryId == null,
-                      onTap: () => _selectCategory(null, "全部"),
-                      selectedColor: Theme.of(context).colorScheme.primary,
-                      selectedTileColor: Theme.of(
-                        context,
-                      ).colorScheme.surfaceContainer,
-                    ),
-                    // 未分类todos
-                    ListTile(
-                      leading: Icon(Icons.label_off),
-                      title: Text("未分类"),
-                      selected: selectedCategoryId == -1,
-                      onTap: () => _selectCategory(-1, "未分类"),
-                      selectedColor: Theme.of(context).colorScheme.primary,
-                      selectedTileColor: Theme.of(
-                        context,
-                      ).colorScheme.surfaceContainer,
-                    ),
-                    if (categories != null && categories!.isNotEmpty) ...[
-                      Divider(),
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
-                        ),
-                        child: Text(
-                          "分类",
-                          style: Theme.of(context).textTheme.titleSmall
-                              ?.copyWith(
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
-                        ),
-                      ),
-                      ...categories!.map((category) {
-                        final isSelected = selectedCategoryId == category.id;
-                        return ListTile(
-                          leading: Container(
-                            width: 24,
-                            height: 24,
-                            decoration: BoxDecoration(
-                              color: category.color != null
-                                  ? _parseColor(category.color)
-                                  : Theme.of(context).colorScheme.primary,
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                          title: Text(category.name),
-                          selected: isSelected,
-                          selectedColor: Theme.of(context).colorScheme.primary,
-                          selectedTileColor: Theme.of(
-                            context,
-                          ).colorScheme.surfaceContainer,
-                          onTap: () =>
-                              _selectCategory(category.id, category.name),
-                        );
-                      }),
-                    ],
-                    Divider(),
-                    ListTile(
-                      leading: Icon(Icons.add),
-                      title: Text("添加分类"),
-                      onTap: () {
-                        Navigator.pop(context);
-                        _showAddCategoryDialog(context);
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
