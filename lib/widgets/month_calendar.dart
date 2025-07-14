@@ -76,10 +76,12 @@ class _MonthCalendarState extends State<MonthCalendar> {
 
   // 检查日期是否被标记
   bool _isDateMarked(DateTime date) {
-    return _markedDates.any((markedDate) =>
-        date.year == markedDate.year &&
-        date.month == markedDate.month &&
-        date.day == markedDate.day);
+    return _markedDates.any(
+      (markedDate) =>
+          date.year == markedDate.year &&
+          date.month == markedDate.month &&
+          date.day == markedDate.day,
+    );
   }
 
   // 检查日期是否是今天
@@ -128,129 +130,150 @@ class _MonthCalendarState extends State<MonthCalendar> {
   @override
   Widget build(BuildContext context) {
     final List<DateTime> calendarData = _generateCalendarData();
-    final Color selectedColor = widget.selectedDateColor ?? Theme.of(context).primaryColor;
+    final Color selectedColor =
+        widget.selectedDateColor ?? Theme.of(context).primaryColor;
     final Color todayHighlightColor = widget.todayColor ?? Colors.green;
     final Color markedColor = widget.markedDateColor ?? Colors.red;
 
-    return Column(
-      children: [
-        // 月份导航栏
-        Container(
-          padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.chevron_left),
-                onPressed: _prevMonth,
-              ),
-              Text(
-                DateFormat('MMMM yyyy').format(_currentDate),
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              IconButton(
-                icon: const Icon(Icons.chevron_right),
-                onPressed: _nextMonth,
-              ),
-            ],
-          ),
-        ),
-
-        // 星期标题
-        Container(
-          decoration: BoxDecoration(
-            border: Border(
-              bottom: BorderSide(color: Colors.grey.shade300),
+    return AspectRatio(
+      aspectRatio: 12 / 13,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.primaryContainer,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Theme.of(
+                context,
+              ).colorScheme.shadow.withValues(alpha: 0.2),
+              offset: Offset(0, 1),
+              blurRadius: 1,
+              spreadRadius: 0.5,
             ),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              for (int i = 1; i <= 7; i++)
-                Expanded(
-                  child: Center(
-                    child: Text(
-                      DateFormat.E().format(DateTime(2023, 1, i)),
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey.shade700,
-                      ),
+          ],
+        ),
+        child: Column(
+          children: [
+            // 月份导航栏
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.chevron_left),
+                    onPressed: _prevMonth,
+                  ),
+                  Text(
+                    DateFormat('MMMM yyyy').format(_currentDate),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                ),
-            ],
-          ),
-        ),
-
-        // 日历网格
-        Expanded(
-          child: GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 7,
-              childAspectRatio: 1.0,
-            ),
-            itemCount: calendarData.length,
-            itemBuilder: (context, index) {
-              final DateTime date = calendarData[index];
-              final bool isCurrentMonth = _isCurrentMonth(date);
-              final bool isToday = _isToday(date);
-              final bool isSelected = _isDateSelected(date);
-              final bool isMarked = _isDateMarked(date);
-
-              return GestureDetector(
-                onTap: () => _onDateTap(date),
-                child: Container(
-                  margin: const EdgeInsets.all(4.0),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: isSelected
-                        ? selectedColor
-                        : isToday
-                            ? todayHighlightColor.withValues(alpha: 0.2)
-                            : null,
-                    border: isToday && !isSelected
-                        ? Border.all(color: todayHighlightColor, width: 2)
-                        : null,
+                  IconButton(
+                    icon: const Icon(Icons.chevron_right),
+                    onPressed: _nextMonth,
                   ),
-                  child: Center(
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        Text(
-                          date.day.toString(),
+                ],
+              ),
+            ),
+
+            // 星期标题
+            Container(
+              decoration: BoxDecoration(
+                border: Border(bottom: BorderSide(color: Colors.grey.shade300)),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  for (int i = 1; i <= 7; i++)
+                    Expanded(
+                      child: Center(
+                        child: Text(
+                          DateFormat.E().format(DateTime(2023, 1, i)),
                           style: TextStyle(
-                            color: isCurrentMonth
-                                ? isSelected
-                                    ? Colors.white
-                                    : null
-                                : Colors.grey.shade400,
-                            fontWeight: isToday ? FontWeight.bold : null,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey.shade700,
                           ),
                         ),
-                        // 标记点
-                        if (isMarked && !isSelected)
-                          Positioned(
-                            bottom: 2,
-                            child: Container(
-                              width: 4,
-                              height: 4,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: markedColor,
+                      ),
+                    ),
+                ],
+              ),
+            ),
+
+            // 日历网格
+            Expanded(
+              child: GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 7,
+                  childAspectRatio: 1.0,
+                ),
+                itemCount: calendarData.length,
+                itemBuilder: (context, index) {
+                  final DateTime date = calendarData[index];
+                  final bool isCurrentMonth = _isCurrentMonth(date);
+                  final bool isToday = _isToday(date);
+                  final bool isSelected = _isDateSelected(date);
+                  final bool isMarked = _isDateMarked(date);
+
+                  return GestureDetector(
+                    onTap: () => _onDateTap(date),
+                    child: Container(
+                      margin: const EdgeInsets.all(4.0),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: isSelected
+                            ? selectedColor
+                            : isToday
+                            ? todayHighlightColor.withValues(alpha: 0.2)
+                            : null,
+                        border: isToday && !isSelected
+                            ? Border.all(color: todayHighlightColor, width: 2)
+                            : null,
+                      ),
+                      child: Center(
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            Text(
+                              date.day.toString(),
+                              style: TextStyle(
+                                color: isCurrentMonth
+                                    ? isSelected
+                                          ? Colors.white
+                                          : null
+                                    : Colors.grey.shade400,
+                                fontWeight: isToday ? FontWeight.bold : null,
                               ),
                             ),
-                          ),
-                      ],
+                            // 标记点
+                            if (isMarked && !isSelected)
+                              Positioned(
+                                bottom: 2,
+                                child: Container(
+                                  width: 4,
+                                  height: 4,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: markedColor,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              );
-            },
-          ),
+                  );
+                },
+              ),
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }

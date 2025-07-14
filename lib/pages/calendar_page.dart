@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:todo_aeo/functions/show_dialog.dart';
 import 'package:todo_aeo/providers/todo_provider.dart';
 import 'package:todo_aeo/widgets/month_calendar.dart';
 
@@ -34,24 +35,20 @@ class _CalendarPageState extends State<CalendarPage> {
             backgroundColor: Theme.of(context).colorScheme.primary,
             foregroundColor: Theme.of(context).colorScheme.onPrimary,
           ),
-          body: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              children: [
-                Expanded(
-                  child: MonthCalendar(
-                    onDateSelected: (date) {
-                      print('选中日期: ${date.toString()}');
-                    },
-                    markedDates: [
-                      DateTime.now().add(const Duration(days: 2)),
-                      DateTime.now().add(const Duration(days: 6)),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+          body: Container(
+            alignment: Alignment(0, -1),
+            padding: EdgeInsets.all(8),
+            child: MonthCalendar(),
           ),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () {
+              ShowDialog.showAddTodoDialog(context, todoProvider);
+            },
+            tooltip: "添加一个Todo",
+            child: Icon(Icons.add),
+          ),
+          floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
+          floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
         );
       },
     );

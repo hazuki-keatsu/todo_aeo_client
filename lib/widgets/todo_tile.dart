@@ -44,7 +44,7 @@ class _TodoTileState extends State<TodoTile> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsetsGeometry.all(4),
+      padding: EdgeInsetsGeometry.fromLTRB(0, 4, 0, 4),
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: isCompleted ? Theme.of(context).colorScheme.surfaceContainer : Theme.of(context).colorScheme.primaryContainer,
