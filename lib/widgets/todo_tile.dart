@@ -41,8 +41,10 @@ class _TodoTileState extends State<TodoTile> {
     });
   }
 
+  // TODO:添加空白区域点击收起Sheet
   void _showOptionsBottomSheet(int id) {
     showBottomSheet(
+      showDragHandle: true,
       context: context,
       builder: (BuildContext context) {
         return SafeArea(

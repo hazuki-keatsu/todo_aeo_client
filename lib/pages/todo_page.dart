@@ -6,6 +6,7 @@ import 'package:todo_aeo/widgets/todo_tile.dart';
 import 'package:todo_aeo/modules/todo.dart';
 import 'package:todo_aeo/modules/category.dart';
 import 'package:todo_aeo/providers/todo_provider.dart';
+import 'package:todo_aeo/modules/page_components.dart';
 
 // TODO: 每次修改ToDo的完成情况时对List进行重建，重新进行排序，使用Hero动画
 // TODO: 添加ToDo删除时的动画
@@ -92,7 +93,6 @@ class _TodoPageState extends State<TodoPage> {
     TodoProvider provider,
   ) {
     return Scaffold(
-      key: _scaffoldKey,
       appBar: AppBar(
         title: Text(
           selectedCategoryName,
