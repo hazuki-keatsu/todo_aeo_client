@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:todo_aeo/functions/data_refresh.dart';
 import 'package:todo_aeo/providers/todo_provider.dart';
 import 'package:todo_aeo/providers/scaffold_elements_notifier.dart';
 
@@ -20,8 +21,11 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   void _updateScaffoldElements() {
-    final scaffoldElements = Provider.of<ScaffoldElementsNotifier>(context, listen: false);
-    
+    final scaffoldElements = Provider.of<ScaffoldElementsNotifier>(
+      context,
+      listen: false,
+    );
+
     scaffoldElements.updateElements(
       appBar: AppBar(
         title: Text('设置'),
@@ -41,137 +45,116 @@ class _SettingsPageState extends State<SettingsPage> {
         });
 
         final totalTodos = todoProvider.todos?.length ?? 0;
-        final completedTodos = todoProvider.todos?.where((todo) => todo.isCompleted).length ?? 0;
+        final completedTodos =
+            todoProvider.todos?.where((todo) => todo.isCompleted).length ?? 0;
         final totalCategories = todoProvider.categories?.length ?? 0;
 
         return ListView(
-          padding: EdgeInsets.all(16),
+          padding: EdgeInsets.all(8),
           children: [
             // 统计信息卡片
-              Card(
-                child: Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '统计信息',
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                      SizedBox(height: 16),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          _buildStatItem(
-                            context,
-                            '总待办',
-                            totalTodos.toString(),
-                            Icons.list,
-                          ),
-                          _buildStatItem(
-                            context,
-                            '已完成',
-                            completedTodos.toString(),
-                            Icons.check_circle,
-                          ),
-                          _buildStatItem(
-                            context,
-                            '分类数',
-                            totalCategories.toString(),
-                            Icons.label,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              SizedBox(height: 16),
-              // 数据管理
-              Card(
+            Card(
+              child: Padding(
+                padding: EdgeInsets.all(16),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    ListTile(
-                      leading: Icon(Icons.refresh),
-                      title: Text('刷新数据'),
-                      subtitle: Text('重新加载所有数据'),
-                      onTap: () async {
-                        try {
-                          await todoProvider.refresh();
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('数据刷新成功'),
-                              behavior: SnackBarBehavior.floating,
-                            ),
-                          );
-                        } catch (e) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('刷新失败: $e'),
-                              behavior: SnackBarBehavior.floating,
-                            ),
-                          );
-                        }
-                      },
-                    ),
-                    Divider(height: 1),
-                    ListTile(
-                      leading: Icon(Icons.info_outline),
-                      title: Text('关于应用'),
-                      subtitle: Text('Todo AEO v1.0'),
-                      onTap: () {
-                        showAboutDialog(
-                          context: context,
-                          applicationName: 'Todo AEO',
-                          applicationVersion: '1.0.0',
-                          applicationIcon: Icon(Icons.check_circle),
-                          children: [
-                            Text('一个简洁美观的待办事项管理应用'),
-                            SizedBox(height: 8),
-                            Text('使用 Flutter 和 Material You 设计'),
-                          ],
-                        );
-                      },
+                    Text('统计信息', style: Theme.of(context).textTheme.titleLarge),
+                    SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        _buildStatItem(
+                          context,
+                          '总待办',
+                          totalTodos.toString(),
+                          Icons.list,
+                        ),
+                        _buildStatItem(
+                          context,
+                          '已完成',
+                          completedTodos.toString(),
+                          Icons.check_circle,
+                        ),
+                        _buildStatItem(
+                          context,
+                          '分类数',
+                          totalCategories.toString(),
+                          Icons.label,
+                        ),
+                      ],
                     ),
                   ],
                 ),
               ),
-              SizedBox(height: 16),
-              // 应用信息
-              Card(
-                child: Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '应用信息',
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                      SizedBox(height: 16),
-                      _buildInfoRow('版本', '1.0.0'),
-                      _buildInfoRow('框架', 'Flutter'),
-                      _buildInfoRow('设计', 'Material You'),
-                      if (todoProvider.error != null)
-                        _buildInfoRow('状态', '错误: ${todoProvider.error}'),
-                    ],
+            ),
+            SizedBox(height: 16),
+            // 数据管理
+            Card(
+              child: Column(
+                children: [
+                  ListTile(
+                    leading: Icon(Icons.refresh),
+                    title: Text('刷新数据'),
+                    subtitle: Text('重新加载所有数据'),
+                    onTap: () => dataRefresh(todoProvider, context),
                   ),
+                  Divider(height: 1),
+                  ListTile(
+                    leading: Icon(Icons.info_outline),
+                    title: Text('关于应用'),
+                    subtitle: Text('Todo AEO v1.0'),
+                    onTap: () {
+                      showAboutDialog(
+                        context: context,
+                        applicationName: 'Todo AEO',
+                        applicationVersion: '1.0.0',
+                        applicationIcon: Icon(Icons.check_circle, size: 48,),
+                        children: [
+                          Text('一个简洁美观的待办事项管理应用'),
+                          SizedBox(height: 8),
+                          Text('使用 Flutter 和 Material You 设计'),
+                        ],
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 16),
+            // 应用信息
+            Card(
+              child: Padding(
+                padding: EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('应用信息', style: Theme.of(context).textTheme.titleLarge),
+                    SizedBox(height: 16),
+                    _buildInfoRow('版本', '1.0.0'),
+                    _buildInfoRow('框架', 'Flutter'),
+                    _buildInfoRow('设计', 'Material You'),
+                    if (todoProvider.error != null)
+                      _buildInfoRow('状态', '错误: ${todoProvider.error}'),
+                  ],
                 ),
               ),
-            ],
-          );
+            ),
+          ],
+        );
       },
     );
   }
 
-  Widget _buildStatItem(BuildContext context, String label, String value, IconData icon) {
+  Widget _buildStatItem(
+    BuildContext context,
+    String label,
+    String value,
+    IconData icon,
+  ) {
     return Column(
       children: [
-        Icon(
-          icon,
-          size: 32,
-          color: Theme.of(context).colorScheme.primary,
-        ),
+        Icon(icon, size: 32, color: Theme.of(context).colorScheme.primary),
         SizedBox(height: 8),
         Text(
           value,
@@ -180,10 +163,7 @@ class _SettingsPageState extends State<SettingsPage> {
             color: Theme.of(context).colorScheme.primary,
           ),
         ),
-        Text(
-          label,
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
+        Text(label, style: Theme.of(context).textTheme.bodySmall),
       ],
     );
   }
@@ -195,10 +175,7 @@ class _SettingsPageState extends State<SettingsPage> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label),
-          Text(
-            value,
-            style: TextStyle(fontWeight: FontWeight.w500),
-          ),
+          Text(value, style: TextStyle(fontWeight: FontWeight.w500)),
         ],
       ),
     );

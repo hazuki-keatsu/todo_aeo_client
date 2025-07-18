@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:todo_aeo/functions/data_refresh.dart';
 import 'package:todo_aeo/functions/todos_sort.dart';
 import 'package:provider/provider.dart';
 import 'package:todo_aeo/functions/show_dialog.dart';
@@ -9,7 +10,7 @@ import 'package:todo_aeo/providers/todo_provider.dart';
 import 'package:todo_aeo/providers/scaffold_elements_notifier.dart';
 
 // TODO: 每次修改ToDo的完成情况时对List进行重建，重新进行排序，使用Hero动画
-// TODO: 添加ToDo删除时的动画
+// TODO: 修复Fab闪烁问题
 
 class TodoPage extends StatefulWidget {
   const TodoPage({super.key});
@@ -150,7 +151,7 @@ class _TodoPageState extends State<TodoPage> {
   ) {
     return FloatingActionButton(
       onPressed: () {
-        ShowDialog.showAddTodoDialog(context, provider);
+        ShowDialog.showTodoDialog(context, provider);
       },
       tooltip: "添加一个Todo",
       child: Icon(Icons.add),
@@ -172,110 +173,116 @@ class _TodoPageState extends State<TodoPage> {
       completionGroups[1],
     );
 
-    return Padding(
-      padding: EdgeInsetsGeometry.fromLTRB(8, 4, 8, 8),
-      child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // 未完成的todos
-            if (uncompletedTodos.isNotEmpty) ...[
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                child: Text(
-                  '未完成 (${uncompletedTodos.length})',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.primary,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              ListView.builder(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                itemCount: uncompletedTodos.length,
-                itemBuilder: (context, index) {
-                  final todo = uncompletedTodos[index];
-                  return Material(
-                    type: MaterialType.transparency,
-                    child: TodoTile(
-                      key: ValueKey('uncompleted_${todo.id}'),
-                      id: todo.id,
-                      title: todo.title,
-                      description: todo.description ?? "",
-                      isCompleted: todo.isCompleted == true ? 1 : 0,
-                      createdAt: todo.createdAt,
-                      finishingAt: todo.finishingAt ?? DateTime.now(),
-                      updateCompetedFunction: _updateCompleted,
-                      categoryName: _getCategoryName(todo.categoryId),
-                      categoryColor: _getCategoryColor(todo.categoryId),
+    return RefreshIndicator(
+      onRefresh: () => dataRefresh(provider, context),
+      child: Padding(
+        padding: EdgeInsetsGeometry.fromLTRB(8, 4, 8, 8),
+        child: SingleChildScrollView(
+          physics: AlwaysScrollableScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 未完成的todos
+              if (uncompletedTodos.isNotEmpty) ...[
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                  child: Text(
+                    '未完成 (${uncompletedTodos.length})',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.primary,
+                      fontWeight: FontWeight.bold,
                     ),
-                  );
-                },
-              ),
-            ],
-            // 已完成的todos
-            if (completedTodos.isNotEmpty) ...[
-              if (uncompletedTodos.isNotEmpty) SizedBox(height: 16),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                child: Text(
-                  '已完成 (${completedTodos.length})',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.outline,
-                    fontWeight: FontWeight.bold,
                   ),
                 ),
-              ),
-              ListView.builder(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                itemCount: completedTodos.length,
-                itemBuilder: (context, index) {
-                  final todo = completedTodos[index];
-                  return Material(
-                    type: MaterialType.transparency,
-                    child: TodoTile(
-                      key: ValueKey('completed_${todo.id}'),
-                      id: todo.id,
-                      title: todo.title,
-                      description: todo.description ?? "",
-                      isCompleted: todo.isCompleted == true ? 1 : 0,
-                      createdAt: todo.createdAt,
-                      finishingAt: todo.finishingAt ?? DateTime.now(),
-                      updateCompetedFunction: _updateCompleted,
-                      categoryName: _getCategoryName(todo.categoryId),
-                      categoryColor: _getCategoryColor(todo.categoryId),
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  itemCount: uncompletedTodos.length,
+                  itemBuilder: (context, index) {
+                    final todo = uncompletedTodos[index];
+                    return Material(
+                      type: MaterialType.transparency,
+                      child: TodoTile(
+                        key: ValueKey('uncompleted_${todo.id}'),
+                        id: todo.id,
+                        title: todo.title,
+                        description: todo.description ?? "",
+                        isCompleted: todo.isCompleted == true ? 1 : 0,
+                        createdAt: todo.createdAt,
+                        finishingAt: todo.finishingAt ?? DateTime.now(),
+                        updateCompetedFunction: _updateCompleted,
+                        categoryName: _getCategoryName(todo.categoryId),
+                        categoryColor: _getCategoryColor(todo.categoryId),
+                        todoProvider: provider,
+                      ),
+                    );
+                  },
+                ),
+              ],
+              // 已完成的todos
+              if (completedTodos.isNotEmpty) ...[
+                if (uncompletedTodos.isNotEmpty) SizedBox(height: 16),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                  child: Text(
+                    '已完成 (${completedTodos.length})',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      color: Theme.of(context).colorScheme.outline,
+                      fontWeight: FontWeight.bold,
                     ),
-                  );
-                },
-              ),
-            ],
-            // 空状态提示
-            if (todos.isEmpty)
-              Center(
-                child: Padding(
-                  padding: EdgeInsets.all(32),
-                  child: Column(
-                    children: [
-                      Icon(
-                        Icons.task_alt,
-                        size: 64,
-                        color: Theme.of(context).colorScheme.outline,
-                      ),
-                      SizedBox(height: 16),
-                      Text(
-                        '暂无待办事项',
-                        style: Theme.of(context).textTheme.titleMedium
-                            ?.copyWith(
-                              color: Theme.of(context).colorScheme.outline,
-                            ),
-                      ),
-                    ],
                   ),
                 ),
-              ),
-          ],
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  itemCount: completedTodos.length,
+                  itemBuilder: (context, index) {
+                    final todo = completedTodos[index];
+                    return Material(
+                      type: MaterialType.transparency,
+                      child: TodoTile(
+                        key: ValueKey('completed_${todo.id}'),
+                        id: todo.id,
+                        title: todo.title,
+                        description: todo.description ?? "",
+                        isCompleted: todo.isCompleted == true ? 1 : 0,
+                        createdAt: todo.createdAt,
+                        finishingAt: todo.finishingAt ?? DateTime.now(),
+                        updateCompetedFunction: _updateCompleted,
+                        categoryName: _getCategoryName(todo.categoryId),
+                        categoryColor: _getCategoryColor(todo.categoryId),
+                        todoProvider: provider,
+                      ),
+                    );
+                  },
+                ),
+              ],
+              // 空状态提示
+              if (todos.isEmpty)
+                Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(32),
+                    child: Column(
+                      children: [
+                        Icon(
+                          Icons.task_alt,
+                          size: 64,
+                          color: Theme.of(context).colorScheme.outline,
+                        ),
+                        SizedBox(height: 16),
+                        Text(
+                          '暂无待办事项',
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(
+                                color: Theme.of(context).colorScheme.outline,
+                              ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );

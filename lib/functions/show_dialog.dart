@@ -3,14 +3,29 @@ import 'package:provider/provider.dart';
 import 'package:todo_aeo/providers/todo_provider.dart';
 
 class ShowDialog {
-  static Future<void> showAddTodoDialog(
+  static Future<void> showTodoDialog(
     BuildContext context,
-    TodoProvider provider,
-  ) async {
+    TodoProvider provider, {
+    int? todoId, // 如果提供了todoId，则为编辑模式；否则为添加模式
+  }) async {
+    final isEditMode = todoId != null;
+
+    // 初始化变量
     String todoName = '';
     String todoDescription = '';
     int? selectedCategoryId;
     DateTime? selectedFinishingDate;
+
+    // 如果是编辑模式，获取现有数据
+    if (isEditMode) {
+      final existingTodo = provider.todos?.firstWhere((todo) => todo.id == todoId);
+      if (existingTodo != null) {
+        todoName = existingTodo.title;
+        todoDescription = existingTodo.description ?? '';
+        selectedCategoryId = existingTodo.categoryId;
+        selectedFinishingDate = existingTodo.finishingAt;
+      }
+    }
 
     // 保存主页面的context
     final scaffoldContext = context;
@@ -22,7 +37,7 @@ class ShowDialog {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              title: Text('添加新的待办事项'),
+              title: Text(isEditMode ? '编辑待办事项' : '添加新的待办事项'),
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -35,6 +50,7 @@ class ShowDialog {
                         border: OutlineInputBorder(),
                         hintText: '请输入待办事项名称',
                       ),
+                      controller: TextEditingController(text: todoName),
                       onChanged: (value) {
                         todoName = value;
                       },
@@ -49,6 +65,7 @@ class ShowDialog {
                         alignLabelWithHint: true,
                       ),
                       maxLines: 3,
+                      controller: TextEditingController(text: todoDescription),
                       onChanged: (value) {
                         todoDescription = value;
                       },
@@ -171,32 +188,37 @@ class ShowDialog {
                   },
                 ),
                 TextButton(
-                  child: Text('确定'),
+                  child: Text(isEditMode ? '保存' : '确定'),
                   onPressed: () async {
                     if (todoName.trim().isEmpty) {
-                      ScaffoldMessenger.of(dialogContext).showSnackBar(
-                        SnackBar(
-                          content: Text('请输入待办事项名称'),
-                        ),
-                      );
+                      ScaffoldMessenger.of(
+                        dialogContext,
+                      ).showSnackBar(SnackBar(content: Text('请输入待办事项名称')));
                       return;
                     }
 
                     try {
-                      // 准备插入数据
+                      // 准备数据
                       final todoData = {
+                        'id': todoId,
                         'title': todoName.trim(),
                         'description': todoDescription.trim().isEmpty
                             ? null
                             : todoDescription.trim(),
-                        'isCompleted': 0,
                         'categoryId': selectedCategoryId,
-                        'createdAt': DateTime.now().toIso8601String(),
                         'finishingAt': selectedFinishingDate?.toIso8601String(),
                       };
 
-                      // 添加到数据库
-                      await provider.addTodo(todoData);
+                      if (isEditMode) {
+                        // 编辑模式：更新现有待办事项
+                        todoData['updatedAt'] = DateTime.now().toIso8601String();
+                        await provider.updateTodo(todoData);
+                      } else {
+                        // 添加模式：创建新的待办事项
+                        todoData['isCompleted'] = 0;
+                        todoData['createdAt'] = DateTime.now().toIso8601String();
+                        await provider.addTodo(todoData);
+                      }
 
                       if (dialogContext.mounted) {
                         Navigator.pop(dialogContext);
@@ -204,22 +226,22 @@ class ShowDialog {
 
                       // 显示成功消息
                       if (scaffoldContext.mounted) {
-                        ScaffoldMessenger.of(scaffoldContext).showSnackBar(
-                          SnackBar(
-                            content: Text('待办事项添加成功'),
-                          ),
-                        );
+                        ScaffoldMessenger.of(
+                          scaffoldContext,
+                        ).showSnackBar(SnackBar(
+                          content: Text(isEditMode ? '待办事项更新成功' : '待办事项添加成功'),
+                        ));
                       }
                     } catch (e) {
                       if (dialogContext.mounted) {
                         Navigator.pop(dialogContext);
                       }
                       if (scaffoldContext.mounted) {
-                        ScaffoldMessenger.of(scaffoldContext).showSnackBar(
-                          SnackBar(
-                            content: Text('添加待办事项失败: $e'),
-                          ),
-                        );
+                        ScaffoldMessenger.of(
+                          scaffoldContext,
+                        ).showSnackBar(SnackBar(
+                          content: Text(isEditMode ? '更新待办事项失败: $e' : '添加待办事项失败: $e'),
+                        ));
                       }
                     }
                   },
@@ -325,11 +347,9 @@ class ShowDialog {
                   child: Text('确定'),
                   onPressed: () async {
                     if (categoryName.trim().isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('请输入分类名称'),
-                        ),
-                      );
+                      ScaffoldMessenger.of(
+                        context,
+                      ).showSnackBar(SnackBar(content: Text('请输入分类名称')));
                       return;
                     }
 
@@ -346,22 +366,18 @@ class ShowDialog {
                       }
 
                       if (scaffoldContext.mounted) {
-                        ScaffoldMessenger.of(scaffoldContext).showSnackBar(
-                          SnackBar(
-                            content: Text('分类添加成功'),
-                          ),
-                        );
+                        ScaffoldMessenger.of(
+                          scaffoldContext,
+                        ).showSnackBar(SnackBar(content: Text('分类添加成功')));
                       }
                     } catch (e) {
                       if (dialogContext.mounted) {
                         Navigator.pop(dialogContext);
                       }
                       if (scaffoldContext.mounted) {
-                        ScaffoldMessenger.of(scaffoldContext).showSnackBar(
-                          SnackBar(
-                            content: Text('添加分类失败: $e'),
-                          ),
-                        );
+                        ScaffoldMessenger.of(
+                          scaffoldContext,
+                        ).showSnackBar(SnackBar(content: Text('添加分类失败: $e')));
                       }
                     }
                   },
@@ -374,7 +390,7 @@ class ShowDialog {
     );
   }
 
-  static void showDeleteConfirmDialog(BuildContext context) {
+  static void showDeleteConfirmDialog(BuildContext context, int id, TodoProvider provider) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -390,7 +406,7 @@ class ShowDialog {
               child: Text('删除', style: TextStyle(color: Colors.red)),
               onPressed: () {
                 Navigator.pop(context);
-                // TODO: 实现删除逻辑
+                provider.deleteTodo(id);
               },
             ),
           ],
@@ -419,4 +435,5 @@ class ShowDialog {
     // 如果不是十六进制格式，返回默认颜色
     return Theme.of(context).colorScheme.primary;
   }
+
 }

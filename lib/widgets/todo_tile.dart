@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:todo_aeo/functions/show_dialog.dart';
+import 'package:todo_aeo/providers/todo_provider.dart';
 
 class TodoTile extends StatefulWidget {
   const TodoTile({
@@ -13,6 +14,7 @@ class TodoTile extends StatefulWidget {
     required this.updateCompetedFunction,
     this.categoryName,
     this.categoryColor,
+    required this.todoProvider,
   });
 
   final int id;
@@ -24,6 +26,7 @@ class TodoTile extends StatefulWidget {
   final Function(bool, int?) updateCompetedFunction;
   final String? categoryName;
   final Color? categoryColor;
+  final TodoProvider todoProvider;
 
   @override
   State<TodoTile> createState() => _TodoTileState();
@@ -77,38 +80,41 @@ class _TodoTileState extends State<TodoTile> {
     return luminance > 0.5 ? Colors.black87 : Colors.white;
   }
 
-  // TODO:添加空白区域点击收起Sheet
-  void _showOptionsBottomSheet(int id) {
-    showBottomSheet(
-      showDragHandle: true,
+  void _showOptionsBottomSheet(int id, TodoProvider provider) {
+    showModalBottomSheet(
       context: context,
+      showDragHandle: true,
+      isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
       builder: (BuildContext context) {
         return SafeArea(
           child: Padding(
-            padding: EdgeInsetsGeometry.all(8),
+            padding: EdgeInsets.all(8),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 ListTile(
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadiusGeometry.circular(12),
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   leading: Icon(Icons.edit),
                   title: Text('编辑'),
                   onTap: () {
                     Navigator.pop(context);
-                    // TODO: 实现编辑对话框
+                    ShowDialog.showTodoDialog(context, provider, todoId: id);
                   },
                 ),
                 ListTile(
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadiusGeometry.circular(12),
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   leading: Icon(Icons.delete, color: Colors.red),
                   title: Text('删除', style: TextStyle(color: Colors.red)),
                   onTap: () {
                     Navigator.pop(context);
-                    ShowDialog.showDeleteConfirmDialog(context);
+                    ShowDialog.showDeleteConfirmDialog(context, widget.id, widget.todoProvider);
                   },
                 ),
               ],
@@ -146,7 +152,7 @@ class _TodoTileState extends State<TodoTile> {
           child: InkWell(
             borderRadius: BorderRadius.circular(12),
             onTap: () {}, // 添加空的onTap以启用涟漪效果
-            onLongPress: () => _showOptionsBottomSheet(widget.id),
+            onLongPress: () => _showOptionsBottomSheet(widget.id, widget.todoProvider),
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
