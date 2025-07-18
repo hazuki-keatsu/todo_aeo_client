@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:todo_aeo/providers/todo_provider.dart';
+import 'package:todo_aeo/providers/scaffold_elements_notifier.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -11,23 +12,42 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _updateScaffoldElements();
+    });
+  }
+
+  void _updateScaffoldElements() {
+    final scaffoldElements = Provider.of<ScaffoldElementsNotifier>(context, listen: false);
+    
+    scaffoldElements.updateElements(
+      appBar: AppBar(
+        title: Text('设置'),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
+      ),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Consumer<TodoProvider>(
       builder: (context, todoProvider, child) {
+        // 当数据变化时更新 Scaffold 元素
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _updateScaffoldElements();
+        });
+
         final totalTodos = todoProvider.todos?.length ?? 0;
         final completedTodos = todoProvider.todos?.where((todo) => todo.isCompleted).length ?? 0;
         final totalCategories = todoProvider.categories?.length ?? 0;
 
-        return Scaffold(
-          appBar: AppBar(
-            title: Text('设置'),
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            foregroundColor: Theme.of(context).colorScheme.onPrimary,
-          ),
-          body: ListView(
-            padding: EdgeInsets.all(16),
-            children: [
-              // 统计信息卡片
+        return ListView(
+          padding: EdgeInsets.all(16),
+          children: [
+            // 统计信息卡片
               Card(
                 child: Padding(
                   padding: EdgeInsets.all(16),
@@ -139,8 +159,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
               ),
             ],
-          ),
-        );
+          );
       },
     );
   }

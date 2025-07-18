@@ -2,7 +2,6 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 // Sqflite操作封装
-// TODO: 修改数据返回方式，按时间优先和完成度优先
 
 class DatabaseQuery {
   static final DatabaseQuery _instance = DatabaseQuery._internal();
@@ -43,7 +42,7 @@ class DatabaseQuery {
         isCompleted INTEGER NOT NULL DEFAULT 0,
         categoryId INTEGER,
         createdAt TEXT NOT NULL,
-        finishingAt TEXT NOT NULL,
+        finishingAt TEXT,
         FOREIGN KEY (categoryId) REFERENCES categories (id) ON DELETE SET NULL
       )
     ''');

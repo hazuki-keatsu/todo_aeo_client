@@ -177,7 +177,6 @@ class ShowDialog {
                       ScaffoldMessenger.of(dialogContext).showSnackBar(
                         SnackBar(
                           content: Text('请输入待办事项名称'),
-                          behavior: SnackBarBehavior.floating,
                         ),
                       );
                       return;
@@ -208,7 +207,6 @@ class ShowDialog {
                         ScaffoldMessenger.of(scaffoldContext).showSnackBar(
                           SnackBar(
                             content: Text('待办事项添加成功'),
-                            behavior: SnackBarBehavior.floating,
                           ),
                         );
                       }
@@ -220,7 +218,6 @@ class ShowDialog {
                         ScaffoldMessenger.of(scaffoldContext).showSnackBar(
                           SnackBar(
                             content: Text('添加待办事项失败: $e'),
-                            behavior: SnackBarBehavior.floating,
                           ),
                         );
                       }
@@ -331,7 +328,6 @@ class ShowDialog {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text('请输入分类名称'),
-                          behavior: SnackBarBehavior.floating,
                         ),
                       );
                       return;
@@ -353,7 +349,6 @@ class ShowDialog {
                         ScaffoldMessenger.of(scaffoldContext).showSnackBar(
                           SnackBar(
                             content: Text('分类添加成功'),
-                            behavior: SnackBarBehavior.floating,
                           ),
                         );
                       }
@@ -365,7 +360,6 @@ class ShowDialog {
                         ScaffoldMessenger.of(scaffoldContext).showSnackBar(
                           SnackBar(
                             content: Text('添加分类失败: $e'),
-                            behavior: SnackBarBehavior.floating,
                           ),
                         );
                       }

@@ -7,6 +7,7 @@ import 'package:todo_aeo/tests/database_initializer.dart';
 import 'package:todo_aeo/pages/calendar_page.dart';
 import 'package:todo_aeo/pages/settings_page.dart';
 import 'package:todo_aeo/providers/todo_provider.dart';
+import 'package:todo_aeo/providers/scaffold_elements_notifier.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,8 +26,11 @@ class ToDo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => TodoProvider(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => TodoProvider()),
+        ChangeNotifierProvider(create: (context) => ScaffoldElementsNotifier()),
+      ],
       child: MaterialApp(
         home: ToDoHomeFrame(title: "ToDo Aeo"),
         title: "ToDo",
@@ -67,29 +71,38 @@ class _ToDoHomeFrameState extends State<ToDoHomeFrame> {
 
   @override
   Widget build(BuildContext context) {
-
-    return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      body: _pages[_selectedIndex],
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _selectedIndex,
-        onDestinationSelected: (int index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
-        indicatorShape: RoundedRectangleBorder(
-          borderRadius: BorderRadiusGeometry.circular(12),
-        ),
-        destinations: const <Widget>[
-          NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
-          NavigationDestination(
-            icon: Icon(Icons.calendar_month),
-            label: 'Calendar',
+    return Consumer<ScaffoldElementsNotifier>(
+      builder: (context, scaffoldElements, child) {
+        return Scaffold(
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          appBar: scaffoldElements.appBar,
+          floatingActionButton: scaffoldElements.floatingActionButton,
+          floatingActionButtonLocation: scaffoldElements.floatingActionButtonLocation,
+          floatingActionButtonAnimator: scaffoldElements.floatingActionButtonAnimator,
+          drawer: scaffoldElements.drawer,
+          endDrawer: scaffoldElements.endDrawer,
+          body: _pages[_selectedIndex],
+          bottomNavigationBar: NavigationBar(
+            selectedIndex: _selectedIndex,
+            onDestinationSelected: (int index) {
+              setState(() {
+                _selectedIndex = index;
+              });
+            },
+            indicatorShape: RoundedRectangleBorder(
+              borderRadius: BorderRadiusGeometry.circular(12),
+            ),
+            destinations: const <Widget>[
+              NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
+              NavigationDestination(
+                icon: Icon(Icons.calendar_month),
+                label: 'Calendar',
+              ),
+              NavigationDestination(icon: Icon(Icons.settings), label: 'Settings'),
+            ],
           ),
-          NavigationDestination(icon: Icon(Icons.settings), label: 'Settings'),
-        ],
-      ),
+        );
+      },
     );
   }
 }
