@@ -11,13 +11,13 @@ class DatabaseInitializer {
       db.clearAllData();
     }
 
-    final int _categoryId1 = await db.insertCategory({
+    final int categoryId1 = await db.insertCategory({
       'name': '学习',
       'color': '#3B82F6',
       'createdAt': DateTime.now().toIso8601String(),
     });
 
-    final int _categoryId2 = await db.insertCategory({
+    final int categoryId2 = await db.insertCategory({
       'name': '日常',
       'color': '#10B981',
       'createdAt': DateTime.now().toIso8601String(),
@@ -31,7 +31,7 @@ class DatabaseInitializer {
         'isCompleted': 0,
         'createdAt': DateTime.now().toIso8601String(),
         'finishingAt': DateTime.now().toIso8601String(),
-        'categoryId': _categoryId1,
+        'categoryId': categoryId1,
       },
       {
         'title': '学习 Flutter',
@@ -39,7 +39,7 @@ class DatabaseInitializer {
         'isCompleted': 0,
         'createdAt': DateTime.now().toIso8601String(),
         'finishingAt': DateTime.now().toIso8601String(),
-        'categoryId': _categoryId1,
+        'categoryId': categoryId1,
       },
       {
         'title': '学习 Flutter',
@@ -47,7 +47,7 @@ class DatabaseInitializer {
         'isCompleted': 0,
         'createdAt': DateTime.now().toIso8601String(),
         'finishingAt': DateTime.now().toIso8601String(),
-        'categoryId': _categoryId1,
+        'categoryId': categoryId1,
       },
       {
         'title': '学习 Flutter',
@@ -55,7 +55,7 @@ class DatabaseInitializer {
         'isCompleted': 0,
         'createdAt': DateTime.now().toIso8601String(),
         'finishingAt': DateTime.now().toIso8601String(),
-        'categoryId': _categoryId1,
+        'categoryId': categoryId1,
       },
       {
         'title': '学习 Flutter',
@@ -63,7 +63,7 @@ class DatabaseInitializer {
         'isCompleted': 0,
         'createdAt': DateTime.now().toIso8601String(),
         'finishingAt': DateTime.now().toIso8601String(),
-        'categoryId': _categoryId1,
+        'categoryId': categoryId1,
       },
       {
         'title': '学习 Flutter',
@@ -71,7 +71,7 @@ class DatabaseInitializer {
         'isCompleted': 0,
         'createdAt': DateTime.now().toIso8601String(),
         'finishingAt': DateTime.now().toIso8601String(),
-        'categoryId': _categoryId1,
+        'categoryId': categoryId1,
       },
       {
         'title': '买菜',
@@ -83,7 +83,7 @@ class DatabaseInitializer {
         'finishingAt': DateTime.now()
             .subtract(Duration(hours: 1))
             .toIso8601String(),
-        'categoryId': _categoryId2,
+        'categoryId': categoryId2,
       },
       {
         'title': '锻炼身体',
@@ -95,7 +95,7 @@ class DatabaseInitializer {
         'finishingAt': DateTime.now()
             .subtract(Duration(hours: 2))
             .toIso8601String(),
-        'categoryId': _categoryId2,
+        'categoryId': categoryId2,
       },
       {
         'title': '给同学送书',

@@ -26,13 +26,15 @@ class _SettingsPageState extends State<SettingsPage> {
       listen: false,
     );
 
-    scaffoldElements.updateElements(
-      appBar: AppBar(
+    scaffoldElements.updateAppBar(
+      AppBar(
         title: Text('设置'),
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Theme.of(context).colorScheme.onPrimary,
       ),
     );
+
+    scaffoldElements.updateFloatingActionButton(null);
   }
 
   @override
@@ -50,7 +52,7 @@ class _SettingsPageState extends State<SettingsPage> {
         final totalCategories = todoProvider.categories?.length ?? 0;
 
         return ListView(
-          padding: EdgeInsets.all(8),
+          padding: EdgeInsets.all(16),
           children: [
             // 统计信息卡片
             Card(
@@ -109,7 +111,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         context: context,
                         applicationName: 'Todo AEO',
                         applicationVersion: '1.0.0',
-                        applicationIcon: Icon(Icons.check_circle, size: 48,),
+                        applicationIcon: Icon(Icons.check_circle, size: 48),
                         children: [
                           Text('一个简洁美观的待办事项管理应用'),
                           SizedBox(height: 8),

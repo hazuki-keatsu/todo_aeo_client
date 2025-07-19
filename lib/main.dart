@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:material_color_utilities/material_color_utilities.dart';
 import 'package:provider/provider.dart';
+import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:todo_aeo/pages/todo_page.dart';
 import 'package:todo_aeo/tests/database_initializer.dart';
 import 'package:todo_aeo/pages/calendar_page.dart';
@@ -31,16 +32,22 @@ class ToDo extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => TodoProvider()),
         ChangeNotifierProvider(create: (context) => ScaffoldElementsNotifier()),
       ],
-      child: MaterialApp(
-        home: ToDoHomeFrame(title: "ToDo Aeo"),
-        title: "ToDo",
-        theme: ThemeData(
-          useMaterial3: true,
-          colorScheme: palette != null
-              ? ColorScheme.fromSeed(seedColor: Color(palette!.primary.get(40)))
-              : null,
-        ),
-        debugShowCheckedModeBanner: false,
+      child: ResponsiveSizer(
+        builder: (context, orientation, screenType) {
+          return MaterialApp(
+            home: ToDoHomeFrame(title: "ToDo Aeo"),
+            title: "ToDo",
+            theme: ThemeData(
+              useMaterial3: true,
+              colorScheme: palette != null
+                  ? ColorScheme.fromSeed(
+                      seedColor: Color(palette!.primary.get(40)),
+                    )
+                  : null,
+            ),
+            debugShowCheckedModeBanner: false,
+          );
+        },
       ),
     );
   }
@@ -77,8 +84,10 @@ class _ToDoHomeFrameState extends State<ToDoHomeFrame> {
           backgroundColor: Theme.of(context).colorScheme.surface,
           appBar: scaffoldElements.appBar,
           floatingActionButton: scaffoldElements.floatingActionButton,
-          floatingActionButtonLocation: scaffoldElements.floatingActionButtonLocation,
-          floatingActionButtonAnimator: scaffoldElements.floatingActionButtonAnimator,
+          floatingActionButtonLocation:
+              scaffoldElements.floatingActionButtonLocation,
+          floatingActionButtonAnimator:
+              scaffoldElements.floatingActionButtonAnimator,
           drawer: scaffoldElements.drawer,
           endDrawer: scaffoldElements.endDrawer,
           body: _pages[_selectedIndex],
@@ -98,7 +107,10 @@ class _ToDoHomeFrameState extends State<ToDoHomeFrame> {
                 icon: Icon(Icons.calendar_month),
                 label: 'Calendar',
               ),
-              NavigationDestination(icon: Icon(Icons.settings), label: 'Settings'),
+              NavigationDestination(
+                icon: Icon(Icons.settings),
+                label: 'Settings',
+              ),
             ],
           ),
         );

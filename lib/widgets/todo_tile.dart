@@ -80,55 +80,10 @@ class _TodoTileState extends State<TodoTile> {
     return luminance > 0.5 ? Colors.black87 : Colors.white;
   }
 
-  void _showOptionsBottomSheet(int id, TodoProvider provider) {
-    showModalBottomSheet(
-      context: context,
-      showDragHandle: true,
-      isScrollControlled: true,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (BuildContext context) {
-        return SafeArea(
-          child: Padding(
-            padding: EdgeInsets.all(8),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ListTile(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  leading: Icon(Icons.edit),
-                  title: Text('编辑'),
-                  onTap: () {
-                    Navigator.pop(context);
-                    ShowDialog.showTodoDialog(context, provider, todoId: id);
-                  },
-                ),
-                ListTile(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  leading: Icon(Icons.delete, color: Colors.red),
-                  title: Text('删除', style: TextStyle(color: Colors.red)),
-                  onTap: () {
-                    Navigator.pop(context);
-                    ShowDialog.showDeleteConfirmDialog(context, widget.id, widget.todoProvider);
-                  },
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsetsGeometry.fromLTRB(0, 4, 0, 4),
+      padding: EdgeInsetsGeometry.fromLTRB(8, 4, 8, 4),
       child: Container(
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.primaryContainer,
@@ -152,7 +107,7 @@ class _TodoTileState extends State<TodoTile> {
           child: InkWell(
             borderRadius: BorderRadius.circular(12),
             onTap: () {}, // 添加空的onTap以启用涟漪效果
-            onLongPress: () => _showOptionsBottomSheet(widget.id, widget.todoProvider),
+            onLongPress: () => ShowDialog.showOptionsBottomSheet(widget.id, widget.todoProvider, context, DelMode.todo),
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
