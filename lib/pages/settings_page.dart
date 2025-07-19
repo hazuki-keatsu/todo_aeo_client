@@ -50,7 +50,7 @@ class _SettingsPageState extends State<SettingsPage> {
         final totalCategories = todoProvider.categories?.length ?? 0;
 
         return ListView(
-          padding: EdgeInsets.all(8),
+          padding: EdgeInsets.all(16),
           children: [
             // 统计信息卡片
             Card(

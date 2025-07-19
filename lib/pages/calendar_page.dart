@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:todo_aeo/modules/todo.dart';
 import 'package:todo_aeo/providers/todo_provider.dart';
 import 'package:todo_aeo/providers/scaffold_elements_notifier.dart';
 import 'package:todo_aeo/widgets/month_calendar.dart';
@@ -23,8 +24,11 @@ class _CalendarPageState extends State<CalendarPage> {
   }
 
   void _updateScaffoldElements() {
-    final scaffoldElements = Provider.of<ScaffoldElementsNotifier>(context, listen: false);
-    
+    final scaffoldElements = Provider.of<ScaffoldElementsNotifier>(
+      context,
+      listen: false,
+    );
+
     scaffoldElements.updateElements(
       appBar: AppBar(
         title: Text('日历'),
@@ -42,6 +46,14 @@ class _CalendarPageState extends State<CalendarPage> {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           _updateScaffoldElements();
         });
+        // TODO: 这是一段有问题的代码
+        List<DateTime> todoDeadLine = [];
+
+        if (todoProvider.todos != null) {
+          for (var i in todoProvider.todos!) {
+            todoDeadLine.add(i.finishingAt!);
+          }
+        }
 
         if (todoProvider.isLoading) {
           return Center(child: CircularProgressIndicator());
@@ -49,8 +61,8 @@ class _CalendarPageState extends State<CalendarPage> {
 
         return Container(
           alignment: Alignment(0, -1),
-          padding: EdgeInsets.all(8),
-          child: MonthCalendar(),
+          padding: EdgeInsets.all(16),
+          child: MonthCalendar(markedDates: todoDeadLine),
         );
       },
     );

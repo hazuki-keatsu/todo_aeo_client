@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:todo_aeo/providers/todo_provider.dart';
 
+enum DelMode { todo, category }
+
 class ShowDialog {
   static Future<void> showTodoDialog(
     BuildContext context,
@@ -18,7 +20,9 @@ class ShowDialog {
 
     // 如果是编辑模式，获取现有数据
     if (isEditMode) {
-      final existingTodo = provider.todos?.firstWhere((todo) => todo.id == todoId);
+      final existingTodo = provider.todos?.firstWhere(
+        (todo) => todo.id == todoId,
+      );
       if (existingTodo != null) {
         todoName = existingTodo.title;
         todoDescription = existingTodo.description ?? '';
@@ -211,12 +215,14 @@ class ShowDialog {
 
                       if (isEditMode) {
                         // 编辑模式：更新现有待办事项
-                        todoData['updatedAt'] = DateTime.now().toIso8601String();
+                        todoData['updatedAt'] = DateTime.now()
+                            .toIso8601String();
                         await provider.updateTodo(todoData);
                       } else {
                         // 添加模式：创建新的待办事项
                         todoData['isCompleted'] = 0;
-                        todoData['createdAt'] = DateTime.now().toIso8601String();
+                        todoData['createdAt'] = DateTime.now()
+                            .toIso8601String();
                         await provider.addTodo(todoData);
                       }
 
@@ -226,22 +232,24 @@ class ShowDialog {
 
                       // 显示成功消息
                       if (scaffoldContext.mounted) {
-                        ScaffoldMessenger.of(
-                          scaffoldContext,
-                        ).showSnackBar(SnackBar(
-                          content: Text(isEditMode ? '待办事项更新成功' : '待办事项添加成功'),
-                        ));
+                        ScaffoldMessenger.of(scaffoldContext).showSnackBar(
+                          SnackBar(
+                            content: Text(isEditMode ? '待办事项更新成功' : '待办事项添加成功'),
+                          ),
+                        );
                       }
                     } catch (e) {
                       if (dialogContext.mounted) {
                         Navigator.pop(dialogContext);
                       }
                       if (scaffoldContext.mounted) {
-                        ScaffoldMessenger.of(
-                          scaffoldContext,
-                        ).showSnackBar(SnackBar(
-                          content: Text(isEditMode ? '更新待办事项失败: $e' : '添加待办事项失败: $e'),
-                        ));
+                        ScaffoldMessenger.of(scaffoldContext).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              isEditMode ? '更新待办事项失败: $e' : '添加待办事项失败: $e',
+                            ),
+                          ),
+                        );
                       }
                     }
                   },
@@ -254,13 +262,30 @@ class ShowDialog {
     );
   }
 
-  static Future<void> showAddCategoryDialog(BuildContext context) async {
+  static Future<void> showCategoryDialog(
+    BuildContext context, {
+    int? categoryId,
+  }) async {
     String categoryName = '';
     String selectedColor = '#3B82F6';
 
     // 保存主页面的context
     final scaffoldContext = context;
     final provider = context.read<TodoProvider>(); // 默认蓝色
+
+    final isEditMode = categoryId != null;
+
+    if (isEditMode) {
+      final existingCategory = provider.categories?.firstWhere(
+        (category) => category.id == categoryId,
+      );
+      if (existingCategory != null) {
+        categoryName = existingCategory.name;
+        selectedColor = existingCategory.color ?? '#3B82F6';
+      } else {
+        print("CategoryId Crushed.");
+      }
+    }
 
     final List<String> predefinedColors = [
       '#3B82F6', // 蓝色
@@ -281,7 +306,7 @@ class ShowDialog {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              title: Text('添加新的分类'),
+              title: Text(isEditMode ? '编辑分类' : '添加新的分类'),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -293,6 +318,7 @@ class ShowDialog {
                       border: OutlineInputBorder(),
                       hintText: '请输入分类名称',
                     ),
+                    controller: TextEditingController(text: categoryName),
                     onChanged: (value) {
                       categoryName = value;
                     },
@@ -390,13 +416,19 @@ class ShowDialog {
     );
   }
 
-  static void showDeleteConfirmDialog(BuildContext context, int id, TodoProvider provider) {
+  static void showDeleteConfirmDialog(
+    BuildContext context,
+    int id,
+    TodoProvider provider,
+    DelMode mode) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('确认删除'),
-          content: Text('确定要删除这个待办事项吗？'),
+          content: mode == DelMode.todo
+              ? Text('确定要删除这个待办事项吗？')
+              : Text('确定要删除这个分类吗？'),
           actions: [
             TextButton(
               child: Text('取消'),
@@ -405,11 +437,70 @@ class ShowDialog {
             TextButton(
               child: Text('删除', style: TextStyle(color: Colors.red)),
               onPressed: () {
-                Navigator.pop(context);
-                provider.deleteTodo(id);
+                if (mode == DelMode.todo) {
+                  Navigator.pop(context);
+                  provider.deleteTodo(id);
+                }
+                else if (mode == DelMode.category) {
+                  Navigator.pop(context);
+                  provider.deleteCategory(id);
+                  for (var i in provider.getTodosByCategory(id)) {
+                    provider.deleteTodo(i.id);
+                  }
+                }
               },
             ),
           ],
+        );
+      },
+    );
+  }
+
+  static void showOptionsBottomSheet(
+    int id,
+    TodoProvider provider,
+    BuildContext context,
+    DelMode mode,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      showDragHandle: true,
+      isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: Padding(
+            padding: EdgeInsets.all(8),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  leading: Icon(Icons.edit),
+                  title: Text('编辑'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    ShowDialog.showTodoDialog(context, provider, todoId: id);
+                  },
+                ),
+                ListTile(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  leading: Icon(Icons.delete, color: Colors.red),
+                  title: Text('删除', style: TextStyle(color: Colors.red)),
+                  onTap: () {
+                    Navigator.pop(context);
+                    ShowDialog.showDeleteConfirmDialog(context, id, provider, mode);
+                  },
+                ),
+              ],
+            ),
+          ),
         );
       },
     );
@@ -435,5 +526,4 @@ class ShowDialog {
     // 如果不是十六进制格式，返回默认颜色
     return Theme.of(context).colorScheme.primary;
   }
-
 }
