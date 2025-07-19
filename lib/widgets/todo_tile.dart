@@ -48,31 +48,6 @@ class _TodoTileState extends State<TodoTile> {
     });
   }
 
-  // 构建分类胶囊标签
-  Widget _buildCategoryChip() {
-    if (widget.categoryName == null || widget.categoryName!.isEmpty) {
-      return SizedBox.shrink(); // 如果没有分类信息，返回空组件
-    }
-
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: widget.categoryColor ?? Theme.of(context).colorScheme.primary,
-        borderRadius: BorderRadius.circular(12), // 胶囊形状
-      ),
-      child: Text(
-        widget.categoryName!,
-        style: TextStyle(
-          color: _getContrastColor(
-            widget.categoryColor ?? Theme.of(context).colorScheme.primary,
-          ),
-          fontSize: 12,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-    );
-  }
-
   // 根据背景颜色获取对比文字颜色
   Color _getContrastColor(Color backgroundColor) {
     // 计算亮度，选择合适的文字颜色
@@ -142,7 +117,7 @@ class _TodoTileState extends State<TodoTile> {
                                   ),
                                 ),
                               ),
-                              _buildCategoryChip(),
+                              _buildCategoryChip(12, 8, 24),
                               SizedBox(width: 8), // 添加一些右边距
                             ],
                           ),
@@ -157,29 +132,7 @@ class _TodoTileState extends State<TodoTile> {
                               fontSize: 16,
                             ),
                           ),
-                          Row(
-                            children: [
-                              Text(
-                                "创建：${widget.createdAt.year}-${widget.createdAt.month}-${widget.createdAt.day} ${widget.createdAt.hour}:${widget.createdAt.minute}",
-                                style: TextStyle(
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.onPrimaryFixedVariant,
-                                ),
-                              ),
-                              Spacer(flex: 3),
-                              if (widget.finishingAt != null)
-                                Text(
-                                  "完成：${widget.finishingAt!.year}-${widget.finishingAt!.month}-${widget.finishingAt!.day} ${widget.finishingAt!.hour}:${widget.finishingAt!.minute}",
-                                  style: TextStyle(
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.onPrimaryFixedVariant,
-                                  ),
-                                ),
-                              Spacer(flex: 1),
-                            ],
-                          ),
+                          _buildTimeRow(16, false, true)
                         ],
                       ),
                     ),
@@ -190,6 +143,73 @@ class _TodoTileState extends State<TodoTile> {
           ),
         ),
       ),
+    );
+  }
+
+  // 构建响应式分类胶囊标签
+  Widget _buildCategoryChip(
+    double fontSize,
+    double padding,
+    double borderRadius,
+  ) {
+    if (widget.categoryName == null || widget.categoryName!.isEmpty) {
+      return SizedBox.shrink();
+    }
+
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: padding,
+        vertical: padding * 0.5,
+      ),
+      decoration: BoxDecoration(
+        color: widget.categoryColor ?? Theme.of(context).colorScheme.primary,
+        borderRadius: BorderRadius.circular(borderRadius),
+      ),
+      child: Text(
+        widget.categoryName!,
+        style: TextStyle(
+          color: _getContrastColor(
+            widget.categoryColor ?? Theme.of(context).colorScheme.primary,
+          ),
+          fontSize: fontSize,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    );
+  }
+
+  // 构建响应式时间信息行
+  Widget _buildTimeRow(double fontSize, bool isMini, bool isCompact) {
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            isMini
+                ? "${widget.createdAt.month}-${widget.createdAt.day}" // 迷你模式简化显示
+                : "创建：${widget.createdAt.year}-${widget.createdAt.month}-${widget.createdAt.day} ${widget.createdAt.hour}:${widget.createdAt.minute.toString().padLeft(2, '0')}",
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onPrimaryFixedVariant,
+              fontSize: fontSize,
+            ),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+        if (widget.finishingAt != null && !isMini) // 在迷你模式下隐藏完成时间
+          Expanded(
+            child: Text(
+              isCompact
+                  ? "完成：${widget.finishingAt!.month}-${widget.finishingAt!.day}"
+                  : "完成：${widget.finishingAt!.year}-${widget.finishingAt!.month}-${widget.finishingAt!.day} ${widget.finishingAt!.hour}:${widget.finishingAt!.minute.toString().padLeft(2, '0')}",
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onPrimaryFixedVariant,
+                fontSize: fontSize,
+              ),
+              textAlign: TextAlign.right,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        SizedBox(width: isMini ? 8 : 16),
+      ],
     );
   }
 }
