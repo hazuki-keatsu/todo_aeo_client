@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:todo_aeo/functions/data_refresh.dart';
 import 'package:todo_aeo/functions/show_dialog.dart';
 import 'package:todo_aeo/modules/todo.dart';
 import 'package:todo_aeo/providers/todo_provider.dart';
@@ -69,11 +70,6 @@ class _CalendarPageState extends State<CalendarPage>
   }
 
   void _onScroll() {
-    // // 防抖：避免快速滚动时频繁触发
-    // final now = DateTime.now();
-    // if (now.difference(_lastScrollTime).inMilliseconds < 50) return;
-    // _lastScrollTime = now;
-
     // 如果正在动画中，不处理滚动事件，避免干扰用户滑动
     if (_isAnimating) return;
 
@@ -116,9 +112,38 @@ class _CalendarPageState extends State<CalendarPage>
     // 分别更新不同的元素
     scaffoldElements.updateAppBar(
       AppBar(
-        title: Text('日历'),
+        title: Text(
+          "日历",
+          style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+        ),
+        automaticallyImplyLeading: false,
+        actions: <Widget>[
+          Tooltip(
+            message: "刷新",
+            child: IconButton(
+              onPressed: () {
+                dataRefresh(provider, context);
+              },
+              icon: Icon(
+                Icons.refresh,
+                color: Theme.of(context).colorScheme.onPrimary,
+              ),
+            ),
+          ),
+          Tooltip(
+            message: "Todo 分组",
+            child: IconButton(
+              onPressed: () {
+                Scaffold.of(context).openEndDrawer();
+              },
+              icon: Icon(
+                Icons.menu,
+                color: Theme.of(context).colorScheme.onPrimary,
+              ),
+            ),
+          ),
+        ],
         backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Theme.of(context).colorScheme.onPrimary,
       ),
     );
 

@@ -68,7 +68,6 @@ class GradientLinePainter extends CustomPainter {
   }
 }
 
-// TODO: 细节优化
 class MonthCalendar extends StatefulWidget {
   final Function(DateTime)? onDateSelected;
   final DateTime? initialDate;

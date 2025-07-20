@@ -9,9 +9,6 @@ import 'package:todo_aeo/modules/todo.dart';
 import 'package:todo_aeo/providers/todo_provider.dart';
 import 'package:todo_aeo/providers/scaffold_elements_notifier.dart';
 
-// TODO: Hero动画
-// TODO: 修复Fab闪烁问题
-
 class TodoPage extends StatefulWidget {
   const TodoPage({super.key});
 
