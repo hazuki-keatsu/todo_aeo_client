@@ -16,5 +16,6 @@
         "faba",
         "fabl",
         "Scrollability"
-    ]
+    ],
+    "java.configuration.updateBuildConfiguration": "interactive"
 }
