@@ -8,7 +8,8 @@ class DatabaseInitializer {
     final existingTodos = await db.getAllTodos();
     if (existingTodos.isNotEmpty) {
       print('数据库已有数据，进行覆盖');
-      db.clearAllData();
+      db.clearTodos();
+      db.clearCategories();
     }
 
     final int categoryId1 = await db.insertCategory({

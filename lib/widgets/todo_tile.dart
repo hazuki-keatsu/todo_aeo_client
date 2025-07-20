@@ -192,7 +192,7 @@ class _TodoTileState extends State<TodoTile> {
               ? "${widget.createdAt.month}-${widget.createdAt.day}" // 迷你模式简化显示
               : "创建：${widget.createdAt.year}-${widget.createdAt.month}-${widget.createdAt.day} ${widget.createdAt.hour}:${widget.createdAt.minute.toString().padLeft(2, '0')}",
           style: TextStyle(
-            color: Theme.of(context).colorScheme.onPrimaryFixedVariant,
+            color: Theme.of(context).colorScheme.onPrimaryFixed,
             fontSize: fontSize,
           ),
           overflow: TextOverflow.ellipsis,
@@ -204,7 +204,7 @@ class _TodoTileState extends State<TodoTile> {
                 ? "完成：${widget.finishingAt!.month}-${widget.finishingAt!.day}"
                 : "完成：${widget.finishingAt!.year}-${widget.finishingAt!.month}-${widget.finishingAt!.day} ${widget.finishingAt!.hour}:${widget.finishingAt!.minute.toString().padLeft(2, '0')}",
             style: TextStyle(
-              color: Theme.of(context).colorScheme.onPrimaryFixedVariant,
+              color: Theme.of(context).colorScheme.onPrimaryFixed,
               fontSize: fontSize,
             ),
             textAlign: TextAlign.right,

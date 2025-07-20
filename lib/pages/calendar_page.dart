@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:todo_aeo/functions/data_refresh.dart';
 import 'package:todo_aeo/functions/show_dialog.dart';
+import 'package:todo_aeo/functions/todos_sort.dart';
 import 'package:todo_aeo/modules/todo.dart';
 import 'package:todo_aeo/providers/todo_provider.dart';
 import 'package:todo_aeo/providers/scaffold_elements_notifier.dart';
 import 'package:todo_aeo/widgets/month_calendar.dart';
+import 'package:todo_aeo/widgets/shared_end_drawer.dart';
 import 'package:todo_aeo/widgets/week_calendar.dart';
 import 'package:todo_aeo/widgets/shared_fab.dart';
 import 'package:todo_aeo/widgets/todo_tile.dart';
@@ -59,6 +61,7 @@ class _CalendarPageState extends State<CalendarPage>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _updateScaffoldElements();
     });
+    
   }
 
   @override
@@ -151,6 +154,13 @@ class _CalendarPageState extends State<CalendarPage>
     scaffoldElements.updateFloatingActionButton(
       SharedFAB.build(context, provider),
     );
+
+    scaffoldElements.updateEndDrawer(SharedEndDrawer.build(
+      context, 
+      provider,
+      selectedCategoryId: null,
+      onCategorySelected: (_, _) {},
+    ));
   }
 
   // 统一的日期选择处理函数，确保两个日历组件同步
@@ -212,6 +222,129 @@ class _CalendarPageState extends State<CalendarPage>
         : null;
   }
 
+  // 构建分成完成和未完成两部分的待办事项列表
+  List<Widget> _buildTodoSections(List<Todo> todayTodo, TodoProvider todoProvider) {
+    if (todayTodo.isEmpty) {
+      return [
+        Center(
+          child: Padding(
+            padding: EdgeInsets.all(32),
+            child: Column(
+              children: [
+                Icon(
+                  Icons.task_alt,
+                  size: 64,
+                  color: Theme.of(context).colorScheme.outline,
+                ),
+                SizedBox(height: 16),
+                Text(
+                  '暂无待办事项',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.outline,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ];
+    }
+
+    // 使用TodosSort进行分组
+    final completionGroups = TodosSort.todosCompletion(todayTodo);
+    final completedTodos = TodosSort.todosSortByFinishingTime(completionGroups[0]);
+    final uncompletedTodos = TodosSort.todosSortByFinishingTime(completionGroups[1]);
+
+    List<Widget> sections = [];
+
+    // 未完成的todos
+    if (uncompletedTodos.isNotEmpty) {
+      sections.add(
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          child: Text(
+            '${selectedDate.day}日未完成 (${uncompletedTodos.length})',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              color: Theme.of(context).colorScheme.primary,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      );
+      sections.add(
+        ListView.builder(
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          itemCount: uncompletedTodos.length,
+          itemBuilder: (context, index) {
+            final todo = uncompletedTodos[index];
+            return Material(
+              type: MaterialType.transparency,
+              child: TodoTile(
+                key: ValueKey('uncompleted_${todo.id}'),
+                id: todo.id,
+                title: todo.title,
+                description: todo.description ?? "",
+                isCompleted: todo.isCompleted == true ? 1 : 0,
+                createdAt: todo.createdAt,
+                finishingAt: todo.finishingAt ?? DateTime.now(),
+                updateCompetedFunction: _updateCompleted,
+                categoryName: _getCategoryName(todo.categoryId),
+                categoryColor: _getCategoryColor(todo.categoryId),
+                todoProvider: todoProvider,
+              ),
+            );
+          },
+        ),
+      );
+    }
+
+    // 已完成的todos
+    if (completedTodos.isNotEmpty) {
+      if (uncompletedTodos.isNotEmpty) sections.add(SizedBox(height: 16));
+      sections.add(
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          child: Text(
+            '${selectedDate.day}日已完成 (${completedTodos.length})',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              color: Theme.of(context).colorScheme.outline,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      );
+      sections.add(
+        ListView.builder(
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          itemCount: completedTodos.length,
+          itemBuilder: (context, index) {
+            final todo = completedTodos[index];
+            return Material(
+              type: MaterialType.transparency,
+              child: TodoTile(
+                key: ValueKey('completed_${todo.id}'),
+                id: todo.id,
+                title: todo.title,
+                description: todo.description ?? "",
+                isCompleted: todo.isCompleted == true ? 1 : 0,
+                createdAt: todo.createdAt,
+                finishingAt: todo.finishingAt ?? DateTime.now(),
+                updateCompetedFunction: _updateCompleted,
+                categoryName: _getCategoryName(todo.categoryId),
+                categoryColor: _getCategoryColor(todo.categoryId),
+                todoProvider: todoProvider,
+              ),
+            );
+          },
+        ),
+      );
+    }
+
+    return sections;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<TodoProvider>(
@@ -254,66 +387,7 @@ class _CalendarPageState extends State<CalendarPage>
                     ),
                   ),
                   Divider(),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    child: Text(
-                      '${selectedDate.day}日 Todo (${todayTodo.length})',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.primary,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  if (todayTodo.isEmpty)
-                    Center(
-                      child: Padding(
-                        padding: EdgeInsets.all(32),
-                        child: Column(
-                          children: [
-                            Icon(
-                              Icons.task_alt,
-                              size: 64,
-                              color: Theme.of(context).colorScheme.outline,
-                            ),
-                            SizedBox(height: 16),
-                            Text(
-                              '暂无待办事项',
-                              style: Theme.of(context).textTheme.titleMedium
-                                  ?.copyWith(
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.outline,
-                                  ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  if (todayTodo.isNotEmpty)
-                    ListView.builder(
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
-                      itemCount: todayTodo.length,
-                      itemBuilder: (context, index) {
-                        final todo = todayTodo[index];
-                        return Material(
-                          type: MaterialType.transparency,
-                          child: TodoTile(
-                            key: ValueKey('todo_${todo.id}'),
-                            id: todo.id,
-                            title: todo.title,
-                            description: todo.description ?? "",
-                            isCompleted: todo.isCompleted == true ? 1 : 0,
-                            createdAt: todo.createdAt,
-                            finishingAt: todo.finishingAt ?? DateTime.now(),
-                            updateCompetedFunction: _updateCompleted,
-                            categoryName: _getCategoryName(todo.categoryId),
-                            categoryColor: _getCategoryColor(todo.categoryId),
-                            todoProvider: todoProvider,
-                          ),
-                        );
-                      },
-                    ),
+                  ..._buildTodoSections(todayTodo, todoProvider),
                 ],
               ),
             ),

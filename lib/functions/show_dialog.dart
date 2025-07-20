@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:todo_aeo/providers/settings_provider.dart';
 import 'package:todo_aeo/providers/todo_provider.dart';
 
 enum DelMode { todo, category }
@@ -420,7 +421,8 @@ class ShowDialog {
     BuildContext context,
     int id,
     TodoProvider provider,
-    DelMode mode) {
+    DelMode mode,
+  ) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -440,8 +442,7 @@ class ShowDialog {
                 if (mode == DelMode.todo) {
                   Navigator.pop(context);
                   provider.deleteTodo(id);
-                }
-                else if (mode == DelMode.category) {
+                } else if (mode == DelMode.category) {
                   Navigator.pop(context);
                   provider.deleteCategory(id);
                   for (var i in provider.getTodosByCategory(id)) {
@@ -495,7 +496,12 @@ class ShowDialog {
                   title: Text('删除', style: TextStyle(color: Colors.red)),
                   onTap: () {
                     Navigator.pop(context);
-                    ShowDialog.showDeleteConfirmDialog(context, id, provider, mode);
+                    ShowDialog.showDeleteConfirmDialog(
+                      context,
+                      id,
+                      provider,
+                      mode,
+                    );
                   },
                 ),
               ],
@@ -503,6 +509,20 @@ class ShowDialog {
           ),
         );
       },
+    );
+  }
+
+  static void showAboutApplicationDialog(BuildContext context, SettingsProvider settingsProvider) {
+    return showAboutDialog(
+      context: context,
+      applicationName: 'Todo AEO',
+      applicationVersion: settingsProvider.fullVersion,
+      applicationIcon: Icon(Icons.check_circle, size: 48),
+      children: [
+        Text('一个主打简洁和安全的待办事项管理应用'),
+        SizedBox(height: 8),
+        Text('使用 Flutter 和 Material You 设计'),
+      ],
     );
   }
 
