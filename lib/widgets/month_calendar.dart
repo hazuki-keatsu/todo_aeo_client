@@ -1,6 +1,73 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+// 自定义画笔：绘制斜着的渐变短线
+class GradientLinePainter extends CustomPainter {
+  final Color color;
+  final bool isSelected;
+
+  GradientLinePainter({
+    required this.color,
+    required this.isSelected,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..strokeCap = StrokeCap.round
+      ..strokeWidth = 6.0;
+
+    // 创建渐变效果 - 蓝绿橙三色渐变，透明度从0到1
+    final gradient = !isSelected ? LinearGradient(
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+      colors: [
+        Color(0xFF3B82F6).withValues(alpha: 0.4),
+        Color(0xFF3B82F6).withValues(alpha: 0.4), 
+        Color(0xFF10B981).withValues(alpha: 0.8), 
+        Color(0xFFF59E0B).withValues(alpha: 0.4),
+        Color(0xFFF59E0B).withValues(alpha: 0.4),
+      ],
+      stops: const [0.0, 0.25, 0.5, 0.75, 1.0],
+    ) : LinearGradient(
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+      colors: [
+        Colors.white.withValues(alpha: 0.4),
+        Colors.white.withValues(alpha: 0.4),
+        Colors.white.withValues(alpha: 0.8),
+        Colors.white.withValues(alpha: 0.4),
+        Colors.white.withValues(alpha: 0.4),
+      ],
+      stops: const [0.0, 0.25, 0.5, 0.75, 1.0],
+    );
+
+    // 设置渐变着色器
+    paint.shader = gradient.createShader(
+      Rect.fromLTWH(0, 0, size.width, size.height),
+    );
+
+    // 绘制斜线（从左上到右下）
+    final startX = size.width * 0.2;
+    final startY = size.height * 0.7;
+    final endX = size.width * 0.8;
+    final endY = size.height * 0.3;
+
+    canvas.drawLine(
+      Offset(startX, startY),
+      Offset(endX, endY),
+      paint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return oldDelegate is! GradientLinePainter ||
+        oldDelegate.color != color ||
+        oldDelegate.isSelected != isSelected;
+  }
+}
+
 // TODO: 细节优化
 class MonthCalendar extends StatefulWidget {
   final Function(DateTime)? onDateSelected;
@@ -301,6 +368,7 @@ class _MonthCalendarState extends State<MonthCalendar> {
                             child: Center(
                               child: Stack(
                                 alignment: Alignment.center,
+                                clipBehavior: Clip.none, // 允许子组件超出边界
                                 children: [
                                   FittedBox(
                                     fit: BoxFit.scaleDown,
@@ -322,16 +390,15 @@ class _MonthCalendarState extends State<MonthCalendar> {
                                       ),
                                     ),
                                   ),
-                                  // 标记点
-                                  if (isMarked && !isSelected)
+                                  // 标记点 - 斜着的渐变短线
+                                  if (isMarked)
                                     Positioned(
-                                      bottom: 0,
-                                      child: Container(
-                                        width: cellSize * 0.06,
-                                        height: cellSize * 0.06,
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: markedColor,
+                                      bottom: -0.5,
+                                      child: CustomPaint(
+                                        size: Size(cellSize * 0.4, cellSize * 0.2),
+                                        painter: GradientLinePainter(
+                                          color: markedColor, // 保留用于未来扩展
+                                          isSelected: isSelected,
                                         ),
                                       ),
                                     ),

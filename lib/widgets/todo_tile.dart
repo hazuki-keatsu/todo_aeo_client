@@ -82,7 +82,12 @@ class _TodoTileState extends State<TodoTile> {
           child: InkWell(
             borderRadius: BorderRadius.circular(12),
             onTap: () {}, // 添加空的onTap以启用涟漪效果
-            onLongPress: () => ShowDialog.showOptionsBottomSheet(widget.id, widget.todoProvider, context, DelMode.todo),
+            onLongPress: () => ShowDialog.showOptionsBottomSheet(
+              widget.id,
+              widget.todoProvider,
+              context,
+              DelMode.todo,
+            ),
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
@@ -132,7 +137,7 @@ class _TodoTileState extends State<TodoTile> {
                               fontSize: 16,
                             ),
                           ),
-                          _buildTimeRow(16, false, true)
+                          _buildTimeRow(16, false, true),
                         ],
                       ),
                     ),
@@ -182,31 +187,28 @@ class _TodoTileState extends State<TodoTile> {
   Widget _buildTimeRow(double fontSize, bool isMini, bool isCompact) {
     return Row(
       children: [
-        Expanded(
-          child: Text(
-            isMini
-                ? "${widget.createdAt.month}-${widget.createdAt.day}" // 迷你模式简化显示
-                : "创建：${widget.createdAt.year}-${widget.createdAt.month}-${widget.createdAt.day} ${widget.createdAt.hour}:${widget.createdAt.minute.toString().padLeft(2, '0')}",
+        Text(
+          isMini
+              ? "${widget.createdAt.month}-${widget.createdAt.day}" // 迷你模式简化显示
+              : "创建：${widget.createdAt.year}-${widget.createdAt.month}-${widget.createdAt.day} ${widget.createdAt.hour}:${widget.createdAt.minute.toString().padLeft(2, '0')}",
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onPrimaryFixedVariant,
+            fontSize: fontSize,
+          ),
+          overflow: TextOverflow.ellipsis,
+        ),
+        Spacer(),
+        if (widget.finishingAt != null && !isMini) // 在迷你模式下隐藏完成时间
+          Text(
+            isCompact
+                ? "完成：${widget.finishingAt!.month}-${widget.finishingAt!.day}"
+                : "完成：${widget.finishingAt!.year}-${widget.finishingAt!.month}-${widget.finishingAt!.day} ${widget.finishingAt!.hour}:${widget.finishingAt!.minute.toString().padLeft(2, '0')}",
             style: TextStyle(
               color: Theme.of(context).colorScheme.onPrimaryFixedVariant,
               fontSize: fontSize,
             ),
+            textAlign: TextAlign.right,
             overflow: TextOverflow.ellipsis,
-          ),
-        ),
-        if (widget.finishingAt != null && !isMini) // 在迷你模式下隐藏完成时间
-          Expanded(
-            child: Text(
-              isCompact
-                  ? "完成：${widget.finishingAt!.month}-${widget.finishingAt!.day}"
-                  : "完成：${widget.finishingAt!.year}-${widget.finishingAt!.month}-${widget.finishingAt!.day} ${widget.finishingAt!.hour}:${widget.finishingAt!.minute.toString().padLeft(2, '0')}",
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.onPrimaryFixedVariant,
-                fontSize: fontSize,
-              ),
-              textAlign: TextAlign.right,
-              overflow: TextOverflow.ellipsis,
-            ),
           ),
         SizedBox(width: isMini ? 8 : 16),
       ],

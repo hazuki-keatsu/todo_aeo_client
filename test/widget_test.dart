@@ -10,13 +10,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:todo_aeo/main.dart';
 import 'package:todo_aeo/providers/todo_provider.dart';
-import 'package:todo_aeo/tests/database_initializer.dart';
 
 void main() {
   // 在所有测试开始前初始化数据库
   setUpAll(() async {
     TestWidgetsFlutterBinding.ensureInitialized();
-    await DatabaseInitializer.initializeWithSampleData();
+    
   });
 
   Widget createTestApp() {
