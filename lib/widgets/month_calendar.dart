@@ -1,73 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-// 自定义画笔：绘制斜着的渐变短线
-class GradientLinePainter extends CustomPainter {
-  final Color color;
-  final bool isSelected;
-  final double painterWidth;
-
-  GradientLinePainter({
-    this.painterWidth = 6.0,
-    required this.color,
-    required this.isSelected,
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..strokeCap = StrokeCap.round
-      ..strokeWidth = painterWidth;
-
-    // 创建渐变效果 - 蓝绿橙三色渐变，透明度从0到1
-    final gradient = !isSelected
-        ? LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color.fromARGB(255, 96, 59, 246).withValues(alpha: 0.4),
-              Color.fromARGB(255, 59, 130, 246).withValues(alpha: 0.4),
-              Color.fromARGB(255, 16, 185, 129).withValues(alpha: 0.8),
-              Color.fromARGB(255, 245, 158, 11).withValues(alpha: 0.4),
-              Color.fromARGB(255, 245, 31, 11).withValues(alpha: 0.4),
-            ],
-            stops: const [0.0, 0.25, 0.5, 0.75, 1.0],
-          )
-        : LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Colors.white.withValues(alpha: 0.4),
-              Colors.white.withValues(alpha: 0.4),
-              Colors.white.withValues(alpha: 0.8),
-              Colors.white.withValues(alpha: 0.4),
-              Colors.white.withValues(alpha: 0.4),
-            ],
-            stops: const [0.0, 0.25, 0.5, 0.75, 1.0],
-          );
-
-    // 设置渐变着色器
-    paint.shader = gradient.createShader(
-      Rect.fromLTWH(0, 0, size.width, size.height),
-    );
-
-    // 绘制斜线（从左上到右下）
-    final startX = size.width * 0.2;
-    final startY = size.height * 0.7;
-    final endX = size.width * 0.8;
-    final endY = size.height * 0.3;
-
-    canvas.drawLine(Offset(startX, startY), Offset(endX, endY), paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return oldDelegate is! GradientLinePainter ||
-        oldDelegate.color != color ||
-        oldDelegate.isSelected != isSelected;
-  }
-}
-
 class MonthCalendar extends StatefulWidget {
   final Function(DateTime)? onDateSelected;
   final DateTime? initialDate;
@@ -109,11 +42,13 @@ class _MonthCalendarState extends State<MonthCalendar> {
   void didUpdateWidget(MonthCalendar oldWidget) {
     super.didUpdateWidget(oldWidget);
     // 当父组件传入的 initialDate 发生变化时，更新内部状态
-    if (widget.initialDate != oldWidget.initialDate && widget.initialDate != null) {
+    if (widget.initialDate != oldWidget.initialDate &&
+        widget.initialDate != null) {
       setState(() {
         _selectedDate = widget.initialDate!;
         // 如果选中的日期不在当前显示的月份，切换到对应月份
-        if (_selectedDate.month != _currentDate.month || _selectedDate.year != _currentDate.year) {
+        if (_selectedDate.month != _currentDate.month ||
+            _selectedDate.year != _currentDate.year) {
           _currentDate = DateTime(_selectedDate.year, _selectedDate.month);
         }
       });
@@ -238,7 +173,6 @@ class _MonthCalendarState extends State<MonthCalendar> {
             final double fontSize = constraints.maxWidth * 0.04;
             final double iconSize = constraints.maxWidth * 0.06;
             final double titleFontSize = constraints.maxWidth * 0.04;
-            final double painterWidth = cellSize * 0.1;
 
             return Container(
               decoration: BoxDecoration(
@@ -305,6 +239,7 @@ class _MonthCalendarState extends State<MonthCalendar> {
 
                   // 星期标题
                   Container(
+                    padding: EdgeInsets.symmetric(horizontal: 4),
                     height: weekHeaderHeight,
                     decoration: BoxDecoration(
                       border: Border(
@@ -404,20 +339,13 @@ class _MonthCalendarState extends State<MonthCalendar> {
                                         ),
                                       ),
                                     ),
-                                    // 标记点 - 斜着的渐变短线
+                                    // 手写椭圆标记 - 框住整个日期
                                     if (isMarked)
                                       Positioned(
-                                        bottom: -0.5,
-                                        child: CustomPaint(
-                                          size: Size(
-                                            cellSize * 0.6,
-                                            cellSize * 0.2,
-                                          ),
-                                          painter: GradientLinePainter(
-                                            color: markedColor, // 保留用于未来扩展
-                                            isSelected: isSelected,
-                                            painterWidth: painterWidth,
-                                          ),
+                                        top: -1,
+                                        right: -4,
+                                        child: Badge(
+                                          backgroundColor: Colors.red[400],
                                         ),
                                       ),
                                   ],

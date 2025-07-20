@@ -1,73 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-// 自定义画笔：绘制斜着的渐变短线（复用月历的样式）
-class WeekGradientLinePainter extends CustomPainter {
-  final Color color;
-  final bool isSelected;
-  final double painterWidth;
-
-  WeekGradientLinePainter({
-    this.painterWidth = 6.0,
-    required this.color,
-    required this.isSelected,
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..strokeCap = StrokeCap.round
-      ..strokeWidth = painterWidth;
-
-    // 创建渐变效果 - 蓝绿橙三色渐变
-    final gradient = !isSelected
-        ? LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color.fromARGB(255, 96, 59, 246).withValues(alpha: 0.4),
-              Color.fromARGB(255, 59, 130, 246).withValues(alpha: 0.4),
-              Color.fromARGB(255, 16, 185, 129).withValues(alpha: 0.8),
-              Color.fromARGB(255, 245, 158, 11).withValues(alpha: 0.4),
-              Color.fromARGB(255, 245, 31, 11).withValues(alpha: 0.4),
-            ],
-            stops: const [0.0, 0.25, 0.5, 0.75, 1.0],
-          )
-        : LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Colors.white.withValues(alpha: 0.4),
-              Colors.white.withValues(alpha: 0.4),
-              Colors.white.withValues(alpha: 0.8),
-              Colors.white.withValues(alpha: 0.4),
-              Colors.white.withValues(alpha: 0.4),
-            ],
-            stops: const [0.0, 0.25, 0.5, 0.75, 1.0],
-          );
-
-    // 设置渐变着色器
-    paint.shader = gradient.createShader(
-      Rect.fromLTWH(0, 0, size.width, size.height),
-    );
-
-    // 绘制斜线（从左上到右下）
-    final startX = size.width * 0.2;
-    final startY = size.height * 0.7;
-    final endX = size.width * 0.8;
-    final endY = size.height * 0.3;
-
-    canvas.drawLine(Offset(startX, startY), Offset(endX, endY), paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return oldDelegate is! WeekGradientLinePainter ||
-        oldDelegate.color != color ||
-        oldDelegate.isSelected != isSelected;
-  }
-}
-
 class WeekCalendar extends StatefulWidget {
   final Function(DateTime)? onDateSelected;
   final DateTime? initialDate;
@@ -110,7 +43,8 @@ class _WeekCalendarState extends State<WeekCalendar> {
   void didUpdateWidget(WeekCalendar oldWidget) {
     super.didUpdateWidget(oldWidget);
     // 当父组件传入的 initialDate 发生变化时，更新内部状态
-    if (widget.initialDate != oldWidget.initialDate && widget.initialDate != null) {
+    if (widget.initialDate != oldWidget.initialDate &&
+        widget.initialDate != null) {
       setState(() {
         _selectedDate = widget.initialDate!;
         _currentWeekStart = _getWeekStart(widget.initialDate!);
@@ -200,17 +134,16 @@ class _WeekCalendarState extends State<WeekCalendar> {
           final double basePadding = constraints.maxWidth * 0.02;
           final double headerHeight = constraints.maxWidth * 0.12;
           final double weekHeaderHeight = constraints.maxWidth * 0.04;
-          final cellSize = (constraints.maxWidth - basePadding * 2) / 7;
+          final cellSize = (constraints.maxWidth - basePadding * 2) / 8;
           final double fontSize = constraints.maxWidth * 0.04;
           final double iconSize = constraints.maxWidth * 0.06;
           final double titleFontSize = constraints.maxWidth * 0.04;
-          final double painterWidth = cellSize * 0.1;
 
           // 获取当前周的月份和年份信息
           final startMonth = DateFormat('MMM').format(weekData.first);
           final endMonth = DateFormat('MMM').format(weekData.last);
           final year = weekData.first.year;
-          
+
           String headerTitle;
           if (startMonth == endMonth) {
             headerTitle = '$startMonth $year';
@@ -224,7 +157,9 @@ class _WeekCalendarState extends State<WeekCalendar> {
               borderRadius: BorderRadius.circular(basePadding),
               boxShadow: [
                 BoxShadow(
-                  color: Theme.of(context).colorScheme.shadow.withValues(alpha: 0.1),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.shadow.withValues(alpha: 0.1),
                   offset: Offset(0, basePadding * 0.1),
                   blurRadius: basePadding * 0.2,
                   spreadRadius: basePadding * 0.05,
@@ -282,6 +217,7 @@ class _WeekCalendarState extends State<WeekCalendar> {
 
                 // 星期标题
                 Container(
+                  padding: EdgeInsets.symmetric(horizontal: 4),
                   height: weekHeaderHeight,
                   decoration: BoxDecoration(
                     border: Border(
@@ -303,7 +239,9 @@ class _WeekCalendarState extends State<WeekCalendar> {
                                 DateFormat.E().format(DateTime(2023, 1, i)),
                                 style: TextStyle(
                                   fontWeight: FontWeight.w400,
-                                  color: Theme.of(context).colorScheme.onPrimaryFixedVariant,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onPrimaryFixedVariant,
                                   fontSize: fontSize * 0.7,
                                 ),
                               ),
@@ -334,8 +272,8 @@ class _WeekCalendarState extends State<WeekCalendar> {
                               color: isSelected
                                   ? selectedColor
                                   : isToday
-                                      ? todayHighlightColor.withValues(alpha: 0.2)
-                                      : null,
+                                  ? todayHighlightColor.withValues(alpha: 0.2)
+                                  : null,
                               border: isToday && !isSelected
                                   ? Border.all(
                                       color: todayHighlightColor,
@@ -355,10 +293,9 @@ class _WeekCalendarState extends State<WeekCalendar> {
                                       style: TextStyle(
                                         color: isSelected
                                             ? Colors.white
-                                            : Theme.of(context)
-                                                .textTheme
-                                                .bodyMedium
-                                                ?.color,
+                                            : Theme.of(
+                                                context,
+                                              ).textTheme.bodyMedium?.color,
                                         fontWeight: isToday || isSelected
                                             ? FontWeight.w500
                                             : FontWeight.normal,
@@ -366,20 +303,13 @@ class _WeekCalendarState extends State<WeekCalendar> {
                                       ),
                                     ),
                                   ),
-                                  // 标记点 - 斜着的渐变短线
+                                  // 手写椭圆标记 - 框住整个日期
                                   if (isMarked)
                                     Positioned(
-                                      bottom: -0.5,
-                                      child: CustomPaint(
-                                        size: Size(
-                                          cellSize * 0.6,
-                                          cellSize * 0.2,
-                                        ),
-                                        painter: WeekGradientLinePainter(
-                                          color: markedColor,
-                                          isSelected: isSelected,
-                                          painterWidth: painterWidth,
-                                        ),
+                                      top: -1,
+                                      right: -4,
+                                      child: Badge(
+                                        backgroundColor: Colors.red[400],
                                       ),
                                     ),
                                 ],
