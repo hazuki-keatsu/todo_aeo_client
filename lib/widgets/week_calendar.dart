@@ -124,7 +124,6 @@ class _WeekCalendarState extends State<WeekCalendar> {
         widget.selectedDateColor ?? Theme.of(context).primaryColor;
     final Color todayHighlightColor =
         widget.todayColor ?? Theme.of(context).colorScheme.secondary;
-    final Color markedColor = widget.markedDateColor ?? Colors.red;
 
     return Padding(
       padding: EdgeInsets.zero,

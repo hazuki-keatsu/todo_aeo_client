@@ -4,7 +4,7 @@ import 'package:material_color_utilities/material_color_utilities.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:todo_aeo/pages/todo_page.dart';
-import 'package:todo_aeo/tests/database_initializer.dart';
+// import 'package:todo_aeo/tests/database_initializer.dart';
 import 'package:todo_aeo/pages/calendar_page.dart';
 import 'package:todo_aeo/pages/settings_page.dart';
 import 'package:todo_aeo/providers/todo_provider.dart';

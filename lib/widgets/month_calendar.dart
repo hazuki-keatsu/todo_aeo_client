@@ -154,7 +154,6 @@ class _MonthCalendarState extends State<MonthCalendar> {
         widget.selectedDateColor ?? Theme.of(context).primaryColor;
     final Color todayHighlightColor =
         widget.todayColor ?? Theme.of(context).colorScheme.secondary;
-    final Color markedColor = widget.markedDateColor ?? Colors.red;
 
     // 根据屏幕方向调整宽高比
     final double aspectRatio = 12 / 13;

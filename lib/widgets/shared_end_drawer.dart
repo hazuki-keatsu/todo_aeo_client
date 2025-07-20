@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:todo_aeo/functions/show_dialog.dart';
+import 'package:todo_aeo/providers/settings_provider.dart';
 import 'package:todo_aeo/providers/todo_provider.dart';
 
 class SharedEndDrawer {
@@ -9,8 +11,6 @@ class SharedEndDrawer {
     int? selectedCategoryId,
     required Function(int?, String) onCategorySelected,
   }) {
-    final categories = provider.categories ?? [];
-    
     return Drawer(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
       child: Column(
@@ -72,96 +72,105 @@ class SharedEndDrawer {
                   ),
                 ),
                 TextButton.icon(
-                  onPressed: () {},
+                  onPressed: () {
+                    final settingsProvider = Provider.of<SettingsProvider>(context, listen: false);
+                    ShowDialog.showAboutApplicationDialog(context, settingsProvider);
+                  },
                   label: Text("关于"),
                   icon: Icon(Icons.info_outline),
                 ),
               ],
             ),
           ),
-          // 分类列表
+          // 分类列表 - 使用 Consumer 来监听 provider 变化
           Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // 全部todos
-                  ListTile(
-                    leading: Icon(Icons.list),
-                    title: Text("全部"),
-                    selected: selectedCategoryId == null,
-                    onTap: () => onCategorySelected(null, "全部"),
-                    selectedColor: Theme.of(context).colorScheme.primary,
-                    selectedTileColor: Theme.of(
-                      context,
-                    ).colorScheme.surfaceContainer,
-                  ),
-                  // 未分类todos
-                  ListTile(
-                    leading: Icon(Icons.label_off),
-                    title: Text("未分类"),
-                    selected: selectedCategoryId == -1,
-                    onTap: () => onCategorySelected(-1, "未分类"),
-                    selectedColor: Theme.of(context).colorScheme.primary,
-                    selectedTileColor: Theme.of(
-                      context,
-                    ).colorScheme.surfaceContainer,
-                  ),
-                  if (categories.isNotEmpty) ...[
-                    Divider(),
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
-                      child: Text(
-                        "分类",
-                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                      ),
-                    ),
-                    ...categories.map((category) {
-                      final isSelected = selectedCategoryId == category.id;
-                      return ListTile(
-                        leading: Container(
-                          width: 24,
-                          height: 24,
-                          decoration: BoxDecoration(
-                            color: category.color != null
-                                ? ShowDialog.parseColor(category.color, context)
-                                : Theme.of(context).colorScheme.primary,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                        title: Text(category.name),
-                        selected: isSelected,
+            child: Consumer<TodoProvider>(
+              builder: (context, todoProvider, child) {
+                final categories = todoProvider.categories ?? [];
+                
+                return SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // 全部todos
+                      ListTile(
+                        leading: Icon(Icons.list),
+                        title: Text("全部"),
+                        selected: selectedCategoryId == null,
+                        onTap: () => onCategorySelected(null, "全部"),
                         selectedColor: Theme.of(context).colorScheme.primary,
                         selectedTileColor: Theme.of(
                           context,
                         ).colorScheme.surfaceContainer,
-                        onTap: () =>
-                            onCategorySelected(category.id, category.name),
-                        onLongPress: () => ShowDialog.showOptionsBottomSheet(
-                          category.id!,
-                          provider,
+                      ),
+                      // 未分类todos
+                      ListTile(
+                        leading: Icon(Icons.label_off),
+                        title: Text("未分类"),
+                        selected: selectedCategoryId == -1,
+                        onTap: () => onCategorySelected(-1, "未分类"),
+                        selectedColor: Theme.of(context).colorScheme.primary,
+                        selectedTileColor: Theme.of(
                           context,
-                          DelMode.category,
+                        ).colorScheme.surfaceContainer,
+                      ),
+                      if (categories.isNotEmpty) ...[
+                        Divider(),
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
+                          child: Text(
+                            "分类",
+                            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                          ),
                         ),
-                      );
-                    }),
-                  ],
-                  Divider(),
-                  ListTile(
-                    leading: Icon(Icons.add),
-                    title: Text("添加分类"),
-                    onTap: () {
-                      Navigator.pop(context);
-                      ShowDialog.showCategoryDialog(context);
-                    },
+                        ...categories.map((category) {
+                          final isSelected = selectedCategoryId == category.id;
+                          return ListTile(
+                            leading: Container(
+                              width: 24,
+                              height: 24,
+                              decoration: BoxDecoration(
+                                color: category.color != null
+                                    ? ShowDialog.parseColor(category.color, context)
+                                    : Theme.of(context).colorScheme.primary,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            title: Text(category.name),
+                            selected: isSelected,
+                            selectedColor: Theme.of(context).colorScheme.primary,
+                            selectedTileColor: Theme.of(
+                              context,
+                            ).colorScheme.surfaceContainer,
+                            onTap: () =>
+                                onCategorySelected(category.id, category.name),
+                            onLongPress: () => ShowDialog.showOptionsBottomSheet(
+                              category.id!,
+                              todoProvider,
+                              context,
+                              DelMode.category,
+                            ),
+                          );
+                        }),
+                      ],
+                      Divider(),
+                      ListTile(
+                        leading: Icon(Icons.add),
+                        title: Text("添加分类"),
+                        onTap: () {
+                          Navigator.pop(context);
+                          ShowDialog.showCategoryDialog(context);
+                        },
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                );
+              },
             ),
           ),
         ],
