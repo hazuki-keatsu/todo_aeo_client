@@ -15,7 +15,7 @@ void main() async {
 
   final CorePalette? palette = await DynamicColorPlugin.getCorePalette();
 
-  // await DatabaseInitializer.initializeWithSampleData();
+  await DatabaseInitializer.initializeWithSampleData();
 
   runApp(ToDo(palette: palette));
 }

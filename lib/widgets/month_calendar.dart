@@ -5,8 +5,10 @@ import 'package:intl/intl.dart';
 class GradientLinePainter extends CustomPainter {
   final Color color;
   final bool isSelected;
+  final double painterWidth;
 
   GradientLinePainter({
+    this.painterWidth = 6.0,
     required this.color,
     required this.isSelected,
   });
@@ -15,32 +17,34 @@ class GradientLinePainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
       ..strokeCap = StrokeCap.round
-      ..strokeWidth = 6.0;
+      ..strokeWidth = painterWidth;
 
     // 创建渐变效果 - 蓝绿橙三色渐变，透明度从0到1
-    final gradient = !isSelected ? LinearGradient(
-      begin: Alignment.topLeft,
-      end: Alignment.bottomRight,
-      colors: [
-        Color(0xFF3B82F6).withValues(alpha: 0.4),
-        Color(0xFF3B82F6).withValues(alpha: 0.4), 
-        Color(0xFF10B981).withValues(alpha: 0.8), 
-        Color(0xFFF59E0B).withValues(alpha: 0.4),
-        Color(0xFFF59E0B).withValues(alpha: 0.4),
-      ],
-      stops: const [0.0, 0.25, 0.5, 0.75, 1.0],
-    ) : LinearGradient(
-      begin: Alignment.topLeft,
-      end: Alignment.bottomRight,
-      colors: [
-        Colors.white.withValues(alpha: 0.4),
-        Colors.white.withValues(alpha: 0.4),
-        Colors.white.withValues(alpha: 0.8),
-        Colors.white.withValues(alpha: 0.4),
-        Colors.white.withValues(alpha: 0.4),
-      ],
-      stops: const [0.0, 0.25, 0.5, 0.75, 1.0],
-    );
+    final gradient = !isSelected
+        ? LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color.fromARGB(255, 96, 59, 246).withValues(alpha: 0.4),
+              Color.fromARGB(255, 59, 130, 246).withValues(alpha: 0.4),
+              Color.fromARGB(255, 16, 185, 129).withValues(alpha: 0.8),
+              Color.fromARGB(255, 245, 158, 11).withValues(alpha: 0.4),
+              Color.fromARGB(255, 245, 31, 11).withValues(alpha: 0.4),
+            ],
+            stops: const [0.0, 0.25, 0.5, 0.75, 1.0],
+          )
+        : LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Colors.white.withValues(alpha: 0.4),
+              Colors.white.withValues(alpha: 0.4),
+              Colors.white.withValues(alpha: 0.8),
+              Colors.white.withValues(alpha: 0.4),
+              Colors.white.withValues(alpha: 0.4),
+            ],
+            stops: const [0.0, 0.25, 0.5, 0.75, 1.0],
+          );
 
     // 设置渐变着色器
     paint.shader = gradient.createShader(
@@ -53,11 +57,7 @@ class GradientLinePainter extends CustomPainter {
     final endX = size.width * 0.8;
     final endY = size.height * 0.3;
 
-    canvas.drawLine(
-      Offset(startX, startY),
-      Offset(endX, endY),
-      paint,
-    );
+    canvas.drawLine(Offset(startX, startY), Offset(endX, endY), paint);
   }
 
   @override
@@ -104,6 +104,25 @@ class _MonthCalendarState extends State<MonthCalendar> {
     _currentDate = widget.initialDate ?? DateTime(_today.year, _today.month);
     _selectedDate = widget.initialDate ?? _today;
     _markedDates = widget.markedDates ?? [];
+  }
+
+  @override
+  void didUpdateWidget(MonthCalendar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // 当父组件传入的 initialDate 发生变化时，更新内部状态
+    if (widget.initialDate != oldWidget.initialDate && widget.initialDate != null) {
+      setState(() {
+        _selectedDate = widget.initialDate!;
+        // 如果选中的日期不在当前显示的月份，切换到对应月份
+        if (_selectedDate.month != _currentDate.month || _selectedDate.year != _currentDate.year) {
+          _currentDate = DateTime(_selectedDate.year, _selectedDate.month);
+        }
+      });
+    }
+    // 更新标记的日期
+    if (widget.markedDates != oldWidget.markedDates) {
+      _markedDates = widget.markedDates ?? [];
+    }
   }
 
   // 获取当月第一天是星期几
@@ -203,219 +222,220 @@ class _MonthCalendarState extends State<MonthCalendar> {
         widget.todayColor ?? Theme.of(context).colorScheme.secondary;
     final Color markedColor = widget.markedDateColor ?? Colors.red;
 
-    // 获取屏幕信息
-    final screenSize = MediaQuery.of(context).size;
-    final screenWidth = screenSize.width;
-    final screenHeight = screenSize.height;
-
-    // 动态计算尺寸
-    final double basePadding = screenWidth * 0.02; // 屏幕宽度的2%
-    final double headerHeight = screenHeight * 0.08; // 屏幕高度的6%
-    final double weekHeaderHeight = screenHeight * 0.05; // 屏幕高度的5%
-    final double fontSize = screenWidth * 0.035; // 屏幕宽度的3.5%
-    final double titleFontSize = screenWidth * 0.04; // 屏幕宽度的4.0%
-    final double iconSize = screenWidth * 0.06; // 屏幕宽度的6%
-
     // 根据屏幕方向调整宽高比
     final double aspectRatio = 12 / 13;
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final availableWidth = constraints.maxWidth;
-        final cellSize = (availableWidth - basePadding * 2) / 7;
+    return Padding(
+      padding: EdgeInsetsGeometry.fromLTRB(8, 4, 8, 4),
+      child: AspectRatio(
+        aspectRatio: aspectRatio,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            // 动态计算尺寸
+            final double basePadding = constraints.maxWidth * 0.02;
+            final double headerHeight = constraints.maxWidth * 0.15;
+            final double weekHeaderHeight = constraints.maxWidth * 0.05;
+            final cellSize = (constraints.maxWidth - basePadding * 2) / 7;
+            final double fontSize = constraints.maxWidth * 0.04;
+            final double iconSize = constraints.maxWidth * 0.06;
+            final double titleFontSize = constraints.maxWidth * 0.04;
+            final double painterWidth = cellSize * 0.1;
 
-        return AspectRatio(
-          aspectRatio: aspectRatio,
-          child: Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primaryContainer,
-              borderRadius: BorderRadius.circular(basePadding),
-              boxShadow: [
-                BoxShadow(
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.shadow.withValues(alpha: 0.1),
-                  offset: Offset(0, basePadding * 0.1),
-                  blurRadius: basePadding * 0.2,
-                  spreadRadius: basePadding * 0.05,
-                ),
-              ],
-            ),
-            child: Column(
-              children: [
-                // 月份导航栏
-                Container(
-                  height: headerHeight,
-                  padding: EdgeInsets.symmetric(
-                    vertical: basePadding * 0.5,
-                    horizontal: basePadding,
+            return Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primaryContainer,
+                borderRadius: BorderRadius.circular(basePadding),
+                boxShadow: [
+                  BoxShadow(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.shadow.withValues(alpha: 0.1),
+                    offset: Offset(0, basePadding * 0.1),
+                    blurRadius: basePadding * 0.2,
+                    spreadRadius: basePadding * 0.05,
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      IconButton(
-                        icon: Icon(Icons.chevron_left, size: iconSize),
-                        onPressed: _prevMonth,
-                        padding: EdgeInsets.all(basePadding * 0.5),
-                        constraints: BoxConstraints(
-                          minWidth: iconSize,
-                          minHeight: iconSize,
-                        ),
-                      ),
-                      Expanded(
-                        child: Center(
-                          child: FittedBox(
-                            fit: BoxFit.scaleDown,
-                            child: Text(
-                              DateFormat('MMMM yyyy').format(_currentDate),
-                              style: TextStyle(
-                                fontSize: titleFontSize,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
+                ],
+              ),
+              child: Column(
+                children: [
+                  // 月份导航栏
+                  Container(
+                    height: headerHeight,
+                    padding: EdgeInsets.symmetric(
+                      vertical: basePadding * 0.5,
+                      horizontal: basePadding,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        IconButton(
+                          icon: Icon(Icons.chevron_left, size: iconSize),
+                          onPressed: _prevMonth,
+                          padding: EdgeInsets.all(basePadding * 0.5),
+                          constraints: BoxConstraints(
+                            minWidth: iconSize,
+                            minHeight: iconSize,
                           ),
                         ),
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.chevron_right, size: iconSize),
-                        onPressed: _nextMonth,
-                        padding: EdgeInsets.all(basePadding * 0.5),
-                        constraints: BoxConstraints(
-                          minWidth: iconSize,
-                          minHeight: iconSize,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                // 星期标题
-                Container(
-                  height: weekHeaderHeight,
-                  decoration: BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(
-                        color: Colors.grey.shade300,
-                        width: 0.5,
-                      ),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      for (int i = 1; i <= 7; i++)
                         Expanded(
                           child: Center(
                             child: FittedBox(
                               fit: BoxFit.scaleDown,
                               child: Text(
-                                DateFormat.E().format(DateTime(2023, 1, i)),
+                                DateFormat('MMMM yyyy').format(_currentDate),
                                 style: TextStyle(
-                                  fontWeight: FontWeight.w400,
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.onPrimaryFixedVariant,
-                                  fontSize: fontSize * 0.8,
+                                  fontSize: titleFontSize,
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
                             ),
                           ),
                         ),
-                    ],
-                  ),
-                ),
-
-                // 日历网格
-                Expanded(
-                  child: Padding(
-                    padding: EdgeInsets.all(basePadding * 0.5),
-                    child: GridView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 7,
-                            childAspectRatio: 1.0,
-                            crossAxisSpacing: 2,
-                            mainAxisSpacing: 2,
+                        IconButton(
+                          icon: Icon(Icons.chevron_right, size: iconSize),
+                          onPressed: _nextMonth,
+                          padding: EdgeInsets.all(basePadding * 0.5),
+                          constraints: BoxConstraints(
+                            minWidth: iconSize,
+                            minHeight: iconSize,
                           ),
-                      itemCount: calendarData.length,
-                      itemBuilder: (context, index) {
-                        final DateTime date = calendarData[index];
-                        final bool isCurrentMonth = _isCurrentMonth(date);
-                        final bool isToday = _isToday(date);
-                        final bool isSelected = _isDateSelected(date);
-                        final bool isMarked = _isDateMarked(date);
+                        ),
+                      ],
+                    ),
+                  ),
 
-                        return GestureDetector(
-                          onTap: () => _onDateTap(date),
-                          child: Container(
-                            margin: EdgeInsets.all(cellSize * 0.05),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: isSelected
-                                  ? selectedColor
-                                  : isToday
-                                  ? todayHighlightColor.withValues(alpha: 0.2)
-                                  : null,
-                              border: isToday && !isSelected
-                                  ? Border.all(
-                                      color: todayHighlightColor,
-                                      width: cellSize * 0.05,
-                                    )
-                                  : null,
-                            ),
+                  // 星期标题
+                  Container(
+                    height: weekHeaderHeight,
+                    decoration: BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(
+                          color: Colors.grey.shade300,
+                          width: 0.5,
+                        ),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        for (int i = 1; i <= 7; i++)
+                          Expanded(
                             child: Center(
-                              child: Stack(
-                                alignment: Alignment.center,
-                                clipBehavior: Clip.none, // 允许子组件超出边界
-                                children: [
-                                  FittedBox(
-                                    fit: BoxFit.scaleDown,
-                                    child: Text(
-                                      date.day.toString(),
-                                      style: TextStyle(
-                                        color: isCurrentMonth
-                                            ? isSelected
-                                                  ? Colors.white
-                                                  : Theme.of(context)
-                                                        .textTheme
-                                                        .bodyMedium
-                                                        ?.color
-                                            : Colors.grey.shade400,
-                                        fontWeight: isToday || isSelected
-                                            ? FontWeight.w500
-                                            : FontWeight.normal,
-                                        fontSize: fontSize,
-                                      ),
-                                    ),
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  DateFormat.E().format(DateTime(2023, 1, i)),
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w400,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onPrimaryFixedVariant,
+                                    fontSize: fontSize * 0.8,
                                   ),
-                                  // 标记点 - 斜着的渐变短线
-                                  if (isMarked)
-                                    Positioned(
-                                      bottom: -0.5,
-                                      child: CustomPaint(
-                                        size: Size(cellSize * 0.4, cellSize * 0.2),
-                                        painter: GradientLinePainter(
-                                          color: markedColor, // 保留用于未来扩展
-                                          isSelected: isSelected,
-                                        ),
-                                      ),
-                                    ),
-                                ],
+                                ),
                               ),
                             ),
                           ),
-                        );
-                      },
+                      ],
                     ),
                   ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
+
+                  // 日历网格
+                  Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.all(basePadding * 0.5),
+                      child: GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 7,
+                              childAspectRatio: 1.0,
+                              crossAxisSpacing: 2,
+                              mainAxisSpacing: 2,
+                            ),
+                        itemCount: calendarData.length,
+                        itemBuilder: (context, index) {
+                          final DateTime date = calendarData[index];
+                          final bool isCurrentMonth = _isCurrentMonth(date);
+                          final bool isToday = _isToday(date);
+                          final bool isSelected = _isDateSelected(date);
+                          final bool isMarked = _isDateMarked(date);
+
+                          return GestureDetector(
+                            onTap: () => _onDateTap(date),
+                            child: Container(
+                              margin: EdgeInsets.all(cellSize * 0.05),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: isSelected
+                                    ? selectedColor
+                                    : isToday
+                                    ? todayHighlightColor.withValues(alpha: 0.2)
+                                    : null,
+                                border: isToday && !isSelected
+                                    ? Border.all(
+                                        color: todayHighlightColor,
+                                        width: cellSize * 0.025,
+                                      )
+                                    : null,
+                              ),
+                              child: Center(
+                                child: Stack(
+                                  alignment: Alignment.center,
+                                  clipBehavior: Clip.none, // 允许子组件超出边界
+                                  children: [
+                                    FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      child: Text(
+                                        date.day.toString(),
+                                        style: TextStyle(
+                                          color: isCurrentMonth
+                                              ? isSelected
+                                                    ? Colors.white
+                                                    : Theme.of(context)
+                                                          .textTheme
+                                                          .bodyMedium
+                                                          ?.color
+                                              : Colors.grey.shade400,
+                                          fontWeight: isToday || isSelected
+                                              ? FontWeight.w500
+                                              : FontWeight.normal,
+                                          fontSize: fontSize,
+                                        ),
+                                      ),
+                                    ),
+                                    // 标记点 - 斜着的渐变短线
+                                    if (isMarked)
+                                      Positioned(
+                                        bottom: -0.5,
+                                        child: CustomPaint(
+                                          size: Size(
+                                            cellSize * 0.6,
+                                            cellSize * 0.2,
+                                          ),
+                                          painter: GradientLinePainter(
+                                            color: markedColor, // 保留用于未来扩展
+                                            isSelected: isSelected,
+                                            painterWidth: painterWidth,
+                                          ),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
     );
   }
 }

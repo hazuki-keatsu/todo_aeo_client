@@ -57,15 +57,14 @@ class TodoProvider extends ChangeNotifier {
   }
 
   // Get todos for today
-  List<Todo> getTodosForToday() {
+  List<Todo> getTodosByDay(DateTime time) {
     if (_todos == null) return [];
-    final today = DateTime.now();
     return _todos!.where((todo) {
       if (todo.finishingAt == null) return false;
       final finishDate = todo.finishingAt!;
-      return finishDate.year == today.year && 
-             finishDate.month == today.month && 
-             finishDate.day == today.day;
+      return finishDate.year == time.year && 
+             finishDate.month == time.month && 
+             finishDate.day == time.day;
     }).toList();
   }
 
