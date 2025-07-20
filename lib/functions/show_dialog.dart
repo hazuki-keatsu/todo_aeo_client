@@ -34,7 +34,6 @@ class ShowDialog {
 
     // 保存主页面的context
     final scaffoldContext = context;
-    final categories = provider.categories ?? [];
 
     return showDialog<void>(
       context: context,
@@ -82,48 +81,109 @@ class ShowDialog {
                     Container(
                       width: double.infinity,
                       decoration: BoxDecoration(
-                        border: Border.all(color: Theme.of(context).hintColor),
+                        border: Border.all(
+                          color: Theme.of(context).dividerColor,
+                        ),
                         borderRadius: BorderRadius.circular(4),
                       ),
-                      child: DropdownButton<int?>(
+                      // TODO: 修复DropdownMenuItem对不齐的问题
+                      child: DropdownButtonFormField<int?>(
                         value: selectedCategoryId,
-                        hint: Text('  选择分类（可选）'),
+                        decoration: InputDecoration(
+                          hintText: '选择分类（可选）',
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                        ),
                         isExpanded: true,
-                        underline: SizedBox(),
+                        icon: Icon(Icons.arrow_drop_down),
                         items: [
                           DropdownMenuItem<int?>(
                             value: null,
-                            child: Text('  无分类'),
-                          ),
-                          if (categories.isNotEmpty)
-                            ...categories.map((category) {
-                              return DropdownMenuItem<int?>(
-                                value: category.id,
-                                child: Row(
-                                  children: [
-                                    SizedBox(width: 8),
-                                    Container(
-                                      width: 16,
-                                      height: 16,
-                                      decoration: BoxDecoration(
-                                        color: parseColor(
-                                          category.color,
-                                          context,
-                                        ),
-                                        shape: BoxShape.circle,
-                                      ),
-                                    ),
-                                    SizedBox(width: 8),
-                                    Text(category.name),
-                                  ],
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.category_outlined,
+                                  color: Colors.grey,
+                                  size: 20,
                                 ),
-                              );
-                            }),
+                                SizedBox(width: 8),
+                                Text('无分类'),
+                              ],
+                            ),
+                          ),
+                          // 添加现有分类
+                          ...provider.categories?.map((category) {
+                                return DropdownMenuItem<int?>(
+                                  value: category.id,
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        width: 16,
+                                        height: 16,
+                                        decoration: BoxDecoration(
+                                          color: parseColor(
+                                            category.color,
+                                            context,
+                                          ),
+                                          shape: BoxShape.circle,
+                                        ),
+                                      ),
+                                      SizedBox(width: 8),
+                                      Text(category.name),
+                                    ],
+                                  ),
+                                );
+                              }) ??
+                              [],
+                          // 添加新分类选项
+                          DropdownMenuItem<int?>(
+                            value: -1,
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.add_circle_outline,
+                                  color: Theme.of(context).colorScheme.primary,
+                                  size: 20,
+                                ),
+                                SizedBox(width: 8),
+                                Text(
+                                  '新增分类',
+                                  style: TextStyle(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ],
-                        onChanged: (value) {
-                          setState(() {
-                            selectedCategoryId = value;
-                          });
+                        onChanged: (value) async {
+                          if (value == -1) {
+                            // 用户选择了新增分类，显示新增分类对话框
+                            final result = await showCategoryDialog(context);
+                            // 如果成功创建了新分类，获取最新创建的分类ID并选中它
+                            if (result == true) {
+                              // 等待下一帧再更新状态，确保 provider 的分类列表已更新
+                              WidgetsBinding.instance.addPostFrameCallback((_) {
+                                if (provider.categories != null &&
+                                    provider.categories!.isNotEmpty) {
+                                  final latestCategory =
+                                      provider.categories!.last;
+                                  setState(() {
+                                    selectedCategoryId = latestCategory.id;
+                                  });
+                                }
+                              });
+                            }
+                          } else {
+                            setState(() {
+                              selectedCategoryId = value;
+                            });
+                          }
                         },
                       ),
                     ),
@@ -263,7 +323,7 @@ class ShowDialog {
     );
   }
 
-  static Future<void> showCategoryDialog(
+  static Future<bool> showCategoryDialog(
     BuildContext context, {
     int? categoryId,
   }) async {
@@ -301,7 +361,7 @@ class ShowDialog {
 
     final dialogContext = context;
 
-    return showDialog<void>(
+    final result = await showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
         return StatefulBuilder(
@@ -367,7 +427,7 @@ class ShowDialog {
                 TextButton(
                   child: Text('取消'),
                   onPressed: () {
-                    Navigator.pop(context);
+                    Navigator.pop(context, false);
                   },
                 ),
                 TextButton(
@@ -389,7 +449,7 @@ class ShowDialog {
                       });
 
                       if (dialogContext.mounted) {
-                        Navigator.pop(dialogContext);
+                        Navigator.pop(dialogContext, true);
                       }
 
                       if (scaffoldContext.mounted) {
@@ -399,7 +459,7 @@ class ShowDialog {
                       }
                     } catch (e) {
                       if (dialogContext.mounted) {
-                        Navigator.pop(dialogContext);
+                        Navigator.pop(dialogContext, false);
                       }
                       if (scaffoldContext.mounted) {
                         ScaffoldMessenger.of(
@@ -415,6 +475,8 @@ class ShowDialog {
         );
       },
     );
+
+    return result ?? false;
   }
 
   static void showDeleteConfirmDialog(
@@ -512,7 +574,10 @@ class ShowDialog {
     );
   }
 
-  static void showAboutApplicationDialog(BuildContext context, SettingsProvider settingsProvider) {
+  static void showAboutApplicationDialog(
+    BuildContext context,
+    SettingsProvider settingsProvider,
+  ) {
     return showAboutDialog(
       context: context,
       applicationName: 'Todo AEO',
