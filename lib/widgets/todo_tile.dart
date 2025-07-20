@@ -130,9 +130,9 @@ class _TodoTileState extends State<TodoTile> {
                             widget.description,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.onPrimaryFixed,
+                              color: isCompleted
+                                  ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)
+                                  : Theme.of(context).colorScheme.onPrimaryContainer.withValues(alpha: 0.8),
                               fontWeight: FontWeight.w400,
                               fontSize: 16,
                             ),
@@ -192,7 +192,9 @@ class _TodoTileState extends State<TodoTile> {
               ? "${widget.createdAt.month}-${widget.createdAt.day}" // 迷你模式简化显示
               : "创建：${widget.createdAt.year}-${widget.createdAt.month}-${widget.createdAt.day} ${widget.createdAt.hour}:${widget.createdAt.minute.toString().padLeft(2, '0')}",
           style: TextStyle(
-            color: Theme.of(context).colorScheme.onPrimaryFixed,
+            color: isCompleted
+                ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)
+                : Theme.of(context).colorScheme.onPrimaryContainer.withValues(alpha: 0.7),
             fontSize: fontSize,
           ),
           overflow: TextOverflow.ellipsis,
@@ -204,7 +206,9 @@ class _TodoTileState extends State<TodoTile> {
                 ? "完成：${widget.finishingAt!.month}-${widget.finishingAt!.day}"
                 : "完成：${widget.finishingAt!.year}-${widget.finishingAt!.month}-${widget.finishingAt!.day} ${widget.finishingAt!.hour}:${widget.finishingAt!.minute.toString().padLeft(2, '0')}",
             style: TextStyle(
-              color: Theme.of(context).colorScheme.onPrimaryFixed,
+              color: isCompleted
+                  ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)
+                  : Theme.of(context).colorScheme.onPrimaryContainer.withValues(alpha: 0.7),
               fontSize: fontSize,
             ),
             textAlign: TextAlign.right,

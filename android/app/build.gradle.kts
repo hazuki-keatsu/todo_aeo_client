@@ -15,7 +15,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace = "com.hazuki.todoaeo"
+    namespace = "com.hazuki.todo_aeo"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 

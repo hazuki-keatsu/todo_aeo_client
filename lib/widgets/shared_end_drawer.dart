@@ -162,9 +162,9 @@ class SharedEndDrawer {
                       ListTile(
                         leading: Icon(Icons.add),
                         title: Text("添加分类"),
-                        onTap: () {
+                        onTap: () async {
                           Navigator.pop(context);
-                          ShowDialog.showCategoryDialog(context);
+                          await ShowDialog.showCategoryDialog(context);
                         },
                       ),
                     ],

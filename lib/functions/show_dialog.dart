@@ -6,6 +6,7 @@ import 'package:todo_aeo/providers/todo_provider.dart';
 enum DelMode { todo, category }
 
 class ShowDialog {
+  // TODO: 编辑描述时，无法写入数据库
   static Future<void> showTodoDialog(
     BuildContext context,
     TodoProvider provider, {
@@ -359,11 +360,9 @@ class ShowDialog {
       '#F97316', // 橙红色
     ];
 
-    final dialogContext = context;
-
     final result = await showDialog<bool>(
       context: context,
-      builder: (BuildContext context) {
+      builder: (BuildContext dialogContext) {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
@@ -427,7 +426,7 @@ class ShowDialog {
                 TextButton(
                   child: Text('取消'),
                   onPressed: () {
-                    Navigator.pop(context, false);
+                    Navigator.pop(dialogContext, false);
                   },
                 ),
                 TextButton(
@@ -435,7 +434,7 @@ class ShowDialog {
                   onPressed: () async {
                     if (categoryName.trim().isEmpty) {
                       ScaffoldMessenger.of(
-                        context,
+                        dialogContext,
                       ).showSnackBar(SnackBar(content: Text('请输入分类名称')));
                       return;
                     }
@@ -519,6 +518,7 @@ class ShowDialog {
     );
   }
 
+  // TODO: 调整编辑弹窗
   static void showOptionsBottomSheet(
     int id,
     TodoProvider provider,
