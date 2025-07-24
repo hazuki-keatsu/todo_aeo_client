@@ -208,18 +208,28 @@ class _CalendarPageState extends State<CalendarPage>
   String? _getCategoryName(int? categoryId) {
     if (categoryId == null) return null;
     final categories = context.read<TodoProvider>().categories ?? [];
-    final category = categories.firstWhere((cat) => cat.id == categoryId);
-    return category.name;
+    try {
+      final category = categories.firstWhere((cat) => cat.id == categoryId);
+      return category.name;
+    } catch (e) {
+      print("Can not find out the category id.");
+      return null; // 如果找不到分类，返回 null
+    }
   }
 
   Color? _getCategoryColor(int? categoryId) {
     if (categoryId == null) return null;
     final categories = context.read<TodoProvider>().categories ?? [];
-    final category = categories.firstWhere((cat) => cat.id == categoryId);
-    // 使用了ShowDialog中的辅助函数
-    return category.color != null
-        ? ShowDialog.parseColor(category.color!, context)
-        : null;
+    try {
+      final category = categories.firstWhere((cat) => cat.id == categoryId);
+      // 使用了ShowDialog中的辅助函数
+      return category.color != null
+          ? ShowDialog.parseColor(category.color!, context)
+          : null;
+    } catch (e) {
+      print("Can not find out the category color.");
+      return null; // 如果找不到分类，返回 null
+    }
   }
 
   // 构建分成完成和未完成两部分的待办事项列表
@@ -287,7 +297,7 @@ class _CalendarPageState extends State<CalendarPage>
                 description: todo.description ?? "",
                 isCompleted: todo.isCompleted == true ? 1 : 0,
                 createdAt: todo.createdAt,
-                finishingAt: todo.finishingAt ?? DateTime.now(),
+                finishingAt: todo.finishingAt,
                 updateCompetedFunction: _updateCompleted,
                 categoryName: _getCategoryName(todo.categoryId),
                 categoryColor: _getCategoryColor(todo.categoryId),
@@ -330,7 +340,7 @@ class _CalendarPageState extends State<CalendarPage>
                 description: todo.description ?? "",
                 isCompleted: todo.isCompleted == true ? 1 : 0,
                 createdAt: todo.createdAt,
-                finishingAt: todo.finishingAt ?? DateTime.now(),
+                finishingAt: todo.finishingAt,
                 updateCompetedFunction: _updateCompleted,
                 categoryName: _getCategoryName(todo.categoryId),
                 categoryColor: _getCategoryColor(todo.categoryId),
@@ -361,7 +371,9 @@ class _CalendarPageState extends State<CalendarPage>
 
         if (todoProvider.todos != null) {
           for (var i in todoProvider.todos!) {
-            todoDeadLine.add(i.finishingAt!);
+            if (i.finishingAt != null) {
+              todoDeadLine.add(i.finishingAt!);
+            }
           }
         }
 
