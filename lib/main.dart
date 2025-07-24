@@ -3,14 +3,17 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:material_color_utilities/material_color_utilities.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
-import 'package:todo_aeo/pages/todo_page.dart';
+import 'package:todo_aeo/pages/home_page.dart';
 import 'package:todo_aeo/pages/calendar_page.dart';
 import 'package:todo_aeo/pages/settings_page.dart';
 import 'package:todo_aeo/providers/todo_provider.dart';
 import 'package:todo_aeo/providers/scaffold_elements_notifier.dart';
 import 'package:todo_aeo/providers/theme_provider.dart';
 import 'package:todo_aeo/providers/settings_provider.dart';
+import 'package:todo_aeo/utils/app_routes.dart';
 // import 'package:todo_aeo/tests/database_initializer.dart';
+
+// TODO: 自定义背景和自定义提示音
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -61,6 +64,7 @@ class ToDo extends StatelessWidget {
               return MaterialApp(
                 home: ToDoHomeFrame(title: "ToDo Aeo"),
                 title: "ToDo",
+                onGenerateRoute: AppRoutes.generateRoute,
                 theme: themeProvider.useDynamicColor && palette != null
                     ? ThemeData(
                         useMaterial3: true,
@@ -94,7 +98,7 @@ class ToDoHomeFrame extends StatefulWidget {
 class _ToDoHomeFrameState extends State<ToDoHomeFrame> {
   int _selectedIndex = 0;
 
-  final List<Widget> _pages = [TodoPage(), CalendarPage(), SettingsPage()];
+  final List<Widget> _pages = [HomePage(), CalendarPage(), SettingsPage()];
 
   @override
   void initState() {

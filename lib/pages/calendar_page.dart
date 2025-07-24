@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:todo_aeo/functions/data_refresh.dart';
-import 'package:todo_aeo/functions/show_dialog.dart';
 import 'package:todo_aeo/functions/todos_sort.dart';
 import 'package:todo_aeo/modules/todo.dart';
 import 'package:todo_aeo/providers/todo_provider.dart';
 import 'package:todo_aeo/providers/scaffold_elements_notifier.dart';
+import 'package:todo_aeo/utils/parse_color.dart';
 import 'package:todo_aeo/widgets/month_calendar.dart';
 import 'package:todo_aeo/widgets/shared_end_drawer.dart';
 import 'package:todo_aeo/widgets/week_calendar.dart';
@@ -224,7 +224,7 @@ class _CalendarPageState extends State<CalendarPage>
       final category = categories.firstWhere((cat) => cat.id == categoryId);
       // 使用了ShowDialog中的辅助函数
       return category.color != null
-          ? ShowDialog.parseColor(category.color!, context)
+          ? parseColor(category.color!, context)
           : null;
     } catch (e) {
       print("Can not find out the category color.");

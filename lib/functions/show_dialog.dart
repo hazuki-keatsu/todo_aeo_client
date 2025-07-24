@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:todo_aeo/providers/settings_provider.dart';
 import 'package:todo_aeo/providers/todo_provider.dart';
+import 'package:todo_aeo/utils/parse_color.dart';
 
 enum OperationMode { todo, category }
 
@@ -163,7 +164,10 @@ class ShowDialog {
                         onChanged: (value) async {
                           if (value == -1) {
                             // 用户选择了新增分类，显示新增分类对话框
-                            final result = await showCategoryDialog(context, provider);
+                            final result = await showCategoryDialog(
+                              context,
+                              provider,
+                            );
                             // 如果成功创建了新分类，获取最新创建的分类ID并选中它
                             if (result == true) {
                               // 等待下一帧再更新状态，确保 provider 的分类列表已更新
@@ -255,9 +259,12 @@ class ShowDialog {
                   child: Text(isEditMode ? '保存' : '确定'),
                   onPressed: () async {
                     if (todoName.trim().isEmpty) {
-                      ScaffoldMessenger.of(
-                        dialogContext,
-                      ).showSnackBar(SnackBar(content: Text('请输入待办事项名称')));
+                      ScaffoldMessenger.of(dialogContext).showSnackBar(
+                        SnackBar(
+                          content: Text('请输入待办事项名称'),
+                          duration: Duration(seconds: 3),
+                        ),
+                      );
                       return;
                     }
 
@@ -293,6 +300,7 @@ class ShowDialog {
                         ScaffoldMessenger.of(scaffoldContext).showSnackBar(
                           SnackBar(
                             content: Text(isEditMode ? '待办事项更新成功' : '待办事项添加成功'),
+                            duration: Duration(seconds: 3),
                           ),
                         );
                       }
@@ -306,6 +314,7 @@ class ShowDialog {
                             content: Text(
                               isEditMode ? '更新待办事项失败: $e' : '添加待办事项失败: $e',
                             ),
+                            duration: Duration(seconds: 3),
                           ),
                         );
                       }
@@ -429,9 +438,12 @@ class ShowDialog {
                   child: Text('确定'),
                   onPressed: () async {
                     if (categoryName.trim().isEmpty) {
-                      ScaffoldMessenger.of(
-                        dialogContext,
-                      ).showSnackBar(SnackBar(content: Text('请输入分类名称')));
+                      ScaffoldMessenger.of(dialogContext).showSnackBar(
+                        SnackBar(
+                          content: Text('请输入分类名称'),
+                          duration: Duration(seconds: 3),
+                        ),
+                      );
                       return;
                     }
 
@@ -457,18 +469,26 @@ class ShowDialog {
                       }
 
                       if (scaffoldContext.mounted) {
-                        ScaffoldMessenger.of(
-                          scaffoldContext,
-                        ).showSnackBar(SnackBar(content: Text(isEditMode ? '分类更新成功' : '分类添加成功')));
+                        ScaffoldMessenger.of(scaffoldContext).showSnackBar(
+                          SnackBar(
+                            content: Text(isEditMode ? '分类更新成功' : '分类添加成功'),
+                            duration: Duration(seconds: 3)
+                          ),
+                        );
                       }
                     } catch (e) {
                       if (dialogContext.mounted) {
                         Navigator.pop(dialogContext, false);
                       }
                       if (scaffoldContext.mounted) {
-                        ScaffoldMessenger.of(
-                          scaffoldContext,
-                        ).showSnackBar(SnackBar(content: Text(isEditMode ? '更新分类失败: $e' : '添加分类失败: $e')));
+                        ScaffoldMessenger.of(scaffoldContext).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              isEditMode ? '更新分类失败: $e' : '添加分类失败: $e',
+                            ),
+                            duration: Duration(seconds: 3)
+                          ),
+                        );
                       }
                     }
                   },
@@ -554,11 +574,13 @@ class ShowDialog {
                     Navigator.pop(context);
                     if (mode == OperationMode.todo) {
                       ShowDialog.showTodoDialog(context, provider, todoId: id);
-                    }
-                    else if (mode == OperationMode.category) {
-                      ShowDialog.showCategoryDialog(context, provider, categoryId: id);
-                    }
-                    else {
+                    } else if (mode == OperationMode.category) {
+                      ShowDialog.showCategoryDialog(
+                        context,
+                        provider,
+                        categoryId: id,
+                      );
+                    } else {
                       throw "showOptionBottomSheet Crushed.";
                     }
                   },
@@ -602,26 +624,5 @@ class ShowDialog {
         Text('使用 Flutter 和 Material You 设计'),
       ],
     );
-  }
-
-  // 颜色解析
-  static Color parseColor(String? colorString, BuildContext context) {
-    if (colorString == null || colorString.isEmpty) {
-      return Theme.of(context).colorScheme.primary;
-    }
-
-    // 检查是否是有效的十六进制颜色格式
-    if (colorString.startsWith('#') && colorString.length == 7) {
-      try {
-        return Color(
-          int.parse(colorString.substring(1), radix: 16) + 0xFF000000,
-        );
-      } catch (e) {
-        return Theme.of(context).colorScheme.primary;
-      }
-    }
-
-    // 如果不是十六进制格式，返回默认颜色
-    return Theme.of(context).colorScheme.primary;
   }
 }

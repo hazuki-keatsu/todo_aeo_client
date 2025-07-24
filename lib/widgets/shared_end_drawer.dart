@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:todo_aeo/functions/show_dialog.dart';
 import 'package:todo_aeo/providers/settings_provider.dart';
 import 'package:todo_aeo/providers/todo_provider.dart';
+import 'package:todo_aeo/utils/parse_color.dart';
 
 class SharedEndDrawer {
   static Widget build(
@@ -136,7 +137,7 @@ class SharedEndDrawer {
                               height: 24,
                               decoration: BoxDecoration(
                                 color: category.color != null
-                                    ? ShowDialog.parseColor(category.color, context)
+                                    ? parseColor(category.color, context)
                                     : Theme.of(context).colorScheme.primary,
                                 shape: BoxShape.circle,
                               ),

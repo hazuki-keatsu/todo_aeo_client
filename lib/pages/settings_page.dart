@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:todo_aeo/functions/show_dialog.dart';
-import 'package:todo_aeo/pages/theme_page.dart';
+import 'package:todo_aeo/pages/theme_settings_page.dart';
 import 'package:todo_aeo/providers/todo_provider.dart';
 import 'package:todo_aeo/providers/scaffold_elements_notifier.dart';
 import 'package:todo_aeo/providers/settings_provider.dart';

@@ -161,7 +161,7 @@ class _MonthCalendarState extends State<MonthCalendar> {
     final double aspectRatio = 12 / 13;
 
     return Padding(
-      padding: EdgeInsetsGeometry.fromLTRB(8, 4, 8, 4),
+      padding: EdgeInsetsGeometry.fromLTRB(8, 8, 8, 4),
       child: AspectRatio(
         aspectRatio: aspectRatio,
         child: LayoutBuilder(

@@ -22,7 +22,7 @@ class ThemePage extends StatelessWidget {
             title: Text("主题设置"),
           ),
           body: ListView(
-            padding: EdgeInsets.all(16),
+            padding: EdgeInsets.all(8),
             children: [
               // 深色模式开关
               Card(
@@ -45,7 +45,7 @@ class ThemePage extends StatelessWidget {
               Card(
                 child: SwitchListTile(
                   title: Text('动态取色'),
-                  subtitle: Text('根据壁纸自动选择主题色'),
+                  subtitle: Text('根据壁纸自动选择主题色 (Android 12 以上)'),
                   value: themeProvider.useDynamicColor,
                   onChanged: (value) async {
                     await themeProvider.setUseDynamicColor(value);
