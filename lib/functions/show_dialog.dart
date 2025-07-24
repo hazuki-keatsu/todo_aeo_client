@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:todo_aeo/providers/settings_provider.dart';
 import 'package:todo_aeo/providers/todo_provider.dart';
 
-enum DelMode { todo, category }
+enum OperationMode { todo, category }
 
 class ShowDialog {
-  // TODO: 编辑描述时，无法写入数据库
   static Future<void> showTodoDialog(
     BuildContext context,
     TodoProvider provider, {
@@ -165,7 +163,7 @@ class ShowDialog {
                         onChanged: (value) async {
                           if (value == -1) {
                             // 用户选择了新增分类，显示新增分类对话框
-                            final result = await showCategoryDialog(context);
+                            final result = await showCategoryDialog(context, provider);
                             // 如果成功创建了新分类，获取最新创建的分类ID并选中它
                             if (result == true) {
                               // 等待下一帧再更新状态，确保 provider 的分类列表已更新
@@ -277,8 +275,6 @@ class ShowDialog {
 
                       if (isEditMode) {
                         // 编辑模式：更新现有待办事项
-                        todoData['updatedAt'] = DateTime.now()
-                            .toIso8601String();
                         await provider.updateTodo(todoData);
                       } else {
                         // 添加模式：创建新的待办事项
@@ -325,7 +321,8 @@ class ShowDialog {
   }
 
   static Future<bool> showCategoryDialog(
-    BuildContext context, {
+    BuildContext context,
+    TodoProvider provider, {
     int? categoryId,
   }) async {
     String categoryName = '';
@@ -333,7 +330,6 @@ class ShowDialog {
 
     // 保存主页面的context
     final scaffoldContext = context;
-    final provider = context.read<TodoProvider>(); // 默认蓝色
 
     final isEditMode = categoryId != null;
 
@@ -345,7 +341,7 @@ class ShowDialog {
         categoryName = existingCategory.name;
         selectedColor = existingCategory.color ?? '#3B82F6';
       } else {
-        print("CategoryId Crushed.");
+        throw "CategoryId Crushed.";
       }
     }
 
@@ -440,12 +436,21 @@ class ShowDialog {
                     }
 
                     try {
-                      // 添加分类到数据库
-                      await provider.addCategory({
-                        'name': categoryName.trim(),
-                        'color': selectedColor,
-                        'createdAt': DateTime.now().toIso8601String(),
-                      });
+                      if (isEditMode) {
+                        // 编辑模式：更新现有分类
+                        await provider.updateCategory({
+                          'id': categoryId,
+                          'name': categoryName.trim(),
+                          'color': selectedColor,
+                        });
+                      } else {
+                        // 添加模式：创建新的分类
+                        await provider.addCategory({
+                          'name': categoryName.trim(),
+                          'color': selectedColor,
+                          'createdAt': DateTime.now().toIso8601String(),
+                        });
+                      }
 
                       if (dialogContext.mounted) {
                         Navigator.pop(dialogContext, true);
@@ -454,7 +459,7 @@ class ShowDialog {
                       if (scaffoldContext.mounted) {
                         ScaffoldMessenger.of(
                           scaffoldContext,
-                        ).showSnackBar(SnackBar(content: Text('分类添加成功')));
+                        ).showSnackBar(SnackBar(content: Text(isEditMode ? '分类更新成功' : '分类添加成功')));
                       }
                     } catch (e) {
                       if (dialogContext.mounted) {
@@ -463,7 +468,7 @@ class ShowDialog {
                       if (scaffoldContext.mounted) {
                         ScaffoldMessenger.of(
                           scaffoldContext,
-                        ).showSnackBar(SnackBar(content: Text('添加分类失败: $e')));
+                        ).showSnackBar(SnackBar(content: Text(isEditMode ? '更新分类失败: $e' : '添加分类失败: $e')));
                       }
                     }
                   },
@@ -482,14 +487,14 @@ class ShowDialog {
     BuildContext context,
     int id,
     TodoProvider provider,
-    DelMode mode,
+    OperationMode mode,
   ) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('确认删除'),
-          content: mode == DelMode.todo
+          content: mode == OperationMode.todo
               ? Text('确定要删除这个待办事项吗？')
               : Text('确定要删除这个分类吗？'),
           actions: [
@@ -500,10 +505,10 @@ class ShowDialog {
             TextButton(
               child: Text('删除', style: TextStyle(color: Colors.red)),
               onPressed: () {
-                if (mode == DelMode.todo) {
+                if (mode == OperationMode.todo) {
                   Navigator.pop(context);
                   provider.deleteTodo(id);
-                } else if (mode == DelMode.category) {
+                } else if (mode == OperationMode.category) {
                   Navigator.pop(context);
                   provider.deleteCategory(id);
                   for (var i in provider.getTodosByCategory(id)) {
@@ -518,12 +523,12 @@ class ShowDialog {
     );
   }
 
-  // TODO: 调整编辑弹窗
+  // 编辑分类变成了新增分类
   static void showOptionsBottomSheet(
     int id,
     TodoProvider provider,
     BuildContext context,
-    DelMode mode,
+    OperationMode mode,
   ) {
     showModalBottomSheet(
       context: context,
@@ -547,7 +552,15 @@ class ShowDialog {
                   title: Text('编辑'),
                   onTap: () {
                     Navigator.pop(context);
-                    ShowDialog.showTodoDialog(context, provider, todoId: id);
+                    if (mode == OperationMode.todo) {
+                      ShowDialog.showTodoDialog(context, provider, todoId: id);
+                    }
+                    else if (mode == OperationMode.category) {
+                      ShowDialog.showCategoryDialog(context, provider, categoryId: id);
+                    }
+                    else {
+                      throw "showOptionBottomSheet Crushed.";
+                    }
                   },
                 ),
                 ListTile(

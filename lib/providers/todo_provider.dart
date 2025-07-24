@@ -133,6 +133,19 @@ class TodoProvider extends ChangeNotifier {
     }
   }
 
+  // Update category
+  Future<void> updateCategory(Map<String, dynamic> categoryData) async {
+    try {
+      await _dq.updateCategory(categoryData);
+      await _loadCategories();
+      notifyListeners();
+    } catch (e) {
+      _error = '更新分类失败: $e';
+      notifyListeners();
+      rethrow;
+    }
+  }
+
   // Delete category
   Future<void> deleteCategory(int id) async {
     try {

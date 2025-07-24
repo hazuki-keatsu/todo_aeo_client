@@ -17,6 +17,10 @@ class TodoPage extends StatefulWidget {
   State<TodoPage> createState() => _TodoPageState();
 }
 
+// TODO: 添加多选功能，优化操作逻辑
+// 短按查看详情 -> 编辑和删除功能
+// 长按进入多选
+
 class _TodoPageState extends State<TodoPage> {
   int? selectedCategoryId; // null表示显示所有todos
   String selectedCategoryName = "全部";

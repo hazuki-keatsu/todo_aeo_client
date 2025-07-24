@@ -86,7 +86,7 @@ class _TodoTileState extends State<TodoTile> {
               widget.id,
               widget.todoProvider,
               context,
-              DelMode.todo,
+              OperationMode.todo,
             ),
             child: Container(
               decoration: BoxDecoration(

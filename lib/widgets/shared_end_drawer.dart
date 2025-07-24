@@ -153,7 +153,7 @@ class SharedEndDrawer {
                               category.id!,
                               todoProvider,
                               context,
-                              DelMode.category,
+                              OperationMode.category,
                             ),
                           );
                         }),
@@ -164,7 +164,7 @@ class SharedEndDrawer {
                         title: Text("添加分类"),
                         onTap: () async {
                           Navigator.pop(context);
-                          await ShowDialog.showCategoryDialog(context);
+                          await ShowDialog.showCategoryDialog(context, provider);
                         },
                       ),
                     ],
