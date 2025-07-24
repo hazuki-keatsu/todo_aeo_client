@@ -59,9 +59,11 @@ class _MonthCalendarState extends State<MonthCalendar> {
     }
   }
 
-  // 获取当月第一天是星期几
+  // 获取当月第一天是星期几 (0=Sunday, 1=Monday, ..., 6=Saturday)
   int _getFirstDayOfMonth() {
-    return DateTime(_currentDate.year, _currentDate.month, 1).weekday;
+    final firstDay = DateTime(_currentDate.year, _currentDate.month, 1);
+    // 将 DateTime.weekday (1=Monday, 7=Sunday) 转换为 (0=Sunday, 1=Monday, ..., 6=Saturday)
+    return firstDay.weekday == 7 ? 0 : firstDay.weekday;
   }
 
   // 获取当月的总天数
@@ -72,12 +74,12 @@ class _MonthCalendarState extends State<MonthCalendar> {
   // 生成日历数据
   List<DateTime> _generateCalendarData() {
     List<DateTime> calendarData = [];
-    final int firstDayOfMonth = _getFirstDayOfMonth();
+    final int firstDayOfMonth = _getFirstDayOfMonth(); // 0=Sunday, 1=Monday, ..., 6=Saturday
     final int daysInMonth = _getDaysInMonth();
 
     // 添加上个月的末尾几天
-    for (int i = firstDayOfMonth - 1; i > 0; i--) {
-      calendarData.add(DateTime(_currentDate.year, _currentDate.month, 1 - i));
+    for (int i = firstDayOfMonth - 1; i >= 0; i--) {
+      calendarData.add(DateTime(_currentDate.year, _currentDate.month, -i));
     }
 
     // 添加当月的所有天

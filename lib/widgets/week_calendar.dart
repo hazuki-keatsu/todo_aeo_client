@@ -56,10 +56,13 @@ class _WeekCalendarState extends State<WeekCalendar> {
     }
   }
 
-  // 获取一周的开始日期（周一）
+  // 获取一周的开始日期（周日）
   DateTime _getWeekStart(DateTime date) {
     final weekday = date.weekday;
-    return date.subtract(Duration(days: weekday - 1));
+    // 将 DateTime.weekday (1=Monday, 7=Sunday) 转换为从周日开始
+    // 如果是周日(weekday=7)，则不需要减去天数；否则减去对应天数
+    final daysToSubtract = weekday == 7 ? 0 : weekday;
+    return date.subtract(Duration(days: daysToSubtract));
   }
 
   // 生成当前周的日期列表
