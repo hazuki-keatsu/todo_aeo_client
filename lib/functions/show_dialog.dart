@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:todo_aeo/providers/settings_provider.dart';
 import 'package:todo_aeo/providers/todo_provider.dart';
+import 'package:todo_aeo/utils/app_routes.dart';
 import 'package:todo_aeo/utils/parse_color.dart';
 
 enum OperationMode { todo, category }
@@ -86,7 +87,6 @@ class ShowDialog {
                         ),
                         borderRadius: BorderRadius.circular(4),
                       ),
-                      // TODO: 修复DropdownMenuItem对不齐的问题
                       child: DropdownButtonFormField<int?>(
                         value: selectedCategoryId,
                         decoration: InputDecoration(
@@ -573,7 +573,7 @@ class ShowDialog {
                   onTap: () {
                     Navigator.pop(context);
                     if (mode == OperationMode.todo) {
-                      ShowDialog.showTodoDialog(context, provider, todoId: id);
+                      AppRoutes.pushTodoEditPage(context, id, provider);
                     } else if (mode == OperationMode.category) {
                       ShowDialog.showCategoryDialog(
                         context,

@@ -188,7 +188,6 @@ class _TodoPageState extends State<TodoPage> {
                   border: Border.all(color: Theme.of(context).dividerColor),
                   borderRadius: BorderRadius.circular(4),
                 ),
-                // TODO: 修复DropdownMenuItem对不齐的问题
                 child: DropdownButtonFormField<int?>(
                   value: selectedCategoryId,
                   decoration: InputDecoration(
