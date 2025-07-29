@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:dynamic_color/dynamic_color.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:material_color_utilities/material_color_utilities.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
@@ -11,7 +12,7 @@ import 'package:todo_aeo/providers/scaffold_elements_notifier.dart';
 import 'package:todo_aeo/providers/theme_provider.dart';
 import 'package:todo_aeo/providers/settings_provider.dart';
 import 'package:todo_aeo/utils/app_routes.dart';
-// import 'package:todo_aeo/tests/database_initializer.dart';
+import 'package:todo_aeo/tests/database_initializer.dart';
 
 // TODO: 自定义背景和自定义提示音
 
@@ -20,7 +21,7 @@ void main() async {
 
   final CorePalette? palette = await DynamicColorPlugin.getCorePalette();
 
-  // await DatabaseInitializer.initializeWithSampleData();
+  await DatabaseInitializer.initializeWithSampleData();
 
   runApp(ToDo(palette: palette));
 }
@@ -50,15 +51,11 @@ class ToDo extends StatelessWidget {
           // 如果主题提供者还没有初始化完成，显示加载界面
           if (!themeProvider.isInitialized) {
             return MaterialApp(
-              home: Scaffold(
-                body: Center(
-                  child: CircularProgressIndicator(),
-                ),
-              ),
+              home: Scaffold(body: Center(child: CircularProgressIndicator())),
               debugShowCheckedModeBanner: false,
             );
           }
-          
+
           return ResponsiveSizer(
             builder: (context, orientation, screenType) {
               return MaterialApp(
@@ -70,13 +67,23 @@ class ToDo extends StatelessWidget {
                         useMaterial3: true,
                         colorScheme: ColorScheme.fromSeed(
                           seedColor: Color(palette!.primary.get(40)),
-                          brightness: themeProvider.isDarkMode 
-                            ? Brightness.dark 
-                            : Brightness.light,
+                          brightness: themeProvider.isDarkMode
+                              ? Brightness.dark
+                              : Brightness.light,
                         ),
                       )
                     : themeProvider.getThemeData(),
                 debugShowCheckedModeBanner: false,
+                localizationsDelegates: [
+                  GlobalMaterialLocalizations.delegate,
+                  GlobalWidgetsLocalizations.delegate,
+                  GlobalCupertinoLocalizations.delegate,
+                ],
+                supportedLocales: [
+                  Locale('zh', 'CN'),
+                  Locale('en', 'US'),
+                ],
+                locale: Locale('zh', 'CN'),
               );
             },
           );

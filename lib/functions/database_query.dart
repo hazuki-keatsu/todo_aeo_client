@@ -19,7 +19,14 @@ class DatabaseQuery {
   Future<Database> _initDB(String filePath) async {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, filePath);
-    return await openDatabase(path, version: 1, onCreate: _createDB);
+    return await openDatabase(path, version: 2, onCreate: _createDB, onUpgrade: _upgradeDB);
+  }
+
+  Future _upgradeDB(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      // 添加优先级字段
+      await db.execute('ALTER TABLE todos ADD COLUMN priority INTEGER DEFAULT 0');
+    }
   }
 
   Future _createDB(Database db, int version) async {
@@ -43,6 +50,7 @@ class DatabaseQuery {
         categoryId INTEGER,
         createdAt TEXT NOT NULL,
         finishingAt TEXT,
+        priority INTEGER DEFAULT 0,
         FOREIGN KEY (categoryId) REFERENCES categories (id) ON DELETE SET NULL
       )
     ''');
@@ -60,7 +68,7 @@ class DatabaseQuery {
   // Todo操作
   Future<List<Map<String, dynamic>>> getAllTodos() async {
     final db = await instance.database;
-    return await db.query('todos', orderBy: 'createdAt DESC');
+    return await db.query('todos', orderBy: 'priority DESC, createdAt DESC');
   }
 
   Future<int> insertTodo(Map<String, dynamic> row) async {
@@ -77,6 +85,48 @@ class DatabaseQuery {
   Future<int> deleteTodo(int id) async {
     final db = await instance.database;
     return await db.delete('todos', where: 'id = ?', whereArgs: [id]);
+  }
+
+  // 批量更新Todo优先级
+  Future<void> updateTodosPriority(List<int> todoIds) async {
+    final db = await instance.database;
+    await db.transaction((txn) async {
+      for (int i = 0; i < todoIds.length; i++) {
+        await txn.update(
+          'todos',
+          {'priority': i},
+          where: 'id = ?',
+          whereArgs: [todoIds[i]],
+        );
+      }
+    });
+  }
+
+  // 批量更新Todo优先级（带起始优先级）
+  Future<void> updateTodosPriorityBatch(List<int> todoIds, int startPriority) async {
+    final db = await instance.database;
+    await db.transaction((txn) async {
+      for (int i = 0; i < todoIds.length; i++) {
+        int newPriority = startPriority - i;
+        await txn.update(
+          'todos',
+          {'priority': newPriority},
+          where: 'id = ?',
+          whereArgs: [todoIds[i]],
+        );
+      }
+    });
+  }
+
+  // 更新单个Todo的优先级
+  Future<void> updateTodoPriority(int todoId, int newPriority) async {
+    final db = await instance.database;
+    await db.update(
+      'todos',
+      {'priority': newPriority},
+      where: 'id = ?',
+      whereArgs: [todoId],
+    );
   }
 
   // Settings操作

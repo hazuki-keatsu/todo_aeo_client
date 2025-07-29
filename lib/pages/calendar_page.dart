@@ -262,8 +262,8 @@ class _CalendarPageState extends State<CalendarPage>
 
     // 使用TodosSort进行分组
     final completionGroups = TodosSort.todosCompletion(todayTodo);
-    final completedTodos = TodosSort.todosSortByFinishingTime(completionGroups[0]);
-    final uncompletedTodos = TodosSort.todosSortByFinishingTime(completionGroups[1]);
+    final completedTodos = TodosSort.todosSortByPriority(completionGroups[0]);
+    final uncompletedTodos = TodosSort.todosSortByPriority(completionGroups[1]);
 
     List<Widget> sections = [];
 

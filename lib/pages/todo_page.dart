@@ -90,9 +90,7 @@ class _TodoPageState extends State<TodoPage> {
 
       // 显示成功消息并返回
       if (mounted) {
-        if (mounted) {
-          Navigator.pop(context);
-        }
+        Navigator.pop(context);
 
         await Future.delayed(Duration(milliseconds: 200));
 

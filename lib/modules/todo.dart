@@ -6,6 +6,7 @@ class Todo {
   final int? categoryId;
   final DateTime createdAt;
   final DateTime? finishingAt;
+  final int priority; // 新增优先级字段，数值越小优先级越高
 
   Todo({
     required this.id,
@@ -15,6 +16,7 @@ class Todo {
     this.categoryId,
     required this.createdAt,
     this.finishingAt,
+    this.priority = 0, // 默认优先级为0
   });
 
   // 从数据库 Map 创建 Todo 对象
@@ -29,6 +31,7 @@ class Todo {
       finishingAt: map['finishingAt'] != null 
           ? DateTime.parse(map['finishingAt'] as String)
           : null,
+      priority: map['priority'] as int? ?? 0, // 添加优先级字段，默认为0
     );
   }
 
@@ -42,6 +45,7 @@ class Todo {
       'categoryId': categoryId,
       'createdAt': createdAt.toIso8601String(),
       'finishingAt': finishingAt?.toIso8601String(),
+      'priority': priority, // 添加优先级字段
     };
   }
 }

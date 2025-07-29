@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:todo_aeo/pages/theme_settings_page.dart';
 import 'package:todo_aeo/pages/todo_page.dart';
 import 'package:todo_aeo/providers/todo_provider.dart';
 
@@ -6,6 +7,7 @@ class AppRoutes {
   // 路由名称常量
   static const String todoPage = '/todo';
   static const String todoEditPage = '/todo/edit';
+  static const String themeSettingPage = '/theme_settings';
 
   // 自定义页面切换动画 - 非线性复合动画（滑动+缩放+淡入）
   static Route<T> slideFromRightRoute<T extends Object?>(
@@ -31,7 +33,6 @@ class AppRoutes {
           end: slideEnd,
         ).chain(CurveTween(curve: slideCurve));
         var slideAnimation = animation.drive(slideTween);
-
 
         // 淡入动画：透明度从0到1
         var fadeTween = Tween(
@@ -89,6 +90,9 @@ class AppRoutes {
           ),
           settings: settings,
         );
+
+      case themeSettingPage:
+        return slideFromRightRoute(ThemePage(), settings: settings);
 
       default:
         return null;

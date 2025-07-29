@@ -15,6 +15,9 @@ class TodoTile extends StatefulWidget {
     this.categoryName,
     this.categoryColor,
     required this.todoProvider,
+    this.priority = 0, // 新增优先级参数
+    this.dragIndex, // 拖动索引
+    this.enableDrag = false, // 是否启用拖动
   });
 
   final int id;
@@ -27,6 +30,9 @@ class TodoTile extends StatefulWidget {
   final String? categoryName;
   final Color? categoryColor;
   final TodoProvider todoProvider;
+  final int priority; // 新增优先级字段
+  final int? dragIndex; // 拖动索引
+  final bool enableDrag; // 是否启用拖动
 
   @override
   State<TodoTile> createState() => _TodoTileState();
@@ -61,7 +67,9 @@ class _TodoTileState extends State<TodoTile> {
       padding: EdgeInsetsGeometry.fromLTRB(8, 4, 8, 4),
       child: Container(
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.primaryContainer,
+          color: isCompleted
+              ? Theme.of(context).colorScheme.surfaceContainer
+              : Theme.of(context).colorScheme.primaryContainer,
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
@@ -74,77 +82,119 @@ class _TodoTileState extends State<TodoTile> {
             ),
           ],
         ),
-        child: Material(
-          color: isCompleted
-              ? Theme.of(context).colorScheme.surfaceContainer
-              : Theme.of(context).colorScheme.primaryContainer,
-          borderRadius: BorderRadius.circular(12),
-          child: InkWell(
-            borderRadius: BorderRadius.circular(12),
-            onTap: () {}, // 添加空的onTap以启用涟漪效果
-            onLongPress: () => ShowDialog.showOptionsBottomSheet(
-              widget.id,
-              widget.todoProvider,
-              context,
-              OperationMode.todo,
-            ),
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Padding(
-                padding: EdgeInsetsGeometry.fromLTRB(0, 4, 0, 4),
-                child: Row(
-                  children: [
-                    Checkbox(
-                      value: isCompleted,
-                      onChanged: (value) => checkboxClick(value ?? false),
+        child: IntrinsicHeight(
+          child: Row(
+            children: [
+              // 主要内容区域
+              Expanded(
+                child: Material(
+                  color: isCompleted
+                      ? Theme.of(context).colorScheme.surfaceContainer
+                      : Theme.of(context).colorScheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(12),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(12),
+                    onTap: () {}, // 添加空的onTap以启用涟漪效果
+                    onLongPress: () => ShowDialog.showOptionsBottomSheet(
+                      widget.id,
+                      widget.todoProvider,
+                      context,
+                      OperationMode.todo,
                     ),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  widget.title,
-                                  style: TextStyle(
-                                    color: isCompleted
-                                        ? Theme.of(
-                                            context,
-                                          ).colorScheme.onSurface
-                                        : Theme.of(
-                                            context,
-                                          ).colorScheme.onPrimaryContainer,
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 20,
-                                  ),
-                                ),
-                              ),
-                              _buildCategoryChip(12, 8, 24),
-                              SizedBox(width: 8), // 添加一些右边距
-                            ],
-                          ),
-                          Text(
-                            widget.description,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              color: isCompleted
-                                  ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)
-                                  : Theme.of(context).colorScheme.onPrimaryContainer.withValues(alpha: 0.8),
-                              fontWeight: FontWeight.w400,
-                              fontSize: 16,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsetsGeometry.fromLTRB(0, 4, 0, 4),
+                        child: Row(
+                          children: [
+                            Checkbox(
+                              value: isCompleted,
+                              onChanged: (value) =>
+                                  checkboxClick(value ?? false),
                             ),
-                          ),
-                          _buildTimeRow(16, false, true),
-                        ],
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          widget.title,
+                                          style: TextStyle(
+                                            color: isCompleted
+                                                ? Theme.of(
+                                                    context,
+                                                  ).colorScheme.onSurface
+                                                : Theme.of(context)
+                                                      .colorScheme
+                                                      .onPrimaryContainer,
+                                            fontWeight: FontWeight.w700,
+                                            fontSize: 20,
+                                          ),
+                                        ),
+                                      ),
+                                      _buildCategoryChip(12, 8, 24),
+                                      SizedBox(width: 8), // 添加一些右边距
+                                    ],
+                                  ),
+                                  Text(
+                                    widget.description,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      color: isCompleted
+                                          ? Theme.of(context)
+                                                .colorScheme
+                                                .onSurface
+                                                .withValues(alpha: 0.7)
+                                          : Theme.of(context)
+                                                .colorScheme
+                                                .onPrimaryContainer
+                                                .withValues(alpha: 0.8),
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                  _buildTimeRow(16, false, true),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ],
+                  ),
                 ),
               ),
-            ),
+              // 拖动手柄 - 只在启用拖动时显示
+              if (widget.enableDrag && widget.dragIndex != null)
+                SizedBox(
+                  width: 48,
+                  child: ReorderableDragStartListener(
+                    index: widget.dragIndex!,
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(12),
+                        onTap: () {},
+                        child: SizedBox(
+                          width: 48,
+                          height: double.infinity, // 填充整个可用高度
+                          child: Center(
+                            child: Icon(
+                              Icons.drag_handle,
+                              color: Theme.of(context).colorScheme.outline,
+                              size: 20,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
           ),
         ),
       ),
@@ -194,7 +244,9 @@ class _TodoTileState extends State<TodoTile> {
           style: TextStyle(
             color: isCompleted
                 ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)
-                : Theme.of(context).colorScheme.onPrimaryContainer.withValues(alpha: 0.7),
+                : Theme.of(
+                    context,
+                  ).colorScheme.onPrimaryContainer.withValues(alpha: 0.7),
             fontSize: fontSize,
           ),
           overflow: TextOverflow.ellipsis,
@@ -207,8 +259,12 @@ class _TodoTileState extends State<TodoTile> {
                 : "完成：${widget.finishingAt!.year}-${widget.finishingAt!.month}-${widget.finishingAt!.day} ${widget.finishingAt!.hour}:${widget.finishingAt!.minute.toString().padLeft(2, '0')}",
             style: TextStyle(
               color: isCompleted
-                  ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)
-                  : Theme.of(context).colorScheme.onPrimaryContainer.withValues(alpha: 0.7),
+                  ? Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.6)
+                  : Theme.of(
+                      context,
+                    ).colorScheme.onPrimaryContainer.withValues(alpha: 0.7),
               fontSize: fontSize,
             ),
             textAlign: TextAlign.right,

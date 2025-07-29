@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:todo_aeo/functions/show_dialog.dart';
-import 'package:todo_aeo/pages/theme_settings_page.dart';
 import 'package:todo_aeo/providers/todo_provider.dart';
 import 'package:todo_aeo/providers/scaffold_elements_notifier.dart';
 import 'package:todo_aeo/providers/settings_provider.dart';
+import 'package:todo_aeo/utils/app_routes.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -130,15 +130,25 @@ class _SettingsPageState extends State<SettingsPage> {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                          builder: (context) {
-                            return ThemePage();
-                          },
-                        ),
+                        AppRoutes.generateRoute(const RouteSettings(name: "/theme_settings"))!,
                       );
                     },
                   ),
-                  Divider(height: 1),
+                  Divider(),
+                  ListTile(
+                    leading: Icon(Icons.language_outlined),
+                    title: Text('切换语言'),
+                    subtitle: Text('选择你的语言'),
+                    onTap: () {},
+                    enabled: false,
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: sizedBoxHeight),
+            Card(
+              child: Column(
+                children: [
                   ListTile(
                     leading: Icon(Icons.info_outline),
                     title: Text('关于应用'),
@@ -184,8 +194,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     ...settingsProvider
                         .getAppInfoMap()
                         .entries
-                        .map((entry) => _buildInfoRow(entry.key, entry.value))
-                        .toList(),
+                        .map((entry) => _buildInfoRow(entry.key, entry.value)),
                     _buildInfoRow('框架', 'Flutter'),
                     _buildInfoRow('设计', 'Material You'),
                     if (settingsProvider.error != null)
