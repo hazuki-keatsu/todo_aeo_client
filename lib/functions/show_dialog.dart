@@ -797,7 +797,7 @@ class ShowDialog {
       children: [
         Text('一个主打简洁和安全的待办事项管理应用'),
         SizedBox(height: 8),
-        Text('使用 Flutter 和 Material You 设��'),
+        Text('使用 Flutter 和 Material You 设计。'),
       ],
     );
   }
