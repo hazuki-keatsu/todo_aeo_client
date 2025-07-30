@@ -18,6 +18,11 @@ class TodoTile extends StatefulWidget {
     this.priority = 0, // 新增优先级参数
     this.dragIndex, // 拖动索引
     this.enableDrag = false, // 是否启用拖动
+    // 多选相关参数
+    this.isMultiSelectMode = false, // 是否处于多选模式
+    this.isSelected = false, // 是否被选中
+    this.onLongPress, // 长按回调
+    this.onSelected, // 选中状态变更回调
   });
 
   final int id;
@@ -30,9 +35,14 @@ class TodoTile extends StatefulWidget {
   final String? categoryName;
   final Color? categoryColor;
   final TodoProvider todoProvider;
-  final int priority; // 新增优先级字段
+  final int priority; // 优先级字段
   final int? dragIndex; // 拖动索引
   final bool enableDrag; // 是否启用拖动
+  // 多选相关参数
+  final bool isMultiSelectMode; // 是否处于多选模式
+  final bool isSelected; // 是否被选中
+  final VoidCallback? onLongPress; // 长按回调
+  final Function(bool)? onSelected; // 选中状态变更回调
 
   @override
   State<TodoTile> createState() => _TodoTileState();
@@ -94,12 +104,27 @@ class _TodoTileState extends State<TodoTile> {
                   borderRadius: BorderRadius.circular(12),
                   child: InkWell(
                     borderRadius: BorderRadius.circular(12),
-                    onTap: () => ShowDialog.showOptionsBottomSheet(
-                      widget.id,
-                      widget.todoProvider,
-                      context,
-                      OperationMode.todo,
-                    ),
+                    onTap: () {
+                      if (widget.isMultiSelectMode) {
+                        // 在多选模式下，切换选中状态
+                        setState(() {
+                          widget.onSelected?.call(!widget.isSelected);
+                        });
+                      } else {
+                        // 正常点击事件
+                        ShowDialog.showOptionsBottomSheet(
+                          widget.id,
+                          widget.todoProvider,
+                          context,
+                          OperationMode.todo,
+                        );
+                      }
+                    },
+                    onLongPress: () {
+                      if (widget.onLongPress != null) {
+                        widget.onLongPress!();
+                      }
+                    },
                     child: Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
@@ -108,10 +133,22 @@ class _TodoTileState extends State<TodoTile> {
                         padding: EdgeInsetsGeometry.fromLTRB(0, 4, 0, 4),
                         child: Row(
                           children: [
+                            // 复选框 - 多选模式下用于选择，正常模式下用于完成状态
                             Checkbox(
-                              value: isCompleted,
-                              onChanged: (value) =>
-                                  checkboxClick(value ?? false),
+                              value: widget.isMultiSelectMode
+                                  ? widget.isSelected
+                                  : isCompleted,
+                              onChanged: (value) {
+                                if (widget.isMultiSelectMode) {
+                                  // 多选模式 - 切换选中状态
+                                  setState(() {
+                                    widget.onSelected?.call(value ?? false);
+                                  });
+                                } else {
+                                  // 正常模式 - 切换完成状态
+                                  checkboxClick(value ?? false);
+                                }
+                              },
                             ),
                             Expanded(
                               child: Column(

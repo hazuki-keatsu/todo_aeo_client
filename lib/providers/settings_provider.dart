@@ -65,14 +65,12 @@ class SettingsProvider extends ChangeNotifier {
     if (_packageInfo == null) {
       return {
         '版本': '加载中...',
-        '构建号': '加载中...',
         '包名': '加载中...',
       };
     }
 
     return {
       '版本': _packageInfo!.version,
-      '构建号': _packageInfo!.buildNumber,
       '包名': _packageInfo!.packageName,
     };
   }
