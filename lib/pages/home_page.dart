@@ -140,25 +140,16 @@ class _HomePageState extends State<HomePage> {
   // 构建 AppBar
   AppBar _buildAppBar(BuildContext context, TodoProvider provider) {
     return AppBar(
-      title: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          // 标题
-          Text(
-            selectedCategoryName,
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.onPrimary,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          SizedBox(width: 16), // 标题和切换按钮之间的间距
-          // 切换按钮组
-          _buildAnimatedToggleButtons(),
-        ],
+      title: Text(
+        selectedCategoryName,
+        style: TextStyle(
+          color: Theme.of(context).colorScheme.onPrimary,
+        ),
       ),
       centerTitle: false,
       automaticallyImplyLeading: false,
       actions: <Widget>[
+        _buildAnimatedToggleButtons(),
         Tooltip(
           message: "刷新",
           child: IconButton(
@@ -191,6 +182,8 @@ class _HomePageState extends State<HomePage> {
   // 构建带滑动动画的切换按钮
   Widget _buildAnimatedToggleButtons() {
     return Container(
+      height: 36,
+      width: 160,
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.onPrimary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20),

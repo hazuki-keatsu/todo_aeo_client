@@ -94,8 +94,7 @@ class _TodoTileState extends State<TodoTile> {
                   borderRadius: BorderRadius.circular(12),
                   child: InkWell(
                     borderRadius: BorderRadius.circular(12),
-                    onTap: () {}, // 添加空的onTap以启用涟漪效果
-                    onLongPress: () => ShowDialog.showOptionsBottomSheet(
+                    onTap: () => ShowDialog.showOptionsBottomSheet(
                       widget.id,
                       widget.todoProvider,
                       context,
