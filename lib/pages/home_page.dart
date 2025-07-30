@@ -130,7 +130,6 @@ class _HomePageState extends State<HomePage> {
 
     // 强制触发Provider重新构建，确保UI更新
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final todoProvider = Provider.of<TodoProvider>(context, listen: false);
       // 触发一次轻量级的状态通知，确保Consumer重新构建
       if (mounted) {
         setState(() {});
@@ -197,7 +196,7 @@ class _HomePageState extends State<HomePage> {
     }
 
     // 正常模式的AppBar
-    rreturn AppBar(
+    return AppBar(
       title: Text(
         selectedCategoryName,
         style: TextStyle(
