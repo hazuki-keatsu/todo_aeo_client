@@ -114,6 +114,20 @@ class TodoProvider extends ChangeNotifier {
     }
   }
 
+  // 批量删除待办事项
+  Future<void> deleteTodos(List<int> ids) async {
+    try {
+      // 使用Future.wait并行处理多个删除请求
+      await Future.wait(ids.map((id) => _dq.deleteTodo(id)));
+      await _loadTodos();
+      notifyListeners();
+    } catch (e) {
+      _error = '批量删除待办事项失败: $e';
+      notifyListeners();
+      rethrow;
+    }
+  }
+
   // Update todos priority order
   Future<void> updateTodosPriority(List<int> todoIds) async {
     try {
@@ -188,17 +202,37 @@ class TodoProvider extends ChangeNotifier {
     }
   }
 
-  // Toggle todo completion
-  Future<void> toggleTodoCompletion(int id) async {
-    if (_todos == null) return;
-    
-    final todo = _todos!.firstWhere((t) => t.id == id);
-    final updatedData = {
-      'id': id,
-      'isCompleted': todo.isCompleted ? 0 : 1,
-    };
-    
-    await updateTodo(updatedData);
+  // 刷新数据
+  Future<void> refresh() async {
+    await init();
+  }
+
+  // 清除错误状态
+  void clearError() {
+    _error = null;
+    notifyListeners();
+  }
+
+  // 切换待办事项完成状态
+  Future<void> toggleTodoCompletion(int todoId) async {
+    try {
+      final todo = _todos?.firstWhere((t) => t.id == todoId);
+      if (todo == null) return;
+
+      final updatedTodo = {
+        'id': todoId,
+        'isCompleted': !todo.isCompleted,
+        'completedAt': !todo.isCompleted
+            ? DateTime.now().toIso8601String()
+            : null,
+      };
+
+      await updateTodo(updatedTodo);
+    } catch (e) {
+      _error = '更新完成状态失败: $e';
+      notifyListeners();
+      rethrow;
+    }
   }
 
   // Add new category
@@ -240,15 +274,4 @@ class TodoProvider extends ChangeNotifier {
       rethrow;
     }
   }
-
-  // Clear error
-  void clearError() {
-    _error = null;
-    notifyListeners();
-  }
-
-  // Refresh all data
-  Future<void> refresh() async {
-    await init();
-  }
-} 
+}

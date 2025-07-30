@@ -168,7 +168,8 @@ class _SettingsPageState extends State<SettingsPage> {
                             ],
                           )
                         : Text(
-                            'Todo AEO ${settingsProvider.getFormattedVersion()}',
+                      'Todo AEO ${settingsProvider.getFormattedVersion(
+                          showBuildNumber: false)}',
                           ),
                     onTap: () {
                       ShowDialog.showAboutApplicationDialog(

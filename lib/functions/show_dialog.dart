@@ -227,21 +227,41 @@ class ShowDialog {
     BuildContext context,
     OperationMode mode,
   ) {
-    final todos = provider.todos;
-    // 根据ID查找对应的待办事项，而不是使用索引访问
-    final todo = todos?.firstWhere((todo) => todo.id == id);
+    // 根据模式查找对应的数据
+    if (mode == OperationMode.todo) {
+      final todos = provider.todos;
+      final todo = todos?.firstWhere((todo) => todo.id == id);
 
-    if (todo == null) {
-      // 如果找不到对应的待办事项，显示错误信息
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('未找到对应的待办事项'),
-          duration: Duration(seconds: 3),
-        ),
-      );
-      return;
+      if (todo == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('未找到对应的待办事项'), duration: Duration(seconds: 3)),
+        );
+        return;
+      }
+
+      _showTodoOptionsBottomSheet(context, todo, id, provider, mode);
+    } else if (mode == OperationMode.category) {
+      final categories = provider.categories;
+      final category = categories?.firstWhere((category) => category.id == id);
+
+      if (category == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('未找到对应的分类'), duration: Duration(seconds: 3)),
+        );
+        return;
+      }
+
+      _showCategoryOptionsBottomSheet(context, category, id, provider, mode);
     }
+  }
 
+  static void _showTodoOptionsBottomSheet(
+    BuildContext context,
+    dynamic todo,
+    int id,
+    TodoProvider provider,
+    OperationMode mode,
+  ) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -249,10 +269,7 @@ class ShowDialog {
       builder: (BuildContext context) {
         return Container(
           decoration: BoxDecoration(
-            color: Theme
-                .of(context)
-                .colorScheme
-                .surface,
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
             boxShadow: [
               BoxShadow(
@@ -276,11 +293,9 @@ class ShowDialog {
                       height: 4,
                       margin: EdgeInsets.only(bottom: 16),
                       decoration: BoxDecoration(
-                        color: Theme
-                            .of(context)
-                            .colorScheme
-                            .onSurfaceVariant
-                            .withValues(alpha: 0.4),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
@@ -290,18 +305,15 @@ class ShowDialog {
                   Container(
                     padding: EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: Theme
-                          .of(context)
+                      color: Theme.of(context)
                           .colorScheme
                           .surfaceContainerHighest
                           .withValues(alpha: 0.3),
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: Theme
-                            .of(context)
-                            .colorScheme
-                            .outline
-                            .withValues(alpha: 0.2),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.outline.withValues(alpha: 0.2),
                       ),
                     ),
                     child: Column(
@@ -313,25 +325,18 @@ class ShowDialog {
                             Icon(
                               Icons.title,
                               size: 18,
-                              color: Theme
-                                  .of(context)
-                                  .colorScheme
-                                  .primary,
+                              color: Theme.of(context).colorScheme.primary,
                             ),
                             SizedBox(width: 8),
                             Text(
                               '标题',
-                              style: Theme
-                                  .of(context)
-                                  .textTheme
-                                  .labelMedium
+                              style: Theme.of(context).textTheme.labelMedium
                                   ?.copyWith(
-                                color: Theme
-                                    .of(context)
-                                    .colorScheme
-                                    .primary,
-                                fontWeight: FontWeight.w600,
-                              ),
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                             ),
                           ],
                         ),
@@ -340,21 +345,13 @@ class ShowDialog {
                           width: double.infinity,
                           padding: EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: Theme
-                                .of(context)
-                                .colorScheme
-                                .surface,
+                            color: Theme.of(context).colorScheme.surface,
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
                             todo.title,
-                            style: Theme
-                                .of(context)
-                                .textTheme
-                                .bodyLarge
-                                ?.copyWith(
-                              fontWeight: FontWeight.w500,
-                            ),
+                            style: Theme.of(context).textTheme.bodyMedium
+                                ?.copyWith(fontWeight: FontWeight.w500),
                           ),
                         ),
 
@@ -367,25 +364,18 @@ class ShowDialog {
                               Icon(
                                 Icons.description,
                                 size: 18,
-                                color: Theme
-                                    .of(context)
-                                    .colorScheme
-                                    .primary,
+                                color: Theme.of(context).colorScheme.primary,
                               ),
                               SizedBox(width: 8),
                               Text(
                                 '描述',
-                                style: Theme
-                                    .of(context)
-                                    .textTheme
-                                    .labelMedium
+                                style: Theme.of(context).textTheme.labelMedium
                                     ?.copyWith(
-                                  color: Theme
-                                      .of(context)
-                                      .colorScheme
-                                      .primary,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.primary,
+                                      fontWeight: FontWeight.w600,
+                                    ),
                               ),
                             ],
                           ),
@@ -394,18 +384,12 @@ class ShowDialog {
                             width: double.infinity,
                             padding: EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: Theme
-                                  .of(context)
-                                  .colorScheme
-                                  .surface,
+                              color: Theme.of(context).colorScheme.surface,
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
                               todo.description!,
-                              style: Theme
-                                  .of(context)
-                                  .textTheme
-                                  .bodyMedium,
+                              style: Theme.of(context).textTheme.bodyMedium,
                             ),
                           ),
                         ],
@@ -424,34 +408,30 @@ class ShowDialog {
                                       Icon(
                                         Icons.access_time,
                                         size: 16,
-                                        color: Theme
-                                            .of(context)
-                                            .colorScheme
-                                            .secondary,
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.secondary,
                                       ),
                                       SizedBox(width: 4),
                                       Text(
                                         '创建时间',
-                                        style: Theme
-                                            .of(context)
+                                        style: Theme.of(context)
                                             .textTheme
                                             .labelSmall
                                             ?.copyWith(
-                                          color: Theme
-                                              .of(context)
-                                              .colorScheme
-                                              .secondary,
-                                        ),
+                                              color: Theme.of(
+                                                context,
+                                              ).colorScheme.secondary,
+                                            ),
                                       ),
                                     ],
                                   ),
                                   SizedBox(height: 4),
                                   Text(
                                     _formatDateTime(todo.createdAt),
-                                    style: Theme
-                                        .of(context)
-                                        .textTheme
-                                        .bodySmall,
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.bodySmall,
                                   ),
                                 ],
                               ),
@@ -466,34 +446,30 @@ class ShowDialog {
                                         Icon(
                                           Icons.event_available,
                                           size: 16,
-                                          color: Theme
-                                              .of(context)
-                                              .colorScheme
-                                              .tertiary,
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.tertiary,
                                         ),
                                         SizedBox(width: 4),
                                         Text(
                                           '完成时间',
-                                          style: Theme
-                                              .of(context)
+                                          style: Theme.of(context)
                                               .textTheme
                                               .labelSmall
                                               ?.copyWith(
-                                            color: Theme
-                                                .of(context)
-                                                .colorScheme
-                                                .tertiary,
-                                          ),
+                                                color: Theme.of(
+                                                  context,
+                                                ).colorScheme.tertiary,
+                                              ),
                                         ),
                                       ],
                                     ),
                                     SizedBox(height: 4),
                                     Text(
                                       _formatDateTime(todo.finishingAt!),
-                                      style: Theme
-                                          .of(context)
-                                          .textTheme
-                                          .bodySmall,
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.bodySmall,
                                     ),
                                   ],
                                 ),
@@ -515,36 +491,21 @@ class ShowDialog {
                           child: ElevatedButton.icon(
                             onPressed: () {
                               Navigator.pop(context);
-                              if (mode == OperationMode.todo) {
-                                AppRoutes.pushTodoEditPage(
-                                    context, id, provider);
-                              } else if (mode == OperationMode.category) {
-                                ShowDialog.showCategoryDialog(
-                                  context,
-                                  provider,
-                                  categoryId: id,
-                                );
-                              } else {
-                                throw "showOptionBottomSheet Crushed.";
-                              }
+                              AppRoutes.pushTodoEditPage(context, id, provider);
                             },
                             icon: Icon(Icons.edit),
                             label: Text('编辑'),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Theme
-                                  .of(context)
-                                  .colorScheme
-                                  .primary,
-                              foregroundColor: Theme
-                                  .of(context)
-                                  .colorScheme
-                                  .onPrimary,
+                              backgroundColor: Theme.of(
+                                context,
+                              ).colorScheme.primary,
+                              foregroundColor: Theme.of(
+                                context,
+                              ).colorScheme.onPrimary,
                               elevation: 2,
-                              shadowColor: Theme
-                                  .of(context)
-                                  .colorScheme
-                                  .primary
-                                  .withValues(alpha: 0.3),
+                              shadowColor: Theme.of(
+                                context,
+                              ).colorScheme.primary.withValues(alpha: 0.3),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(16),
                               ),
@@ -569,15 +530,223 @@ class ShowDialog {
                             icon: Icon(Icons.delete_outline),
                             label: Text('删除'),
                             style: OutlinedButton.styleFrom(
-                              foregroundColor: Theme
-                                  .of(context)
-                                  .colorScheme
-                                  .error,
+                              foregroundColor: Theme.of(
+                                context,
+                              ).colorScheme.error,
                               side: BorderSide(
-                                color: Theme
-                                    .of(context)
-                                    .colorScheme
-                                    .error,
+                                color: Theme.of(context).colorScheme.error,
+                                width: 1.5,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  SizedBox(height: 8),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  static void _showCategoryOptionsBottomSheet(
+    BuildContext context,
+    dynamic category,
+    int id,
+    TodoProvider provider,
+    OperationMode mode,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.1),
+                blurRadius: 10,
+                offset: Offset(0, -2),
+              ),
+            ],
+          ),
+          child: SafeArea(
+            child: Padding(
+              padding: EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // 拖拽指示器
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      margin: EdgeInsets.only(bottom: 16),
+                      decoration: BoxDecoration(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+
+                  // 分类详情卡片
+                  Container(
+                    padding: EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .surfaceContainerHighest
+                          .withValues(alpha: 0.3),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.outline.withValues(alpha: 0.2),
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // 分类名称
+                        Row(
+                          children: [
+                            Container(
+                              width: 24,
+                              height: 24,
+                              decoration: BoxDecoration(
+                                color: category.color != null
+                                    ? parseColor(category.color, context)
+                                    : Theme.of(context).colorScheme.primary,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            SizedBox(width: 12),
+                            Text(
+                              '分类名称',
+                              style: Theme.of(context).textTheme.labelMedium
+                                  ?.copyWith(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 8),
+                        Container(
+                          width: double.infinity,
+                          padding: EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.surface,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            category.name,
+                            style: Theme.of(context).textTheme.bodyLarge
+                                ?.copyWith(fontWeight: FontWeight.w500),
+                          ),
+                        ),
+
+                        SizedBox(height: 16),
+
+                        // 统计信息
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.info_outline,
+                              size: 16,
+                              color: Theme.of(context).colorScheme.secondary,
+                            ),
+                            SizedBox(width: 4),
+                            Text(
+                              '该分类下的待办事项数量: ${provider.todos?.where((todo) => todo.categoryId == id).length ?? 0}',
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.secondary,
+                                  ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  SizedBox(height: 20),
+
+                  // 操作按钮
+                  Row(
+                    children: [
+                      Expanded(
+                        child: SizedBox(
+                          height: 56,
+                          child: ElevatedButton.icon(
+                            onPressed: () {
+                              Navigator.pop(context);
+                              ShowDialog.showCategoryDialog(
+                                context,
+                                provider,
+                                categoryId: id,
+                              );
+                            },
+                            icon: Icon(Icons.edit),
+                            label: Text('编辑'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Theme.of(
+                                context,
+                              ).colorScheme.primary,
+                              foregroundColor: Theme.of(
+                                context,
+                              ).colorScheme.onPrimary,
+                              elevation: 2,
+                              shadowColor: Theme.of(
+                                context,
+                              ).colorScheme.primary.withValues(alpha: 0.3),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 12),
+                      Expanded(
+                        child: SizedBox(
+                          height: 56,
+                          child: OutlinedButton.icon(
+                            onPressed: () {
+                              Navigator.pop(context);
+                              ShowDialog.showDeleteConfirmDialog(
+                                context,
+                                id,
+                                provider,
+                                mode,
+                              );
+                            },
+                            icon: Icon(Icons.delete_outline),
+                            label: Text('删除'),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: Theme.of(
+                                context,
+                              ).colorScheme.error,
+                              side: BorderSide(
+                                color: Theme.of(context).colorScheme.error,
                                 width: 1.5,
                               ),
                               shape: RoundedRectangleBorder(
@@ -608,29 +777,27 @@ class ShowDialog {
     final targetDate = DateTime(dateTime.year, dateTime.month, dateTime.day);
 
     if (targetDate == today) {
-      return '今天 ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute
-          .toString().padLeft(2, '0')}';
+      return '今天 ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
     } else if (targetDate == yesterday) {
-      return '昨天 ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute
-          .toString().padLeft(2, '0')}';
+      return '昨天 ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
     } else {
-      return '${dateTime.month}/${dateTime.day} ${dateTime.hour
-          .toString()
-          .padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
+      return '${dateTime.month}/${dateTime.day} ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
     }
   }
 
-  static void showAboutApplicationDialog(BuildContext context,
-      SettingsProvider settingsProvider,) {
+  static void showAboutApplicationDialog(
+    BuildContext context,
+    SettingsProvider settingsProvider,
+  ) {
     return showAboutDialog(
       context: context,
       applicationName: 'Todo AEO',
-      applicationVersion: settingsProvider.fullVersion,
+      applicationVersion: settingsProvider.version,
       applicationIcon: Icon(Icons.check_circle, size: 48),
       children: [
         Text('一个主打简洁和安全的待办事项管理应用'),
         SizedBox(height: 8),
-        Text('使用 Flutter 和 Material You 设计'),
+        Text('使用 Flutter 和 Material You 设��'),
       ],
     );
   }

@@ -17,16 +17,16 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-// TODO: 添加多选功能，优化操作逻辑
-// 短按查看详情 -> 编辑和删除功能
-// 长按进入多选
-
 class _HomePageState extends State<HomePage> {
   int? selectedCategoryId; // null表示显示所有todos
   String selectedCategoryName = "全部";
   bool _hasInitialized = false;
   List<Todo>? _localSortedTodos; // 本地排序状态
   bool _showCompleted = false; // 是否显示已完成的todo
+
+  // 多选相关状态
+  bool _isMultiSelectMode = false; // 是否处于多选模式
+  Set<int> _selectedTodoIds = {}; // 已选中的待办事项ID集合
 
   @override
   void initState() {
@@ -104,7 +104,6 @@ class _HomePageState extends State<HomePage> {
           );
         }
 
-        // 修改这部分逻辑来正确处理未分类的情况
         final todos = selectedCategoryId == null
             ? todoProvider.todos ?? []
             : selectedCategoryId == -1
@@ -123,9 +122,20 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       selectedCategoryId = categoryId;
       selectedCategoryName = categoryName;
+      _localSortedTodos = null; // 清空本地状态以强制重新排序
     });
+
     // 立即更新 AppBar 标题
     _updateScaffoldElements();
+
+    // 强制触发Provider重新构建，确保UI更新
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // 触发一次轻量级的状态通知，确保Consumer重新构建
+      if (mounted) {
+        setState(() {});
+      }
+    });
+
     Navigator.pop(context); // 关闭侧边栏
   }
 
@@ -139,6 +149,53 @@ class _HomePageState extends State<HomePage> {
 
   // 构建 AppBar
   AppBar _buildAppBar(BuildContext context, TodoProvider provider) {
+    // 多选模式下的AppBar
+    if (_isMultiSelectMode) {
+      return AppBar(
+        leading: IconButton(
+          icon: Icon(
+            Icons.close,
+            color: Theme.of(context).colorScheme.onPrimary,
+          ),
+          onPressed: () {
+            setState(() {
+              _isMultiSelectMode = false;
+              _selectedTodoIds.clear();
+            });
+            _updateScaffoldElements();
+          },
+          tooltip: '退出多选',
+        ),
+        title: Text(
+          '已选择 ${_selectedTodoIds.length} 项',
+          style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+        ),
+        centerTitle: false,
+        actions: <Widget>[
+          // 全选/取消全选按钮
+          IconButton(
+            icon: Icon(
+              _areAllTodosSelected() ? Icons.deselect : Icons.select_all,
+              color: Theme.of(context).colorScheme.onPrimary,
+            ),
+            onPressed: _toggleSelectAll,
+            tooltip: _areAllTodosSelected() ? '取消全选' : '全选',
+          ),
+          // 删除按钮
+          IconButton(
+            icon: Icon(
+              Icons.delete,
+              color: Theme.of(context).colorScheme.onPrimary,
+            ),
+            onPressed: _selectedTodoIds.isEmpty ? null : _deleteSelectedTodos,
+            tooltip: '删除所选项',
+          ),
+        ],
+        backgroundColor: Theme.of(context).colorScheme.primary,
+      );
+    }
+
+    // 正常模式的AppBar
     return AppBar(
       title: Text(
         selectedCategoryName,
@@ -420,8 +477,15 @@ class _HomePageState extends State<HomePage> {
               categoryColor: _getCategoryColor(todo.categoryId),
               todoProvider: provider,
               priority: todo.priority,
-              dragIndex: index, // 传递拖动索引
-              enableDrag: true, // 启用拖动功能
+              dragIndex: _isMultiSelectMode ? null : index,
+              // 在多选模式下禁用拖动
+              enableDrag: !_isMultiSelectMode,
+              // 在多选模式下禁用拖动功能
+              // 多选相关属性
+              isMultiSelectMode: _isMultiSelectMode,
+              isSelected: _selectedTodoIds.contains(todo.id),
+              onLongPress: () => _enableMultiSelectMode(todo.id),
+              onSelected: (selected) => _toggleTodoSelection(todo.id, selected),
             );
           },
         ),
@@ -454,8 +518,6 @@ class _HomePageState extends State<HomePage> {
       await provider.reorderTodosSilently(todoIds, startPriority);
     } catch (e) {
       print('静默更新数据库失败: $e');
-      // 如果更新失败，可以选择重新加载数据
-      // provider.refresh();
     }
   }
 
@@ -490,5 +552,87 @@ class _HomePageState extends State<HomePage> {
       // 如果找不到分类，返回null
       return null;
     }
+  }
+
+  // 启用多选模式
+  void _enableMultiSelectMode(int initialId) {
+    setState(() {
+      _isMultiSelectMode = true;
+      _selectedTodoIds = {initialId}; // 添加长按的待办事项作为初始选中项
+    });
+    _updateScaffoldElements(); // 更新AppBar以显示多选操作
+  }
+
+  // 切换待办事项的选中状态
+  void _toggleTodoSelection(int id, bool selected) {
+    setState(() {
+      if (selected) {
+        _selectedTodoIds.add(id);
+      } else {
+        _selectedTodoIds.remove(id);
+      }
+    });
+  }
+
+  // 切换全选/取消全选
+  void _toggleSelectAll() {
+    setState(() {
+      if (_areAllTodosSelected()) {
+        // 如果当前是全选状态，则取消全选
+        _selectedTodoIds.clear();
+      } else {
+        // 否则执行全选
+        _selectedTodoIds = _localSortedTodos!.map((todo) => todo.id).toSet();
+      }
+    });
+  }
+
+  // 检查是否所有待办事项都被选中
+  bool _areAllTodosSelected() {
+    if (_localSortedTodos == null) return false;
+    return _localSortedTodos!.every((todo) =>
+        _selectedTodoIds.contains(todo.id));
+  }
+
+  // 删除选中的待办事项
+  void _deleteSelectedTodos() {
+    final provider = context.read<TodoProvider>();
+    // 过滤出选中的待办事项
+    final selectedTodos = provider.todos?.where((todo) =>
+        _selectedTodoIds.contains(todo.id)).toList() ?? [];
+
+    // 显示确认对话框
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('确认删除'),
+          content: Text(
+              '您确定要删除选中的 ${selectedTodos.length} 项待办事项吗？'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('取消'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('删除', style: TextStyle(color: Colors.red)),
+              onPressed: () {
+                Navigator.of(context).pop();
+                // 执行删除操作
+                provider.deleteTodos(
+                    selectedTodos.map((todo) => todo.id).toList());
+                // 退出多选模式
+                setState(() {
+                  _isMultiSelectMode = false;
+                  _selectedTodoIds.clear();
+                });
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }
