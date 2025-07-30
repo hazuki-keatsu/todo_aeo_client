@@ -9,6 +9,9 @@ import 'package:todo_aeo/widgets/shared_fab.dart';
 import 'package:todo_aeo/modules/todo.dart';
 import 'package:todo_aeo/providers/todo_provider.dart';
 import 'package:todo_aeo/providers/scaffold_elements_notifier.dart';
+import 'package:todo_aeo/modules/category.dart';
+
+// TODO: 切换按钮的动画，添加Todo后页面没有刷新
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -24,6 +27,10 @@ class _HomePageState extends State<HomePage> {
   List<Todo>? _localSortedTodos; // 本地排序状态
   bool _showCompleted = false; // 是否显示已完成的todo
 
+  // 用于比较provider数据是否变化
+  List<Todo>? _lastTodos;
+  List<Category>? _lastCategories;
+
   // 多选相关状态
   bool _isMultiSelectMode = false; // 是否处于多选模式
   Set<int> _selectedTodoIds = {}; // 已选中的待办事项ID集合
@@ -37,6 +44,26 @@ class _HomePageState extends State<HomePage> {
         _hasInitialized = true;
       }
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // 监听TodoProvider的变化
+    final todoProvider = Provider.of<TodoProvider>(context);
+    // 当todos或categories变化时，更新scaffold元素并清空本地排序
+    if (todoProvider.todos != _lastTodos ||
+        todoProvider.categories != _lastCategories) {
+      _lastTodos = todoProvider.todos;
+      _lastCategories = todoProvider.categories;
+      _localSortedTodos = null; // 清空本地排序
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _updateScaffoldElements();
+          setState(() {}); // 触发重构以更新列表
+        }
+      });
+    }
   }
 
   void _updateScaffoldElements() {
@@ -74,12 +101,12 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Consumer<TodoProvider>(
       builder: (context, todoProvider, child) {
-        // 当数据变化时更新 Scaffold 元素
-        if (_hasInitialized && (todoProvider.categories?.isNotEmpty == true)) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            _updateScaffoldElements();
-          });
-        }
+        // 当数据变化时或切换状态变化时都要更新 Scaffold 元素
+        // if (_hasInitialized) {
+        //   WidgetsBinding.instance.addPostFrameCallback((_) {
+        //     _updateScaffoldElements();
+        //   });
+        // }
 
         if (todoProvider.isLoading) {
           return Center(child: CircularProgressIndicator());
@@ -270,19 +297,25 @@ class _HomePageState extends State<HomePage> {
                 context,
                 "进行中",
                 !_showCompleted,
-                () => setState(() {
-                  _showCompleted = false;
-                  _localSortedTodos = null; // 清空本地状态以强制重新排序
-                }),
+                    () {
+                  setState(() {
+                    _showCompleted = false;
+                    _localSortedTodos = null; // 清空本地状态以强制重新排序
+                  });
+                  _updateScaffoldElements(); // 手动更新AppBar
+                },
               ),
               _buildToggleButton(
                 context,
                 "已完成",
                 _showCompleted,
-                () => setState(() {
-                  _showCompleted = true;
-                  _localSortedTodos = null; // 清空本地状态以强制重新排序
-                }),
+                    () {
+                  setState(() {
+                    _showCompleted = true;
+                    _localSortedTodos = null; // 清空本地状态以强制重新排序
+                  });
+                  _updateScaffoldElements(); // 手动更新AppBar
+                },
               ),
             ],
           ),
@@ -299,10 +332,7 @@ class _HomePageState extends State<HomePage> {
     VoidCallback onTap,
   ) {
     return GestureDetector(
-      onTap: () {
-        if (isSelected) return; // 如果已经选中则不执行
-        onTap();
-      },
+      onTap: onTap, // 直接调用onTap，移除isSelected检查
       child: Container(
         width: 80.0, // 固定宽度确保对齐
         padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),

@@ -12,16 +12,17 @@ import 'package:todo_aeo/providers/scaffold_elements_notifier.dart';
 import 'package:todo_aeo/providers/theme_provider.dart';
 import 'package:todo_aeo/providers/settings_provider.dart';
 import 'package:todo_aeo/utils/app_routes.dart';
-import 'package:todo_aeo/tests/database_initializer.dart';
+// import 'package:todo_aeo/tests/database_initializer.dart';
 
 // TODO: 自定义背景和自定义提示音
+// TODO: 添加主页面切换动画
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   final CorePalette? palette = await DynamicColorPlugin.getCorePalette();
 
-  await DatabaseInitializer.initializeWithSampleData();
+  // await DatabaseInitializer.initializeWithSampleData();
 
   runApp(ToDo(palette: palette));
 }
@@ -142,14 +143,14 @@ class _ToDoHomeFrameState extends State<ToDoHomeFrame> {
               borderRadius: BorderRadiusGeometry.circular(12),
             ),
             destinations: const <Widget>[
-              NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
+              NavigationDestination(icon: Icon(Icons.home), label: '主页'),
               NavigationDestination(
                 icon: Icon(Icons.calendar_month),
-                label: 'Calendar',
+                label: '日历',
               ),
               NavigationDestination(
                 icon: Icon(Icons.settings),
-                label: 'Settings',
+                label: '设置',
               ),
             ],
           ),
