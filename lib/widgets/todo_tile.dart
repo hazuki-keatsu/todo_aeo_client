@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:todo_aeo/functions/show_dialog.dart';
+import 'package:todo_aeo/widgets/show_dialog.dart';
 import 'package:todo_aeo/providers/todo_provider.dart';
 
 class TodoTile extends StatefulWidget {

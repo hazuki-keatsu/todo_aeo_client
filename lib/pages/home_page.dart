@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:todo_aeo/functions/data_refresh.dart';
-import 'package:todo_aeo/functions/todos_sort.dart';
+import 'package:todo_aeo/services/data_refresh.dart';
+import 'package:todo_aeo/utils/todos_sort.dart';
 import 'package:provider/provider.dart';
 import 'package:todo_aeo/utils/parse_color.dart';
 import 'package:todo_aeo/widgets/shared_end_drawer.dart';

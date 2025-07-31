@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:todo_aeo/functions/show_dialog.dart';
+import 'package:todo_aeo/widgets/show_dialog.dart';
 import 'package:todo_aeo/providers/settings_provider.dart';
 import 'package:todo_aeo/providers/todo_provider.dart';
 import 'package:todo_aeo/utils/parse_color.dart';

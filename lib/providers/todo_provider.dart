@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:todo_aeo/functions/database_query.dart';
+import 'package:todo_aeo/services/database_query.dart';
 import 'package:todo_aeo/modules/todo.dart';
 import 'package:todo_aeo/modules/category.dart';
 

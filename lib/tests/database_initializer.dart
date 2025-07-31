@@ -1,4 +1,4 @@
-import 'package:todo_aeo/functions/database_query.dart';
+import 'package:todo_aeo/services/database_query.dart';
 
 class DatabaseInitializer {
   static Future<void> initializeWithSampleData() async {
