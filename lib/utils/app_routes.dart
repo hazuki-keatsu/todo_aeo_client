@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:todo_aeo/pages/theme_settings_page.dart';
+import 'package:todo_aeo/pages/sync_settings_page.dart';
 import 'package:todo_aeo/pages/todo_page.dart';
 import 'package:todo_aeo/providers/todo_provider.dart';
 
@@ -8,8 +9,9 @@ class AppRoutes {
   static const String todoPage = '/todo';
   static const String todoEditPage = '/todo/edit';
   static const String themeSettingPage = '/theme_settings';
+  static const String syncSettingsPage = '/sync_settings';
 
-  // 自定义页面切换动画 - 非线性复合动画（滑动+缩放+淡入）
+  // 自定义页面切换动画 - 非线性复合动画（滑动+淡入）
   static Route<T> slideFromRightRoute<T extends Object?>(
     Widget page, {
     RouteSettings? settings,
@@ -93,6 +95,9 @@ class AppRoutes {
 
       case themeSettingPage:
         return slideFromRightRoute(ThemePage(), settings: settings);
+
+      case syncSettingsPage:
+        return slideFromRightRoute(SyncSettingsPage(), settings: settings);
 
       default:
         return null;

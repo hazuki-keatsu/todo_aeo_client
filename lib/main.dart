@@ -4,9 +4,11 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:material_color_utilities/material_color_utilities.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
+import 'package:todo_aeo/modules/sync_settings.dart';
 import 'package:todo_aeo/pages/home_page.dart';
 import 'package:todo_aeo/pages/calendar_page.dart';
 import 'package:todo_aeo/pages/settings_page.dart';
+import 'package:todo_aeo/providers/sync_settings_provider.dart';
 import 'package:todo_aeo/providers/todo_provider.dart';
 import 'package:todo_aeo/providers/scaffold_elements_notifier.dart';
 import 'package:todo_aeo/providers/theme_provider.dart';
@@ -16,6 +18,9 @@ import 'package:todo_aeo/utils/app_routes.dart';
 
 // TODO: 自定义背景和自定义提示音
 // TODO: 添加主页面切换动画
+// TODO: 修复同步设置页面没办法马上加载设置的问题
+// TODO: 修复AppBar动画问题
+// TODO: 开启同步按钮
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -39,6 +44,7 @@ class ToDo extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => TodoProvider()),
         ChangeNotifierProvider(create: (context) => ScaffoldElementsNotifier()),
         ChangeNotifierProvider(create: (context) => SettingsProvider()),
+        ChangeNotifierProvider(create: (context) => SyncSettingsProvider()),
         ChangeNotifierProvider(
           create: (context) {
             final themeProvider = ThemeProvider();

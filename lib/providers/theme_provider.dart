@@ -79,7 +79,7 @@ class ThemeProvider extends ChangeNotifier {
     
     try {
       final db = DatabaseQuery.instance;
-      await db.setSetting('theme_seed_color', color.value.toString());
+      await db.setSetting('theme_seed_color', color.toString());
     } catch (e) {
       print('Failed to save seed color: $e');
     }

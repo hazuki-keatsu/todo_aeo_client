@@ -101,11 +101,16 @@ class _SettingsPageState extends State<SettingsPage> {
               child: Column(
                 children: [
                   ListTile(
-                    enabled: false,
                     leading: Icon(Icons.cloud_outlined),
                     title: Text('服务器配置'),
-                    subtitle: Text('选择你的同步方式（开发中）'),
-                    onTap: () {},
+                    subtitle: Text('配置同步设置'),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        AppRoutes.generateRoute(const RouteSettings(
+                            name: "/sync_settings"))!,
+                      );
+                    },
                   ),
                   Divider(height: 1),
                   ListTile(
