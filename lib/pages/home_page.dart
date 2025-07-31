@@ -11,8 +11,6 @@ import 'package:todo_aeo/providers/todo_provider.dart';
 import 'package:todo_aeo/providers/scaffold_elements_notifier.dart';
 import 'package:todo_aeo/modules/category.dart';
 
-// TODO: 切换按钮的动画，添加Todo后页面没有刷新
-
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 

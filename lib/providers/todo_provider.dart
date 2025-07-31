@@ -222,9 +222,6 @@ class TodoProvider extends ChangeNotifier {
       final updatedTodo = {
         'id': todoId,
         'isCompleted': !todo.isCompleted,
-        'completedAt': !todo.isCompleted
-            ? DateTime.now().toIso8601String()
-            : null,
       };
 
       await updateTodo(updatedTodo);
