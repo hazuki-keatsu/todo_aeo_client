@@ -52,6 +52,20 @@ class _HomePageState extends State<HomePage> {
     // 当todos或categories变化时，更新scaffold元素并清空本地排序
     if (todoProvider.todos != _lastTodos ||
         todoProvider.categories != _lastCategories) {
+      // 检查当前选中的分类是否已被删除
+      if (selectedCategoryId != null && selectedCategoryId != -1) {
+        final categories = todoProvider.categories ?? [];
+        // 在新的分类列表中查找当前选中的分类ID
+        final categoryExists =
+        categories.any((cat) => cat.id == selectedCategoryId);
+
+        // 如果分类不存在，则重置为“全部”视图
+        if (!categoryExists) {
+          selectedCategoryId = null;
+          selectedCategoryName = "全部";
+        }
+      }
+
       _lastTodos = todoProvider.todos;
       _lastCategories = todoProvider.categories;
       _localSortedTodos = null; // 清空本地排序
@@ -99,12 +113,12 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Consumer<TodoProvider>(
       builder: (context, todoProvider, child) {
-        // 当数据变化时或切换状态变化时都要更新 Scaffold 元素
-        // if (_hasInitialized) {
-        //   WidgetsBinding.instance.addPostFrameCallback((_) {
-        //     _updateScaffoldElements();
-        //   });
-        // }
+        /*// 当数据变化时或切换状态变化时都要更新 Scaffold 元素
+        if (_hasInitialized) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            _updateScaffoldElements();
+          });
+        }*/
 
         if (todoProvider.isLoading) {
           return Center(child: CircularProgressIndicator());
@@ -222,9 +236,19 @@ class _HomePageState extends State<HomePage> {
 
     // 正常模式的AppBar
     return AppBar(
-      title: Text(
-        selectedCategoryName,
-        style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+      title: SizedBox(
+        width: MediaQuery
+            .of(context)
+            .size
+            .width / 2 - 80 - 32, // 减去切换按钮的宽度
+        child: Text(
+          selectedCategoryName,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(color: Theme
+              .of(context)
+              .colorScheme
+              .onPrimary),
+        ),
       ),
       flexibleSpace: SafeArea(
         child: Center(child: _buildAnimatedToggleButtons()),
