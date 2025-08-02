@@ -224,14 +224,19 @@ class _HomePageState extends State<HomePage> {
     return AppBar(
       title: Text(
         selectedCategoryName,
-        style: TextStyle(
-          color: Theme.of(context).colorScheme.onPrimary,
+        style: TextStyle(color: Theme
+            .of(context)
+            .colorScheme
+            .onPrimary),
+      ),
+      flexibleSpace: SafeArea(
+        child: Center(
+          child: _buildAnimatedToggleButtons(),
         ),
       ),
       centerTitle: false,
       automaticallyImplyLeading: false,
       actions: <Widget>[
-        _buildAnimatedToggleButtons(),
         Tooltip(
           message: "刷新",
           child: IconButton(
@@ -291,30 +296,20 @@ class _HomePageState extends State<HomePage> {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              _buildToggleButton(
-                context,
-                "进行中",
-                !_showCompleted,
-                    () {
-                  setState(() {
-                    _showCompleted = false;
-                    _localSortedTodos = null; // 清空本地状态以强制重新排序
-                  });
-                  _updateScaffoldElements(); // 手动更新AppBar
-                },
-              ),
-              _buildToggleButton(
-                context,
-                "已完成",
-                _showCompleted,
-                    () {
-                  setState(() {
-                    _showCompleted = true;
-                    _localSortedTodos = null; // 清空本地状态以强制重新排序
-                  });
-                  _updateScaffoldElements(); // 手动更新AppBar
-                },
-              ),
+              _buildToggleButton(context, "进行中", !_showCompleted, () {
+                setState(() {
+                  _showCompleted = false;
+                  _localSortedTodos = null; // 清空本地状态以强制重新排序
+                });
+                _updateScaffoldElements(); // 手动更新AppBar
+              }),
+              _buildToggleButton(context, "已完成", _showCompleted, () {
+                setState(() {
+                  _showCompleted = true;
+                  _localSortedTodos = null; // 清空本地状态以强制重新排序
+                });
+                _updateScaffoldElements(); // 手动更新AppBar
+              }),
             ],
           ),
         ],
@@ -618,16 +613,20 @@ class _HomePageState extends State<HomePage> {
   // 检查是否所有待办事项都被选中
   bool _areAllTodosSelected() {
     if (_localSortedTodos == null) return false;
-    return _localSortedTodos!.every((todo) =>
-        _selectedTodoIds.contains(todo.id));
+    return _localSortedTodos!.every(
+          (todo) => _selectedTodoIds.contains(todo.id),
+    );
   }
 
   // 删除选中的待办事项
   void _deleteSelectedTodos() {
     final provider = context.read<TodoProvider>();
     // 过滤出选中的待办事项
-    final selectedTodos = provider.todos?.where((todo) =>
-        _selectedTodoIds.contains(todo.id)).toList() ?? [];
+    final selectedTodos =
+        provider.todos
+            ?.where((todo) => _selectedTodoIds.contains(todo.id))
+            .toList() ??
+            [];
 
     // 显示确认对话框
     showDialog(
@@ -650,7 +649,8 @@ class _HomePageState extends State<HomePage> {
                 Navigator.of(context).pop();
                 // 执行删除操作
                 provider.deleteTodos(
-                    selectedTodos.map((todo) => todo.id).toList());
+                  selectedTodos.map((todo) => todo.id).toList(),
+                );
                 // 退出多选模式
                 setState(() {
                   _isMultiSelectMode = false;
