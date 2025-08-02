@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:todo_aeo/l10n/app_localizations.dart';
+import 'package:todo_aeo/pages/language_settings_page.dart';
 import 'package:todo_aeo/services/sync/data_refresh.dart';
 import 'package:todo_aeo/widgets/show_dialog.dart';
 import 'package:todo_aeo/providers/todo_provider.dart';
@@ -28,10 +30,11 @@ class _SettingsPageState extends State<SettingsPage> {
       context,
       listen: false,
     );
+    final l10n = AppLocalizations.of(context)!;
 
     scaffoldElements.updateAppBar(
       AppBar(
-        title: Text('设置'),
+        title: Text(l10n.settings),
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Theme.of(context).colorScheme.onPrimary,
       ),
@@ -43,6 +46,8 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Consumer2<TodoProvider, SettingsProvider>(
       builder: (context, todoProvider, settingsProvider, child) {
         // 当数据变化时更新 Scaffold 元素
@@ -67,26 +72,26 @@ class _SettingsPageState extends State<SettingsPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('统计信息', style: Theme.of(context).textTheme.titleLarge),
+                    Text(l10n.statistics, style: Theme.of(context).textTheme.titleLarge),
                     SizedBox(height: 16),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         _buildStatItem(
                           context,
-                          '总待办',
+                          l10n.total,
                           totalTodos.toString(),
                           Icons.list,
                         ),
                         _buildStatItem(
                           context,
-                          '已完成',
+                          l10n.completed,
                           completedTodos.toString(),
                           Icons.check_circle_outline,
                         ),
                         _buildStatItem(
                           context,
-                          '分类数',
+                          l10n.categoryCount,
                           totalCategories.toString(),
                           Icons.label_outlined,
                         ),
@@ -103,8 +108,8 @@ class _SettingsPageState extends State<SettingsPage> {
                 children: [
                   ListTile(
                     leading: Icon(Icons.cloud_outlined),
-                    title: Text('服务器配置'),
-                    subtitle: Text('配置同步设置'),
+                    title: Text(l10n.serverConfiguration),
+                    subtitle: Text(l10n.configureSyncSettings),
                     onTap: () {
                       Navigator.push(
                         context,
@@ -116,8 +121,8 @@ class _SettingsPageState extends State<SettingsPage> {
                   Divider(height: 1),
                   ListTile(
                     leading: Icon(Icons.sync),
-                    title: Text('立即同步'),
-                    subtitle: Text('立即通过您配置的方式同步）'),
+                    title: Text(l10n.syncNow),
+                    subtitle: Text(l10n.syncImmediately),
                     onTap: () {
                       dataRefresh(todoProvider, context, () => mounted);
                     },
@@ -132,8 +137,8 @@ class _SettingsPageState extends State<SettingsPage> {
                 children: [
                   ListTile(
                     leading: Icon(Icons.color_lens_outlined),
-                    title: Text('主题切换'),
-                    subtitle: Text('选择你喜欢的主题'),
+                    title: Text(l10n.themeSwitch),
+                    subtitle: Text(l10n.chooseTheme),
                     onTap: () {
                       Navigator.push(
                         context,
@@ -144,10 +149,11 @@ class _SettingsPageState extends State<SettingsPage> {
                   Divider(),
                   ListTile(
                     leading: Icon(Icons.language_outlined),
-                    title: Text('切换语言'),
-                    subtitle: Text('选择你的语言'),
-                    onTap: () {},
-                    enabled: false,
+                    title: Text(l10n.languageSwitch),
+                    subtitle: Text(l10n.chooseLanguage),
+                    onTap: () {
+                      AppRoutes.pushPage(context, LanguageSettingsPage());
+                    },
                   ),
                 ],
               ),
@@ -158,7 +164,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 children: [
                   ListTile(
                     leading: Icon(Icons.info_outline),
-                    title: Text('关于应用'),
+                    title: Text(l10n.aboutApp),
                     subtitle: settingsProvider.isLoading
                         ? Row(
                             mainAxisSize: MainAxisSize.min,
@@ -171,7 +177,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                 ),
                               ),
                               SizedBox(width: 8),
-                              Text('加载中...'),
+                              Text(l10n.loading),
                             ],
                           )
                         : Text(
@@ -196,7 +202,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('应用信息', style: Theme.of(context).textTheme.titleLarge),
+                    Text(l10n.appInfo, style: Theme.of(context).textTheme.titleLarge),
                     SizedBox(height: 16),
                     // 使用SettingsProvider的便捷方法来构建信息行
                     ...settingsProvider

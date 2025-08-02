@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:dynamic_color/dynamic_color.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:material_color_utilities/material_color_utilities.dart';
 import 'package:provider/provider.dart';
-import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:todo_aeo/pages/home_page.dart';
 import 'package:todo_aeo/pages/calendar_page.dart';
 import 'package:todo_aeo/pages/settings_page.dart';
@@ -12,9 +10,16 @@ import 'package:todo_aeo/providers/todo_provider.dart';
 import 'package:todo_aeo/providers/scaffold_elements_notifier.dart';
 import 'package:todo_aeo/providers/theme_provider.dart';
 import 'package:todo_aeo/providers/settings_provider.dart';
+import 'package:todo_aeo/providers/language_provider.dart';
 import 'package:todo_aeo/services/sync/weddav_sync.dart';
 import 'package:todo_aeo/utils/app_routes.dart';
 import 'package:flutter/foundation.dart' show debugPrint, kDebugMode;
+
+// 国际化
+import 'package:todo_aeo/l10n/app_localizations.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+
+// 测试
 // import 'package:todo_aeo/tests/database_initializer.dart';
 
 // TODO: 自定义背景和自定义提示音
@@ -51,47 +56,48 @@ class ToDo extends StatelessWidget {
             return themeProvider;
           },
         ),
+        ChangeNotifierProvider(
+          create: (context) {
+            final languageProvider = LanguageProvider();
+            languageProvider.initialize(); // 初始化语言设置
+            return languageProvider;
+          },
+        ),
       ],
-      child: Consumer2<ThemeProvider, SyncSettingsProvider>(
-        builder: (context, themeProvider, syncSettingsProvider, child) {
-          // 如果主题还没有初始化完成，显示加载界面
-          if (!themeProvider.isInitialized) {
+      child: Consumer3<ThemeProvider, SyncSettingsProvider, LanguageProvider>(
+        builder: (context, themeProvider, syncSettingsProvider, languageProvider, child) {
+          // 如果主题或语言还没有初始化完成，显示加载界面
+          if (!themeProvider.isInitialized || !languageProvider.isInitialized) {
             return MaterialApp(
               home: Scaffold(body: Center(child: CircularProgressIndicator())),
               debugShowCheckedModeBanner: false,
             );
           }
 
-          return ResponsiveSizer(
-            builder: (context, orientation, screenType) {
-              return MaterialApp(
-                home: ToDoHomeFrame(title: "ToDo Aeo"),
-                title: "ToDo",
-                onGenerateRoute: AppRoutes.generateRoute,
-                theme: themeProvider.useDynamicColor && palette != null
-                    ? ThemeData(
-                        useMaterial3: true,
-                        colorScheme: ColorScheme.fromSeed(
-                          seedColor: Color(palette!.primary.get(40)),
-                          brightness: themeProvider.isDarkMode
-                              ? Brightness.dark
-                              : Brightness.light,
-                        ),
-                      )
-                    : themeProvider.getThemeData(),
-                debugShowCheckedModeBanner: false,
-                localizationsDelegates: [
-                  GlobalMaterialLocalizations.delegate,
-                  GlobalWidgetsLocalizations.delegate,
-                  GlobalCupertinoLocalizations.delegate,
-                ],
-                supportedLocales: [
-                  Locale('zh', 'CN'),
-                  Locale('en', 'US'),
-                ],
-                locale: Locale('zh', 'CN'),
-              );
-            },
+          return MaterialApp(
+            home: ToDoHomeFrame(title: "ToDo Aeo"),
+            title: "ToDo Aeo",
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            onGenerateRoute: AppRoutes.generateRoute,
+            theme: themeProvider.useDynamicColor && palette != null
+                ? ThemeData(
+                    useMaterial3: true,
+                    colorScheme: ColorScheme.fromSeed(
+                      seedColor: Color(palette!.primary.get(40)),
+                      brightness: themeProvider.isDarkMode
+                          ? Brightness.dark
+                          : Brightness.light,
+                    ),
+                  )
+                : themeProvider.getThemeData(),
+            debugShowCheckedModeBanner: false,
+            supportedLocales: LanguageProvider.supportedLocales,
+            locale: languageProvider.currentLocale,
           );
         },
       ),
@@ -150,10 +156,11 @@ class _ToDoHomeFrameState extends State<ToDoHomeFrame> {
         }
       } catch (e) {
         // 如果初始化失败，显示错误提示
-        if (mounted) { // 检查widget是否仍在树中
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('WebDAV 初始化失败: $e')),
-          );
+        if (mounted) {
+          // 检查widget是否仍在树中
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('WebDAV 初始化失败: $e')));
         }
       }
     }
@@ -161,6 +168,8 @@ class _ToDoHomeFrameState extends State<ToDoHomeFrame> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Consumer<ScaffoldElementsNotifier>(
       builder: (context, scaffoldElements, child) {
         return Scaffold(
@@ -184,16 +193,13 @@ class _ToDoHomeFrameState extends State<ToDoHomeFrame> {
             indicatorShape: RoundedRectangleBorder(
               borderRadius: BorderRadiusGeometry.circular(12),
             ),
-            destinations: const <Widget>[
-              NavigationDestination(icon: Icon(Icons.home), label: '主页'),
+            destinations: <Widget>[
+              NavigationDestination(icon: Icon(Icons.home), label: l10n.homePage),
               NavigationDestination(
                 icon: Icon(Icons.calendar_month),
-                label: '日历',
+                label: l10n.calendarPage,
               ),
-              NavigationDestination(
-                icon: Icon(Icons.settings),
-                label: '设置',
-              ),
+              NavigationDestination(icon: Icon(Icons.settings), label: l10n.settingsPage),
             ],
           ),
         );

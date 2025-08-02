@@ -793,7 +793,18 @@ class ShowDialog {
       context: context,
       applicationName: 'Todo AEO',
       applicationVersion: settingsProvider.version,
-      applicationIcon: Icon(Icons.check_circle, size: 48),
+      applicationIcon: Container(
+        width: 48,
+        height: 48,
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/icon.png'),
+            fit: BoxFit.contain,
+          ),
+          shape: BoxShape.rectangle,
+          borderRadius: const BorderRadius.all(Radius.circular(12)),
+        ),
+      ),
       children: [
         Text('一个主打简洁和安全的待办事项管理应用'),
         SizedBox(height: 8),
