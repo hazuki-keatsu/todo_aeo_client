@@ -224,15 +224,10 @@ class _HomePageState extends State<HomePage> {
     return AppBar(
       title: Text(
         selectedCategoryName,
-        style: TextStyle(color: Theme
-            .of(context)
-            .colorScheme
-            .onPrimary),
+        style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
       ),
       flexibleSpace: SafeArea(
-        child: Center(
-          child: _buildAnimatedToggleButtons(),
-        ),
+        child: Center(child: _buildAnimatedToggleButtons()),
       ),
       centerTitle: false,
       automaticallyImplyLeading: false,
@@ -385,11 +380,12 @@ class _HomePageState extends State<HomePage> {
         transitionBuilder: (Widget child, Animation<double> animation) {
           return FadeTransition(
             opacity: animation,
-            child: ScaleTransition(
-              scale: Tween<double>(begin: 0.8, end: 1.0).animate(
-                CurvedAnimation(parent: animation, curve: Curves.easeOutBack),
-              ),
-              child: child,
+            child: SlideTransition(
+              position: Tween<Offset>(begin: Offset(0.0, 0.1), end: Offset.zero)
+                  .animate(
+                    CurvedAnimation(parent: animation, curve: Curves.easeInOut),
+                  ),
+              child: FadeTransition(opacity: animation, child: child),
             ),
           );
         },
@@ -614,7 +610,7 @@ class _HomePageState extends State<HomePage> {
   bool _areAllTodosSelected() {
     if (_localSortedTodos == null) return false;
     return _localSortedTodos!.every(
-          (todo) => _selectedTodoIds.contains(todo.id),
+      (todo) => _selectedTodoIds.contains(todo.id),
     );
   }
 
@@ -626,7 +622,7 @@ class _HomePageState extends State<HomePage> {
         provider.todos
             ?.where((todo) => _selectedTodoIds.contains(todo.id))
             .toList() ??
-            [];
+        [];
 
     // 显示确认对话框
     showDialog(
@@ -634,8 +630,7 @@ class _HomePageState extends State<HomePage> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('确认删除'),
-          content: Text(
-              '您确定要删除选中的 ${selectedTodos.length} 项待办事项吗？'),
+          content: Text('您确定要删除选中的 ${selectedTodos.length} 项待办事项吗？'),
           actions: <Widget>[
             TextButton(
               child: Text('取消'),
