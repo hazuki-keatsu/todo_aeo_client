@@ -18,12 +18,8 @@ class SyncSettingsProvider extends ChangeNotifier {
 
   bool get isTestingConnection => _isTestingConnection;
 
-  SyncSettingsProvider() {
-    _loadSettings();
-  }
-
   // 从数据库加载设置
-  Future<void> _loadSettings() async {
+  Future<void> loadSettings() async {
     try {
       _isLoading = true;
       _error = null;
@@ -153,6 +149,6 @@ class SyncSettingsProvider extends ChangeNotifier {
 
   // 刷新设置
   Future<void> refresh() async {
-    await _loadSettings();
+    await loadSettings();
   }
 }

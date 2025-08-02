@@ -25,9 +25,7 @@ class _SyncSettingsPageState extends State<SyncSettingsPage> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loadCurrentSettings();
-    });
+    _loadCurrentSettings();
 
     // 为文本控制器添加监听器，实现自动保存
     _hostController.addListener(_onTextFieldChanged);
@@ -35,8 +33,9 @@ class _SyncSettingsPageState extends State<SyncSettingsPage> {
     _passwordController.addListener(_onTextFieldChanged);
   }
 
-  void _loadCurrentSettings() {
+  void _loadCurrentSettings() async {
     final provider = Provider.of<SyncSettingsProvider>(context, listen: false);
+    await provider.loadSettings();
     final settings = provider.settings;
 
     _hostController.text = settings.host ?? '';
