@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:todo_aeo/l10n/app_localizations.dart';
 import 'package:todo_aeo/widgets/show_dialog.dart';
 import 'package:todo_aeo/providers/settings_provider.dart';
 import 'package:todo_aeo/providers/todo_provider.dart';
@@ -12,6 +13,7 @@ class SharedEndDrawer {
     int? selectedCategoryId,
     required Function(int?, String) onCategorySelected,
   }) {
+    final l10n = AppLocalizations.of(context)!;
     return Drawer(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
       child: Column(
@@ -27,7 +29,7 @@ class SharedEndDrawer {
                   text: TextSpan(
                     children: [
                       TextSpan(
-                        text: "Todo ",
+                        text: l10n.todoAppName,
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -64,7 +66,7 @@ class SharedEndDrawer {
                   ),
                 ),
                 Text(
-                  "A nice day meets you!",
+                  l10n.niceDay,
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.onSecondaryContainer,
                     fontWeight: FontWeight.w400,
@@ -77,7 +79,7 @@ class SharedEndDrawer {
                     final settingsProvider = Provider.of<SettingsProvider>(context, listen: false);
                     ShowDialog.showAboutApplicationDialog(context, settingsProvider);
                   },
-                  label: Text("关于"),
+                  label: Text(AppLocalizations.of(context)!.aboutApp),
                   icon: Icon(Icons.info_outline),
                 ),
               ],
@@ -96,9 +98,9 @@ class SharedEndDrawer {
                       // 全部todos
                       ListTile(
                         leading: Icon(Icons.list),
-                        title: Text("全部"),
+                        title: Text(AppLocalizations.of(context)!.all),
                         selected: selectedCategoryId == null,
-                        onTap: () => onCategorySelected(null, "全部"),
+                        onTap: () => onCategorySelected(null, AppLocalizations.of(context)!.all),
                         selectedColor: Theme.of(context).colorScheme.primary,
                         selectedTileColor: Theme.of(
                           context,
@@ -107,9 +109,9 @@ class SharedEndDrawer {
                       // 未分类todos
                       ListTile(
                         leading: Icon(Icons.label_off),
-                        title: Text("未分类"),
+                        title: Text(AppLocalizations.of(context)!.uncategorize),
                         selected: selectedCategoryId == -1,
-                        onTap: () => onCategorySelected(-1, "未分类"),
+                        onTap: () => onCategorySelected(-1, AppLocalizations.of(context)!.uncategorize),
                         selectedColor: Theme.of(context).colorScheme.primary,
                         selectedTileColor: Theme.of(
                           context,
@@ -123,7 +125,7 @@ class SharedEndDrawer {
                             vertical: 8,
                           ),
                           child: Text(
-                            "分类",
+                            AppLocalizations.of(context)!.categories,
                             style: Theme.of(context).textTheme.titleSmall?.copyWith(
                               color: Theme.of(context).colorScheme.primary,
                             ),
@@ -162,7 +164,7 @@ class SharedEndDrawer {
                       Divider(),
                       ListTile(
                         leading: Icon(Icons.add),
-                        title: Text("添加分类"),
+                        title: Text(AppLocalizations.of(context)!.addCategory),
                         onTap: () async {
                           Navigator.pop(context);
                           await ShowDialog.showCategoryDialog(context, provider);

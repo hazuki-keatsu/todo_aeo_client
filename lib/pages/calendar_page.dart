@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart' show debugPrint, kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:todo_aeo/l10n/app_localizations.dart';
 import 'package:todo_aeo/services/sync/data_refresh.dart';
 import 'package:todo_aeo/utils/todos_sort.dart';
 import 'package:todo_aeo/modules/todo.dart';
@@ -62,7 +63,6 @@ class _CalendarPageState extends State<CalendarPage>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _updateScaffoldElements();
     });
-    
   }
 
   @override
@@ -112,18 +112,19 @@ class _CalendarPageState extends State<CalendarPage>
       context,
       listen: false,
     );
+    final l10n = AppLocalizations.of(context)!;
 
     // 分别更新不同的元素
     scaffoldElements.updateAppBar(
       AppBar(
         title: Text(
-          "日历",
+          l10n.calendar,
           style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
         ),
         automaticallyImplyLeading: false,
         actions: <Widget>[
           Tooltip(
-            message: "刷新",
+            message: l10n.refresh,
             child: IconButton(
               onPressed: () async {
                 dataRefresh(provider, context, () => mounted);
@@ -135,7 +136,7 @@ class _CalendarPageState extends State<CalendarPage>
             ),
           ),
           Tooltip(
-            message: "Todo 分组",
+            message: l10n.categories,
             child: IconButton(
               onPressed: () {
                 Scaffold.of(context).openEndDrawer();
@@ -156,12 +157,14 @@ class _CalendarPageState extends State<CalendarPage>
       SharedFAB.build(context, provider),
     );
 
-    scaffoldElements.updateEndDrawer(SharedEndDrawer.build(
-      context, 
-      provider,
-      selectedCategoryId: null,
-      onCategorySelected: (_, _) {},
-    ));
+    scaffoldElements.updateEndDrawer(
+      SharedEndDrawer.build(
+        context,
+        provider,
+        selectedCategoryId: null,
+        onCategorySelected: (_, _) {},
+      ),
+    );
   }
 
   // 统一的日期选择处理函数，确保两个日历组件同步
@@ -240,7 +243,11 @@ class _CalendarPageState extends State<CalendarPage>
   }
 
   // 构建分成完成和未完成两部分的待办事项列表
-  List<Widget> _buildTodoSections(List<Todo> todayTodo, TodoProvider todoProvider) {
+  List<Widget> _buildTodoSections(
+    List<Todo> todayTodo,
+    TodoProvider todoProvider,
+  ) {
+    final l10n = AppLocalizations.of(context)!;
     if (todayTodo.isEmpty) {
       return [
         Center(
@@ -255,7 +262,7 @@ class _CalendarPageState extends State<CalendarPage>
                 ),
                 SizedBox(height: 16),
                 Text(
-                  '暂无待办事项',
+                  l10n.noTodoHere,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     color: Theme.of(context).colorScheme.outline,
                   ),
@@ -280,7 +287,10 @@ class _CalendarPageState extends State<CalendarPage>
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           child: Text(
-            '${selectedDate.day}日未完成 (${uncompletedTodos.length})',
+            l10n.selectedDayHasUncompletedTodos(
+              selectedDate.day,
+              uncompletedTodos.length,
+            ),
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
               color: Theme.of(context).colorScheme.primary,
               fontWeight: FontWeight.bold,
@@ -323,7 +333,10 @@ class _CalendarPageState extends State<CalendarPage>
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           child: Text(
-            '${selectedDate.day}日已完成 (${completedTodos.length})',
+              l10n.selectedDayHasCompletedTodos(
+                selectedDate.day,
+                completedTodos.length,
+              ),
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
               color: Theme.of(context).colorScheme.outline,
               fontWeight: FontWeight.bold,

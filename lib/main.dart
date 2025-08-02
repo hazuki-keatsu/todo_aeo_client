@@ -45,7 +45,7 @@ class ToDo extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => TodoProvider()),
+        ChangeNotifierProvider(create: (context) => TodoProvider(context)),
         ChangeNotifierProvider(create: (context) => ScaffoldElementsNotifier()),
         ChangeNotifierProvider(create: (context) => SettingsProvider()),
         ChangeNotifierProvider(create: (context) => SyncSettingsProvider()),
@@ -133,7 +133,7 @@ class _ToDoHomeFrameState extends State<ToDoHomeFrame> {
   Future<void> _initializeWebdav() async {
     // 使用 context.read 获取 Provider，因为我们不需要监听变化
     final syncSettings = context.read<SyncSettingsProvider>();
-
+    final l10n = AppLocalizations.of(context)!;
     await syncSettings.loadSettings();
 
     // 检查WebDAV同步是否已启用
@@ -152,7 +152,7 @@ class _ToDoHomeFrameState extends State<ToDoHomeFrame> {
         }
 
         if (kDebugMode) {
-          debugPrint("WebDAV 服务启动成功");
+          debugPrint(l10n.webdavStartedSuccessfully);
         }
       } catch (e) {
         // 如果初始化失败，显示错误提示
@@ -160,7 +160,7 @@ class _ToDoHomeFrameState extends State<ToDoHomeFrame> {
           // 检查widget是否仍在树中
           ScaffoldMessenger.of(
             context,
-          ).showSnackBar(SnackBar(content: Text('WebDAV 初始化失败: $e')));
+          ).showSnackBar(SnackBar(content: Text('${l10n.webdavInitializationFailed}: $e')));
         }
       }
     }
@@ -194,12 +194,12 @@ class _ToDoHomeFrameState extends State<ToDoHomeFrame> {
               borderRadius: BorderRadiusGeometry.circular(12),
             ),
             destinations: <Widget>[
-              NavigationDestination(icon: Icon(Icons.home), label: l10n.homePage),
+              NavigationDestination(icon: Icon(Icons.home), label: l10n.home),
               NavigationDestination(
                 icon: Icon(Icons.calendar_month),
-                label: l10n.calendarPage,
+                label: l10n.calendar,
               ),
-              NavigationDestination(icon: Icon(Icons.settings), label: l10n.settingsPage),
+              NavigationDestination(icon: Icon(Icons.settings), label: l10n.settings),
             ],
           ),
         );

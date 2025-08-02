@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:todo_aeo/l10n/app_localizations.dart';
 import 'package:todo_aeo/widgets/show_dialog.dart';
 import 'package:todo_aeo/providers/todo_provider.dart';
 import 'package:todo_aeo/utils/parse_color.dart';
@@ -12,6 +13,7 @@ class TodoPage extends StatefulWidget {
   });
 
   final int? todoId;
+
   bool get isEditMode => todoId != null;
   final TodoProvider provider;
   final BuildContext lastPageContext;
@@ -29,6 +31,7 @@ class _TodoPageState extends State<TodoPage> {
   late bool isEditMode;
   late TodoProvider provider;
   late BuildContext lastPageContext;
+  late AppLocalizations l10n;
 
   @override
   void initState() {
@@ -38,6 +41,7 @@ class _TodoPageState extends State<TodoPage> {
     isEditMode = widget.isEditMode;
     provider = widget.provider;
     lastPageContext = widget.lastPageContext;
+    l10n = AppLocalizations.of(context)!;
 
     // 如果是编辑模式，获取现有数据
     if (widget.isEditMode) {
@@ -61,7 +65,10 @@ class _TodoPageState extends State<TodoPage> {
   Future<void> writeInTodoData() async {
     if (todoName.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('请输入待办事项名称'), duration: Duration(seconds: 3)),
+        SnackBar(
+          content: Text(l10n.pleaseEnterTodoName),
+          duration: Duration(seconds: 3),
+        ),
       );
       return Future.value();
     }
@@ -102,7 +109,11 @@ class _TodoPageState extends State<TodoPage> {
       if (lastPageContext.mounted) {
         lastPageScaffoldMessenger.showSnackBar(
           SnackBar(
-            content: Text(isEditMode ? '待办事项更新成功' : '待办事项添加成功'),
+            content: Text(
+              isEditMode
+                  ? l10n.todoUpdatedSuccessfully
+                  : l10n.todoAddedSuccessfully,
+            ),
             duration: const Duration(seconds: 3),
           ),
         );
@@ -111,7 +122,11 @@ class _TodoPageState extends State<TodoPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(isEditMode ? '更新待办事项失败: $e' : '添加待办事项失败: $e'),
+            content: Text(
+              isEditMode
+                  ? l10n.updateTodoFailed(e.toString())
+                  : l10n.addTodoFailed(e.toString()),
+            ),
             duration: const Duration(seconds: 3),
           ),
         );
@@ -134,13 +149,17 @@ class _TodoPageState extends State<TodoPage> {
           ),
         ),
         title: Text(
-          isEditMode ? "编辑 Todo" : "新增一个 Todo",
+          isEditMode
+              ? l10n.editTodo
+              : l10n.addNewTodo,
           style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
         ),
       ),
       floatingActionButton: FloatingActionButton(
         heroTag: "todo_add_fab_to_todo_save_fab", // 使用相同的heroTag实现Hero动画
-        tooltip: isEditMode ? "保存更改" : "保存 Todo",
+        tooltip: isEditMode
+            ? l10n.saveChanges
+            : l10n.saveTodo,
         child: Icon(Icons.save_outlined),
         onPressed: () async {
           await writeInTodoData();
@@ -156,9 +175,11 @@ class _TodoPageState extends State<TodoPage> {
               // 待办事项名称
               TextField(
                 decoration: InputDecoration(
-                  labelText: '待办事项名称',
+                  labelText: l10n.todoName,
                   border: OutlineInputBorder(),
-                  hintText: '请输入待办事项名称',
+                  hintText: AppLocalizations.of(
+                    context,
+                  )!.pleaseEnterTodoNameHint,
                 ),
                 controller: TextEditingController(text: todoName),
                 onChanged: (value) {
@@ -169,9 +190,13 @@ class _TodoPageState extends State<TodoPage> {
               // 待办事项描述
               TextField(
                 decoration: InputDecoration(
-                  labelText: '待办事项描述(可选)',
+                  labelText: AppLocalizations.of(
+                    context,
+                  )!.todoDescriptionOptional,
                   border: OutlineInputBorder(),
-                  hintText: '请输入待办事项描述',
+                  hintText: AppLocalizations.of(
+                    context,
+                  )!.pleaseEnterTodoDescription,
                   alignLabelWithHint: true,
                 ),
                 maxLines: 3,
@@ -182,7 +207,10 @@ class _TodoPageState extends State<TodoPage> {
               ),
               SizedBox(height: 16),
               // 分类选择
-              Text('选择分类', style: Theme.of(context).textTheme.titleSmall),
+              Text(
+                l10n.selectCategory,
+                style: Theme.of(context).textTheme.titleSmall,
+              ),
               SizedBox(height: 8),
               Container(
                 width: double.infinity,
@@ -193,7 +221,9 @@ class _TodoPageState extends State<TodoPage> {
                 child: DropdownButtonFormField<int?>(
                   value: selectedCategoryId,
                   decoration: InputDecoration(
-                    hintText: '选择分类（可选）',
+                    hintText: AppLocalizations.of(
+                      context,
+                    )!.selectCategoryOptional,
                     border: InputBorder.none,
                     contentPadding: EdgeInsets.symmetric(
                       horizontal: 16,
@@ -213,7 +243,7 @@ class _TodoPageState extends State<TodoPage> {
                             size: 20,
                           ),
                           SizedBox(width: 8),
-                          Text('无分类'),
+                          Text(l10n.noCategory),
                         ],
                       ),
                     ),
@@ -250,7 +280,7 @@ class _TodoPageState extends State<TodoPage> {
                           ),
                           SizedBox(width: 8),
                           Text(
-                            '新增分类',
+                            l10n.addNewCategory,
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.primary,
                             ),
@@ -289,15 +319,18 @@ class _TodoPageState extends State<TodoPage> {
               ),
               SizedBox(height: 16),
               // 完成日期选择
-              Text('完成日期', style: Theme.of(context).textTheme.titleSmall),
+              Text(
+                l10n.finishingDate,
+                style: Theme.of(context).textTheme.titleSmall,
+              ),
               SizedBox(height: 8),
               InkWell(
                 onTap: () async {
                   final date = await showDatePicker(
-                    helpText: "选择日期",
-                    cancelText: "取消",
-                    confirmText: "确定",
-                    fieldLabelText: "请输入日期",
+                    helpText: l10n.selectDate,
+                    cancelText: l10n.cancel,
+                    confirmText: l10n.confirm,
+                    fieldLabelText: l10n.enterDate,
                     fieldHintText: "mm/dd/yyyy",
                     context: context,
                     initialDate: selectedFinishingDate ?? DateTime.now(),
@@ -324,7 +357,9 @@ class _TodoPageState extends State<TodoPage> {
                       Text(
                         selectedFinishingDate != null
                             ? '${selectedFinishingDate!.year}-${selectedFinishingDate!.month.toString().padLeft(2, '0')}-${selectedFinishingDate!.day.toString().padLeft(2, '0')}'
-                            : '选择完成日期（可选）',
+                            : AppLocalizations.of(
+                                context,
+                              )!.selectFinishingDateOptional,
                         style: TextStyle(
                           color: selectedFinishingDate != null
                               ? Theme.of(context).textTheme.bodyMedium?.color

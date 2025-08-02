@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:todo_aeo/l10n/app_localizations.dart';
 import 'package:todo_aeo/widgets/show_dialog.dart';
 import 'package:todo_aeo/providers/todo_provider.dart';
 
@@ -276,7 +277,7 @@ class _TodoTileState extends State<TodoTile> {
         Text(
           isMini
               ? "${widget.createdAt.month}-${widget.createdAt.day}" // 迷你模式简化显示
-              : "创建：${widget.createdAt.year}-${widget.createdAt.month}-${widget.createdAt.day} ${widget.createdAt.hour}:${widget.createdAt.minute.toString().padLeft(2, '0')}",
+              : "${AppLocalizations.of(context)!.createAt}：${widget.createdAt.year}-${widget.createdAt.month}-${widget.createdAt.day} ${widget.createdAt.hour}:${widget.createdAt.minute.toString().padLeft(2, '0')}",
           style: TextStyle(
             color: isCompleted
                 ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)
@@ -291,8 +292,8 @@ class _TodoTileState extends State<TodoTile> {
         if (widget.finishingAt != null && !isMini) // 在迷你模式下隐藏完成时间
           Text(
             isCompact
-                ? "完成：${widget.finishingAt!.month}-${widget.finishingAt!.day}"
-                : "完成：${widget.finishingAt!.year}-${widget.finishingAt!.month}-${widget.finishingAt!.day} ${widget.finishingAt!.hour}:${widget.finishingAt!.minute.toString().padLeft(2, '0')}",
+                ? "${AppLocalizations.of(context)!.finishAt}：${widget.finishingAt!.month}-${widget.finishingAt!.day}"
+                : "${AppLocalizations.of(context)!.finishAt}：${widget.finishingAt!.year}-${widget.finishingAt!.month}-${widget.finishingAt!.day} ${widget.finishingAt!.hour}:${widget.finishingAt!.minute.toString().padLeft(2, '0')}",
             style: TextStyle(
               color: isCompleted
                   ? Theme.of(

@@ -72,7 +72,10 @@ class _SettingsPageState extends State<SettingsPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(l10n.statistics, style: Theme.of(context).textTheme.titleLarge),
+                    Text(
+                      l10n.statistics,
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
                     SizedBox(height: 16),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -113,8 +116,9 @@ class _SettingsPageState extends State<SettingsPage> {
                     onTap: () {
                       Navigator.push(
                         context,
-                        AppRoutes.generateRoute(const RouteSettings(
-                            name: "/sync_settings"))!,
+                        AppRoutes.generateRoute(
+                          const RouteSettings(name: "/sync_settings"),
+                        )!,
                       );
                     },
                   ),
@@ -142,7 +146,9 @@ class _SettingsPageState extends State<SettingsPage> {
                     onTap: () {
                       Navigator.push(
                         context,
-                        AppRoutes.generateRoute(const RouteSettings(name: "/theme_settings"))!,
+                        AppRoutes.generateRoute(
+                          const RouteSettings(name: "/theme_settings"),
+                        )!,
                       );
                     },
                   ),
@@ -181,8 +187,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             ],
                           )
                         : Text(
-                      'Todo AEO ${settingsProvider.getFormattedVersion(
-                          showBuildNumber: false)}',
+                            'Todo AEO ${settingsProvider.getFormattedVersion(showBuildNumber: false, l10nPrama: AppLocalizations.of(context)!)}',
                           ),
                     onTap: () {
                       ShowDialog.showAboutApplicationDialog(
@@ -202,22 +207,28 @@ class _SettingsPageState extends State<SettingsPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(l10n.appInfo, style: Theme.of(context).textTheme.titleLarge),
+                    Text(
+                      l10n.appInfo,
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
                     SizedBox(height: 16),
                     // 使用SettingsProvider的便捷方法来构建信息行
                     ...settingsProvider
-                        .getAppInfoMap()
+                        .getAppInfoMap(l10nPrama: AppLocalizations.of(context)!)
                         .entries
                         .map((entry) => _buildInfoRow(entry.key, entry.value)),
-                    _buildInfoRow('框架', 'Flutter'),
-                    _buildInfoRow('设计', 'Material You'),
+                    _buildInfoRow(l10n.framework, 'Flutter'),
+                    _buildInfoRow(l10n.design, 'Material You'),
                     if (settingsProvider.error != null)
                       _buildInfoRow(
-                        'Provider状态',
-                        '错误: ${settingsProvider.error}',
+                        l10n.settingProviderState,
+                        '${l10n.error}: ${settingsProvider.error}',
                       ),
                     if (todoProvider.error != null)
-                      _buildInfoRow('Todo状态', '错误: ${todoProvider.error}'),
+                      _buildInfoRow(
+                        l10n.todoProviderState,
+                        '${l10n.error}: ${todoProvider.error}',
+                      ),
                   ],
                 ),
               ),

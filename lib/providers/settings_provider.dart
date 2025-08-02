@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:flutter/foundation.dart' show debugPrint, kDebugMode;
+import 'package:todo_aeo/l10n/app_localizations.dart';
 
 class SettingsProvider extends ChangeNotifier {
   PackageInfo? _packageInfo;
@@ -11,15 +12,6 @@ class SettingsProvider extends ChangeNotifier {
   PackageInfo? get packageInfo => _packageInfo;
   bool get isLoading => _isLoading;
   String? get error => _error;
-  
-  // 便捷的getter方法
-  String get appName => _packageInfo?.appName ?? '未知应用';
-  String get packageName => _packageInfo?.packageName ?? '未知包名';
-  String get version => _packageInfo?.version ?? '未知版本';
-  String get buildNumber => _packageInfo?.buildNumber ?? '未知构建号';
-  String get fullVersion => _packageInfo != null 
-      ? '${_packageInfo!.version}+${_packageInfo!.buildNumber}'
-      : '未知版本';
 
   SettingsProvider() {
     _loadPackageInfo();
@@ -54,8 +46,9 @@ class SettingsProvider extends ChangeNotifier {
   }
 
   // 获取格式化的版本信息用于显示
-  String getFormattedVersion({bool showBuildNumber = true}) {
-    if (_packageInfo == null) return '加载中...';
+  String getFormattedVersion({bool showBuildNumber = true, required AppLocalizations l10nPrama}) {
+    final l10n = l10nPrama;
+    if (_packageInfo == null) return l10n.loading;
     
     if (showBuildNumber) {
       return 'v${_packageInfo!.version}+${_packageInfo!.buildNumber}';
@@ -65,17 +58,18 @@ class SettingsProvider extends ChangeNotifier {
   }
 
   // 获取应用的基本信息Map，方便在UI中遍历显示
-  Map<String, String> getAppInfoMap() {
+  Map<String, String> getAppInfoMap({required AppLocalizations l10nPrama}) {
+    final l10n = l10nPrama;
     if (_packageInfo == null) {
       return {
-        '版本': '加载中...',
-        '包名': '加载中...',
+        l10n.version: l10n.loading,
+        l10n.packageName: l10n.loading,
       };
     }
 
     return {
-      '版本': _packageInfo!.version,
-      '包名': _packageInfo!.packageName,
+      l10n.version: _packageInfo!.version,
+      l10n.packageName: _packageInfo!.packageName,
     };
   }
 

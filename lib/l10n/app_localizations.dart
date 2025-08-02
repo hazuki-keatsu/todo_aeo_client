@@ -6,7 +6,6 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
 import 'app_localizations_en.dart';
-import 'app_localizations_zh.dart';
 
 // ignore_for_file: type=lint
 
@@ -93,34 +92,223 @@ abstract class AppLocalizations {
       ];
 
   /// A list of this localizations delegate's supported locales.
-  static const List<Locale> supportedLocales = <Locale>[
-    Locale('en'),
-    Locale('zh'),
-  ];
+  static const List<Locale> supportedLocales = <Locale>[Locale('en')];
 
-  /// No description provided for @homePage.
+  /// No description provided for @comment0.
   ///
   /// In en, this message translates to:
-  /// **'Home'**
-  String get homePage;
+  /// **'pages/calendar_page.dart'**
+  String get comment0;
 
-  /// No description provided for @calendarPage.
+  /// No description provided for @calendar.
   ///
   /// In en, this message translates to:
   /// **'Calendar'**
-  String get calendarPage;
+  String get calendar;
 
-  /// No description provided for @settingsPage.
+  /// No description provided for @refresh.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh'**
+  String get refresh;
+
+  /// No description provided for @categories.
+  ///
+  /// In en, this message translates to:
+  /// **'Categories'**
+  String get categories;
+
+  /// No description provided for @noTodoHere.
+  ///
+  /// In en, this message translates to:
+  /// **'There is no todo here'**
+  String get noTodoHere;
+
+  /// No description provided for @noTodoToday.
+  ///
+  /// In en, this message translates to:
+  /// **'There is no todo today'**
+  String get noTodoToday;
+
+  /// No description provided for @selectedDayHasUncompletedTodos.
+  ///
+  /// In en, this message translates to:
+  /// **'Uncompleted on day {day} ({count})'**
+  String selectedDayHasUncompletedTodos(int day, int count);
+
+  /// No description provided for @selectedDayHasCompletedTodos.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed on day {day} ({count})'**
+  String selectedDayHasCompletedTodos(int day, int count);
+
+  /// No description provided for @comment1.
+  ///
+  /// In en, this message translates to:
+  /// **'pages/home_page.dart'**
+  String get comment1;
+
+  /// No description provided for @all.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get all;
+
+  /// No description provided for @uncompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Uncompleted'**
+  String get uncompleted;
+
+  /// No description provided for @completed.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get completed;
+
+  /// No description provided for @loadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load'**
+  String get loadFailed;
+
+  /// No description provided for @retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get retry;
+
+  /// No description provided for @quitMultiselectionMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Quit multiselection mode'**
+  String get quitMultiselectionMode;
+
+  /// No description provided for @selectedTodos.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} todos are selected'**
+  String selectedTodos(int count);
+
+  /// No description provided for @selectAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Select all'**
+  String get selectAll;
+
+  /// No description provided for @cancelSelectAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancelSelectAll;
+
+  /// No description provided for @deleteAllTodosSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete all the selected todos'**
+  String get deleteAllTodosSelected;
+
+  /// No description provided for @noTodoToComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'No todo to complete'**
+  String get noTodoToComplete;
+
+  /// No description provided for @noTodoCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'No todo completed'**
+  String get noTodoCompleted;
+
+  /// No description provided for @confirmToDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm To Delete'**
+  String get confirmToDelete;
+
+  /// No description provided for @areYouShouldDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you should delete the {count} todos you have selected?'**
+  String areYouShouldDelete(int count);
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// No description provided for @delete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get delete;
+
+  /// No description provided for @comment2.
+  ///
+  /// In en, this message translates to:
+  /// **'pages/language_settings_page.dart'**
+  String get comment2;
+
+  /// No description provided for @english.
+  ///
+  /// In en, this message translates to:
+  /// **'English'**
+  String get english;
+
+  /// No description provided for @chinese.
+  ///
+  /// In en, this message translates to:
+  /// **'Chinese'**
+  String get chinese;
+
+  /// No description provided for @followSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'Follow System'**
+  String get followSystem;
+
+  /// No description provided for @languageSwitch.
+  ///
+  /// In en, this message translates to:
+  /// **'Language Switch'**
+  String get languageSwitch;
+
+  /// No description provided for @languageChanged.
+  ///
+  /// In en, this message translates to:
+  /// **'Language changed'**
+  String get languageChanged;
+
+  /// No description provided for @comment3.
+  ///
+  /// In en, this message translates to:
+  /// **'page/settings_page.dart'**
+  String get comment3;
+
+  /// No description provided for @settings.
   ///
   /// In en, this message translates to:
   /// **'Settings'**
-  String get settingsPage;
+  String get settings;
 
   /// No description provided for @statistics.
   ///
   /// In en, this message translates to:
   /// **'Statistics'**
   String get statistics;
+
+  /// No description provided for @total.
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get total;
+
+  /// No description provided for @categoryCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Category Count'**
+  String get categoryCount;
 
   /// No description provided for @serverConfiguration.
   ///
@@ -131,7 +319,7 @@ abstract class AppLocalizations {
   /// No description provided for @configureSyncSettings.
   ///
   /// In en, this message translates to:
-  /// **'Configure Sync Settings'**
+  /// **'Configure sync settings.'**
   String get configureSyncSettings;
 
   /// No description provided for @syncNow.
@@ -140,11 +328,11 @@ abstract class AppLocalizations {
   /// **'Sync Now'**
   String get syncNow;
 
-  /// No description provided for @aboutApp.
+  /// No description provided for @syncImmediately.
   ///
   /// In en, this message translates to:
-  /// **'About App'**
-  String get aboutApp;
+  /// **'Sync immediately.'**
+  String get syncImmediately;
 
   /// No description provided for @themeSwitch.
   ///
@@ -152,83 +340,29 @@ abstract class AppLocalizations {
   /// **'Theme Switch'**
   String get themeSwitch;
 
-  /// No description provided for @languageSwitch.
+  /// No description provided for @chooseTheme.
   ///
   /// In en, this message translates to:
-  /// **'Switch Language'**
-  String get languageSwitch;
+  /// **'Choose the theme you like.'**
+  String get chooseTheme;
 
-  /// No description provided for @settings.
+  /// No description provided for @chooseLanguage.
   ///
   /// In en, this message translates to:
-  /// **'Settings'**
-  String get settings;
+  /// **'Choose the language you use.'**
+  String get chooseLanguage;
 
-  /// No description provided for @all.
+  /// No description provided for @aboutApp.
   ///
   /// In en, this message translates to:
-  /// **'All'**
-  String get all;
-
-  /// No description provided for @uncategorized.
-  ///
-  /// In en, this message translates to:
-  /// **'Uncategorized'**
-  String get uncategorized;
-
-  /// No description provided for @categories.
-  ///
-  /// In en, this message translates to:
-  /// **'Categories'**
-  String get categories;
-
-  /// No description provided for @about.
-  ///
-  /// In en, this message translates to:
-  /// **'About'**
-  String get about;
+  /// **'About App'**
+  String get aboutApp;
 
   /// No description provided for @loading.
   ///
   /// In en, this message translates to:
-  /// **'Loading...'**
+  /// **'Loading'**
   String get loading;
-
-  /// No description provided for @retry.
-  ///
-  /// In en, this message translates to:
-  /// **'Retry'**
-  String get retry;
-
-  /// No description provided for @loadFailed.
-  ///
-  /// In en, this message translates to:
-  /// **'Load Failed'**
-  String get loadFailed;
-
-  /// No description provided for @addTodo.
-  ///
-  /// In en, this message translates to:
-  /// **'Add a Todo'**
-  String get addTodo;
-
-  /// No description provided for @total.
-  ///
-  /// In en, this message translates to:
-  /// **'Total'**
-  String get total;
-
-  /// No description provided for @completed.
-  ///
-  /// In en, this message translates to:
-  /// **'Completed'**
-  String get completed;
-
-  /// No description provided for @categoryCount.
-  ///
-  /// In en, this message translates to:
-  /// **'Categories'**
-  String get categoryCount;
 
   /// No description provided for @appInfo.
   ///
@@ -236,503 +370,23 @@ abstract class AppLocalizations {
   /// **'App Info'**
   String get appInfo;
 
-  /// No description provided for @dataManagement.
+  /// No description provided for @framework.
   ///
   /// In en, this message translates to:
-  /// **'Data Management'**
-  String get dataManagement;
+  /// **'Framework'**
+  String get framework;
 
-  /// No description provided for @syncImmediately.
+  /// No description provided for @design.
   ///
   /// In en, this message translates to:
-  /// **'Sync immediately with your configured method'**
-  String get syncImmediately;
+  /// **'Design'**
+  String get design;
 
-  /// No description provided for @chooseTheme.
+  /// No description provided for @settingProviderState.
   ///
   /// In en, this message translates to:
-  /// **'Choose your favorite theme'**
-  String get chooseTheme;
-
-  /// No description provided for @chooseLanguage.
-  ///
-  /// In en, this message translates to:
-  /// **'Choose your language'**
-  String get chooseLanguage;
-
-  /// No description provided for @todoName.
-  ///
-  /// In en, this message translates to:
-  /// **'Todo Name'**
-  String get todoName;
-
-  /// No description provided for @todoDescription.
-  ///
-  /// In en, this message translates to:
-  /// **'Todo Description'**
-  String get todoDescription;
-
-  /// No description provided for @pleaseEnterTodoName.
-  ///
-  /// In en, this message translates to:
-  /// **'Please enter todo name'**
-  String get pleaseEnterTodoName;
-
-  /// No description provided for @category.
-  ///
-  /// In en, this message translates to:
-  /// **'Category'**
-  String get category;
-
-  /// No description provided for @dueDate.
-  ///
-  /// In en, this message translates to:
-  /// **'Due Date'**
-  String get dueDate;
-
-  /// No description provided for @noDueDate.
-  ///
-  /// In en, this message translates to:
-  /// **'No Due Date'**
-  String get noDueDate;
-
-  /// No description provided for @save.
-  ///
-  /// In en, this message translates to:
-  /// **'Save'**
-  String get save;
-
-  /// No description provided for @cancel.
-  ///
-  /// In en, this message translates to:
-  /// **'Cancel'**
-  String get cancel;
-
-  /// No description provided for @edit.
-  ///
-  /// In en, this message translates to:
-  /// **'Edit'**
-  String get edit;
-
-  /// No description provided for @delete.
-  ///
-  /// In en, this message translates to:
-  /// **'Delete'**
-  String get delete;
-
-  /// No description provided for @deleteConfirm.
-  ///
-  /// In en, this message translates to:
-  /// **'Confirm Delete'**
-  String get deleteConfirm;
-
-  /// No description provided for @deleteMessage.
-  ///
-  /// In en, this message translates to:
-  /// **'Are you sure you want to delete this todo?'**
-  String get deleteMessage;
-
-  /// No description provided for @yes.
-  ///
-  /// In en, this message translates to:
-  /// **'Yes'**
-  String get yes;
-
-  /// No description provided for @no.
-  ///
-  /// In en, this message translates to:
-  /// **'No'**
-  String get no;
-
-  /// No description provided for @created.
-  ///
-  /// In en, this message translates to:
-  /// **'Created'**
-  String get created;
-
-  /// No description provided for @finished.
-  ///
-  /// In en, this message translates to:
-  /// **'Finished'**
-  String get finished;
-
-  /// No description provided for @createdAt.
-  ///
-  /// In en, this message translates to:
-  /// **'Created at'**
-  String get createdAt;
-
-  /// No description provided for @finishedAt.
-  ///
-  /// In en, this message translates to:
-  /// **'Finished at'**
-  String get finishedAt;
-
-  /// No description provided for @selectAll.
-  ///
-  /// In en, this message translates to:
-  /// **'Select All'**
-  String get selectAll;
-
-  /// No description provided for @deselectAll.
-  ///
-  /// In en, this message translates to:
-  /// **'Deselect All'**
-  String get deselectAll;
-
-  /// No description provided for @deleteSelected.
-  ///
-  /// In en, this message translates to:
-  /// **'Delete Selected'**
-  String get deleteSelected;
-
-  /// No description provided for @markCompleted.
-  ///
-  /// In en, this message translates to:
-  /// **'Mark Completed'**
-  String get markCompleted;
-
-  /// No description provided for @markIncomplete.
-  ///
-  /// In en, this message translates to:
-  /// **'Mark Incomplete'**
-  String get markIncomplete;
-
-  /// No description provided for @selectedCount.
-  ///
-  /// In en, this message translates to:
-  /// **'Selected {count} items'**
-  String selectedCount(int count);
-
-  /// No description provided for @showCompleted.
-  ///
-  /// In en, this message translates to:
-  /// **'Show Completed'**
-  String get showCompleted;
-
-  /// No description provided for @hideCompleted.
-  ///
-  /// In en, this message translates to:
-  /// **'Hide Completed'**
-  String get hideCompleted;
-
-  /// No description provided for @sortBy.
-  ///
-  /// In en, this message translates to:
-  /// **'Sort By'**
-  String get sortBy;
-
-  /// No description provided for @sortByCreated.
-  ///
-  /// In en, this message translates to:
-  /// **'By Created Time'**
-  String get sortByCreated;
-
-  /// No description provided for @sortByDueDate.
-  ///
-  /// In en, this message translates to:
-  /// **'By Due Date'**
-  String get sortByDueDate;
-
-  /// No description provided for @sortByName.
-  ///
-  /// In en, this message translates to:
-  /// **'By Name'**
-  String get sortByName;
-
-  /// No description provided for @sortByCategory.
-  ///
-  /// In en, this message translates to:
-  /// **'By Category'**
-  String get sortByCategory;
-
-  /// No description provided for @categoryName.
-  ///
-  /// In en, this message translates to:
-  /// **'Category Name'**
-  String get categoryName;
-
-  /// No description provided for @categoryColor.
-  ///
-  /// In en, this message translates to:
-  /// **'Category Color'**
-  String get categoryColor;
-
-  /// No description provided for @addCategory.
-  ///
-  /// In en, this message translates to:
-  /// **'Add Category'**
-  String get addCategory;
-
-  /// No description provided for @editCategory.
-  ///
-  /// In en, this message translates to:
-  /// **'Edit Category'**
-  String get editCategory;
-
-  /// No description provided for @deleteCategory.
-  ///
-  /// In en, this message translates to:
-  /// **'Delete Category'**
-  String get deleteCategory;
-
-  /// No description provided for @pleaseEnterCategoryName.
-  ///
-  /// In en, this message translates to:
-  /// **'Please enter category name'**
-  String get pleaseEnterCategoryName;
-
-  /// No description provided for @categoryDeleteConfirm.
-  ///
-  /// In en, this message translates to:
-  /// **'Are you sure you want to delete this category? All todos in this category will become uncategorized.'**
-  String get categoryDeleteConfirm;
-
-  /// No description provided for @syncSettings.
-  ///
-  /// In en, this message translates to:
-  /// **'Sync Settings'**
-  String get syncSettings;
-
-  /// No description provided for @serverUrl.
-  ///
-  /// In en, this message translates to:
-  /// **'Server URL'**
-  String get serverUrl;
-
-  /// No description provided for @username.
-  ///
-  /// In en, this message translates to:
-  /// **'Username'**
-  String get username;
-
-  /// No description provided for @password.
-  ///
-  /// In en, this message translates to:
-  /// **'Password'**
-  String get password;
-
-  /// No description provided for @testConnection.
-  ///
-  /// In en, this message translates to:
-  /// **'Test Connection'**
-  String get testConnection;
-
-  /// No description provided for @connectionSuccess.
-  ///
-  /// In en, this message translates to:
-  /// **'Connection Successful'**
-  String get connectionSuccess;
-
-  /// No description provided for @connectionFailed.
-  ///
-  /// In en, this message translates to:
-  /// **'Connection Failed'**
-  String get connectionFailed;
-
-  /// No description provided for @saveSettings.
-  ///
-  /// In en, this message translates to:
-  /// **'Save Settings'**
-  String get saveSettings;
-
-  /// No description provided for @syncType.
-  ///
-  /// In en, this message translates to:
-  /// **'Sync Type'**
-  String get syncType;
-
-  /// No description provided for @webdav.
-  ///
-  /// In en, this message translates to:
-  /// **'WebDAV'**
-  String get webdav;
-
-  /// No description provided for @themeSettings.
-  ///
-  /// In en, this message translates to:
-  /// **'Theme Settings'**
-  String get themeSettings;
-
-  /// No description provided for @lightTheme.
-  ///
-  /// In en, this message translates to:
-  /// **'Light Theme'**
-  String get lightTheme;
-
-  /// No description provided for @darkTheme.
-  ///
-  /// In en, this message translates to:
-  /// **'Dark Theme'**
-  String get darkTheme;
-
-  /// No description provided for @systemTheme.
-  ///
-  /// In en, this message translates to:
-  /// **'Follow System'**
-  String get systemTheme;
-
-  /// No description provided for @accentColor.
-  ///
-  /// In en, this message translates to:
-  /// **'Accent Color'**
-  String get accentColor;
-
-  /// No description provided for @searchTodos.
-  ///
-  /// In en, this message translates to:
-  /// **'Search Todos'**
-  String get searchTodos;
-
-  /// No description provided for @noTodosFound.
-  ///
-  /// In en, this message translates to:
-  /// **'No todos found'**
-  String get noTodosFound;
-
-  /// No description provided for @noTodosNow.
-  ///
-  /// In en, this message translates to:
-  /// **'No todos now'**
-  String get noTodosNow;
-
-  /// No description provided for @noTodosInCategory.
-  ///
-  /// In en, this message translates to:
-  /// **'No todos in this category'**
-  String get noTodosInCategory;
-
-  /// No description provided for @createFirstTodo.
-  ///
-  /// In en, this message translates to:
-  /// **'Create your first todo'**
-  String get createFirstTodo;
-
-  /// No description provided for @todayTodos.
-  ///
-  /// In en, this message translates to:
-  /// **'Today\'s Todos'**
-  String get todayTodos;
-
-  /// No description provided for @overdueTodos.
-  ///
-  /// In en, this message translates to:
-  /// **'Overdue Todos'**
-  String get overdueTodos;
-
-  /// No description provided for @upcomingTodos.
-  ///
-  /// In en, this message translates to:
-  /// **'Upcoming Todos'**
-  String get upcomingTodos;
-
-  /// No description provided for @syncSuccess.
-  ///
-  /// In en, this message translates to:
-  /// **'Sync Successful'**
-  String get syncSuccess;
-
-  /// No description provided for @syncFailed.
-  ///
-  /// In en, this message translates to:
-  /// **'Sync Failed'**
-  String get syncFailed;
-
-  /// No description provided for @lastSyncTime.
-  ///
-  /// In en, this message translates to:
-  /// **'Last Sync Time'**
-  String get lastSyncTime;
-
-  /// No description provided for @neverSynced.
-  ///
-  /// In en, this message translates to:
-  /// **'Never Synced'**
-  String get neverSynced;
-
-  /// No description provided for @exportData.
-  ///
-  /// In en, this message translates to:
-  /// **'Export Data'**
-  String get exportData;
-
-  /// No description provided for @importData.
-  ///
-  /// In en, this message translates to:
-  /// **'Import Data'**
-  String get importData;
-
-  /// No description provided for @exportSuccess.
-  ///
-  /// In en, this message translates to:
-  /// **'Export Successful'**
-  String get exportSuccess;
-
-  /// No description provided for @importSuccess.
-  ///
-  /// In en, this message translates to:
-  /// **'Import Successful'**
-  String get importSuccess;
-
-  /// No description provided for @exportFailed.
-  ///
-  /// In en, this message translates to:
-  /// **'Export Failed'**
-  String get exportFailed;
-
-  /// No description provided for @importFailed.
-  ///
-  /// In en, this message translates to:
-  /// **'Import Failed'**
-  String get importFailed;
-
-  /// No description provided for @clearAllData.
-  ///
-  /// In en, this message translates to:
-  /// **'Clear All Data'**
-  String get clearAllData;
-
-  /// No description provided for @clearDataConfirm.
-  ///
-  /// In en, this message translates to:
-  /// **'Are you sure you want to clear all data? This action cannot be undone.'**
-  String get clearDataConfirm;
-
-  /// No description provided for @dataCleared.
-  ///
-  /// In en, this message translates to:
-  /// **'Data Cleared'**
-  String get dataCleared;
-
-  /// No description provided for @version.
-  ///
-  /// In en, this message translates to:
-  /// **'Version'**
-  String get version;
-
-  /// No description provided for @buildNumber.
-  ///
-  /// In en, this message translates to:
-  /// **'Build Number'**
-  String get buildNumber;
-
-  /// No description provided for @developer.
-  ///
-  /// In en, this message translates to:
-  /// **'Developer'**
-  String get developer;
-
-  /// No description provided for @license.
-  ///
-  /// In en, this message translates to:
-  /// **'License'**
-  String get license;
-
-  /// No description provided for @openSourceLicenses.
-  ///
-  /// In en, this message translates to:
-  /// **'Open Source Licenses'**
-  String get openSourceLicenses;
+  /// **'Setting Provider State'**
+  String get settingProviderState;
 
   /// No description provided for @error.
   ///
@@ -740,155 +394,251 @@ abstract class AppLocalizations {
   /// **'Error'**
   String get error;
 
-  /// No description provided for @success.
+  /// No description provided for @todoProviderState.
   ///
   /// In en, this message translates to:
-  /// **'Success'**
-  String get success;
+  /// **'Todo Provider State'**
+  String get todoProviderState;
 
-  /// No description provided for @warning.
+  /// No description provided for @comment4.
   ///
   /// In en, this message translates to:
-  /// **'Warning'**
-  String get warning;
+  /// **'page/sync_settings_page.dart'**
+  String get comment4;
 
-  /// No description provided for @info.
+  /// No description provided for @syncSettings.
   ///
   /// In en, this message translates to:
-  /// **'Info'**
-  String get info;
+  /// **'Sync Settings'**
+  String get syncSettings;
 
-  /// No description provided for @networkError.
+  /// No description provided for @webDAVSyncSettings.
   ///
   /// In en, this message translates to:
-  /// **'Network Error'**
-  String get networkError;
+  /// **'WebDAV Sync Settings'**
+  String get webDAVSyncSettings;
 
-  /// No description provided for @serverError.
+  /// No description provided for @enableSync.
   ///
   /// In en, this message translates to:
-  /// **'Server Error'**
-  String get serverError;
+  /// **'Enable Sync'**
+  String get enableSync;
 
-  /// No description provided for @unknownError.
+  /// No description provided for @haveEnabledSync.
   ///
   /// In en, this message translates to:
-  /// **'Unknown Error'**
-  String get unknownError;
+  /// **'Enable sync successfully'**
+  String get haveEnabledSync;
 
-  /// No description provided for @confirm.
+  /// No description provided for @syncUnenabled.
   ///
   /// In en, this message translates to:
-  /// **'Confirm'**
-  String get confirm;
+  /// **'Unable to enable sync'**
+  String get syncUnenabled;
 
-  /// No description provided for @ok.
+  /// No description provided for @host.
   ///
   /// In en, this message translates to:
-  /// **'OK'**
-  String get ok;
+  /// **'Host'**
+  String get host;
 
-  /// No description provided for @close.
+  /// No description provided for @plsInputHost.
   ///
   /// In en, this message translates to:
-  /// **'Close'**
-  String get close;
+  /// **'Please input host address'**
+  String get plsInputHost;
 
-  /// No description provided for @back.
+  /// No description provided for @plsInputValidURL.
   ///
   /// In en, this message translates to:
-  /// **'Back'**
-  String get back;
+  /// **'Please input valid URL (http:// or https://)'**
+  String get plsInputValidURL;
 
-  /// No description provided for @next.
+  /// No description provided for @userName.
   ///
   /// In en, this message translates to:
-  /// **'Next'**
-  String get next;
+  /// **'User Name'**
+  String get userName;
 
-  /// No description provided for @previous.
+  /// No description provided for @plsInputUserName.
   ///
   /// In en, this message translates to:
-  /// **'Previous'**
-  String get previous;
+  /// **'Please input your user name'**
+  String get plsInputUserName;
 
-  /// No description provided for @finish.
+  /// No description provided for @password.
   ///
   /// In en, this message translates to:
-  /// **'Finish'**
-  String get finish;
+  /// **'Password'**
+  String get password;
 
-  /// No description provided for @todaySchedule.
+  /// No description provided for @plsInputPassword.
   ///
   /// In en, this message translates to:
-  /// **'Today\'s Schedule'**
-  String get todaySchedule;
+  /// **'Please input your password'**
+  String get plsInputPassword;
 
-  /// No description provided for @weekView.
+  /// No description provided for @testing.
   ///
   /// In en, this message translates to:
-  /// **'Week View'**
-  String get weekView;
+  /// **'Testing...'**
+  String get testing;
 
-  /// No description provided for @monthView.
+  /// No description provided for @connectionTest.
   ///
   /// In en, this message translates to:
-  /// **'Month View'**
-  String get monthView;
+  /// **'Connection test'**
+  String get connectionTest;
 
-  /// No description provided for @yearView.
+  /// No description provided for @connectionSuccess.
   ///
   /// In en, this message translates to:
-  /// **'Year View'**
-  String get yearView;
+  /// **'Connection test succeeded.'**
+  String get connectionSuccess;
 
-  /// No description provided for @noDataToShow.
+  /// No description provided for @connectionFailure.
   ///
   /// In en, this message translates to:
-  /// **'No data to show'**
-  String get noDataToShow;
+  /// **'Connection test failed. Please check your configuration.'**
+  String get connectionFailure;
 
-  /// No description provided for @refresh.
+  /// No description provided for @comment5.
   ///
   /// In en, this message translates to:
-  /// **'Refresh'**
-  String get refresh;
+  /// **'page/theme_settings_page.dart'**
+  String get comment5;
 
-  /// No description provided for @releaseToRefresh.
+  /// No description provided for @themeSettings.
   ///
   /// In en, this message translates to:
-  /// **'Release to refresh'**
-  String get releaseToRefresh;
+  /// **'Theme Settings'**
+  String get themeSettings;
 
-  /// No description provided for @refreshing.
+  /// No description provided for @darkMode.
   ///
   /// In en, this message translates to:
-  /// **'Refreshing...'**
-  String get refreshing;
+  /// **'Dark Mode'**
+  String get darkMode;
 
-  /// No description provided for @refreshCompleted.
+  /// No description provided for @enableDarkMode.
   ///
   /// In en, this message translates to:
-  /// **'Refresh completed'**
-  String get refreshCompleted;
+  /// **'Enable dark mode'**
+  String get enableDarkMode;
 
-  /// No description provided for @uncompletedTodosOnDate.
+  /// No description provided for @dynamicColor.
   ///
   /// In en, this message translates to:
-  /// **'Uncompleted on {day}th ({count})'**
-  String uncompletedTodosOnDate(int day, int count);
+  /// **'Dynamic Color'**
+  String get dynamicColor;
 
-  /// No description provided for @completedTodosOnDate.
+  /// No description provided for @dynamicColorHint.
   ///
   /// In en, this message translates to:
-  /// **'Completed on {day}th ({count})'**
-  String completedTodosOnDate(int day, int count);
+  /// **'Select the main color based on wallpaper (Android 12 and above)'**
+  String get dynamicColorHint;
 
-  /// No description provided for @noTodosOnDate.
+  /// No description provided for @mainColor.
   ///
   /// In en, this message translates to:
-  /// **'No todos on this day'**
-  String get noTodosOnDate;
+  /// **'Main Color'**
+  String get mainColor;
+
+  /// No description provided for @currentColorDC.
+  ///
+  /// In en, this message translates to:
+  /// **'Current color is generated by Dynamic Color'**
+  String get currentColorDC;
+
+  /// No description provided for @currentColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Current color is {color}'**
+  String currentColor(String color);
+
+  /// No description provided for @comment6.
+  ///
+  /// In en, this message translates to:
+  /// **'page/todo_page.dart'**
+  String get comment6;
+
+  /// No description provided for @pleaseEnterTodoName.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter todo name'**
+  String get pleaseEnterTodoName;
+
+  /// No description provided for @editTodo.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Todo'**
+  String get editTodo;
+
+  /// No description provided for @addNewTodo.
+  ///
+  /// In en, this message translates to:
+  /// **'Add New Todo'**
+  String get addNewTodo;
+
+  /// No description provided for @saveChanges.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Changes'**
+  String get saveChanges;
+
+  /// No description provided for @saveTodo.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Todo'**
+  String get saveTodo;
+
+  /// No description provided for @todoName.
+  ///
+  /// In en, this message translates to:
+  /// **'Todo Name'**
+  String get todoName;
+
+  /// No description provided for @pleaseEnterTodoNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter todo name'**
+  String get pleaseEnterTodoNameHint;
+
+  /// No description provided for @todoDescriptionOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Todo Description (Optional)'**
+  String get todoDescriptionOptional;
+
+  /// No description provided for @pleaseEnterTodoDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter todo description'**
+  String get pleaseEnterTodoDescription;
+
+  /// No description provided for @selectCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Category'**
+  String get selectCategory;
+
+  /// No description provided for @selectCategoryOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Select category (optional)'**
+  String get selectCategoryOptional;
+
+  /// No description provided for @noCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'No Category'**
+  String get noCategory;
+
+  /// No description provided for @finishingDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Finishing Date'**
+  String get finishingDate;
 
   /// No description provided for @selectDate.
   ///
@@ -896,29 +646,611 @@ abstract class AppLocalizations {
   /// **'Select Date'**
   String get selectDate;
 
-  /// No description provided for @followSystem.
+  /// No description provided for @selectFinishingDateOptional.
   ///
   /// In en, this message translates to:
-  /// **'Follow System'**
-  String get followSystem;
+  /// **'Select finishing date (optional)'**
+  String get selectFinishingDateOptional;
 
-  /// No description provided for @chinese.
+  /// No description provided for @todoUpdatedSuccessfully.
   ///
   /// In en, this message translates to:
-  /// **'中文'**
-  String get chinese;
+  /// **'Todo updated successfully'**
+  String get todoUpdatedSuccessfully;
 
-  /// No description provided for @english.
+  /// No description provided for @todoAddedSuccessfully.
   ///
   /// In en, this message translates to:
-  /// **'English'**
-  String get english;
+  /// **'Todo added successfully'**
+  String get todoAddedSuccessfully;
 
-  /// No description provided for @languageChanged.
+  /// No description provided for @updateTodoFailed.
   ///
   /// In en, this message translates to:
-  /// **'Language changed'**
-  String get languageChanged;
+  /// **'Update todo failed: {error}'**
+  String updateTodoFailed(String error);
+
+  /// No description provided for @addTodoFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Add todo failed: {error}'**
+  String addTodoFailed(String error);
+
+  /// No description provided for @confirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get confirm;
+
+  /// No description provided for @enterDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter date'**
+  String get enterDate;
+
+  /// No description provided for @comment7.
+  ///
+  /// In en, this message translates to:
+  /// **'providers/settings_provider.dart'**
+  String get comment7;
+
+  /// No description provided for @unknownApp.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown application'**
+  String get unknownApp;
+
+  /// No description provided for @unknownPackageName.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown package name'**
+  String get unknownPackageName;
+
+  /// No description provided for @unknownVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown version'**
+  String get unknownVersion;
+
+  /// No description provided for @unknownBuildNum.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown build number'**
+  String get unknownBuildNum;
+
+  /// No description provided for @version.
+  ///
+  /// In en, this message translates to:
+  /// **'Version'**
+  String get version;
+
+  /// No description provided for @packageName.
+  ///
+  /// In en, this message translates to:
+  /// **'Package Name'**
+  String get packageName;
+
+  /// No description provided for @comment8.
+  ///
+  /// In en, this message translates to:
+  /// **'providers/sync_settings_provider.dart'**
+  String get comment8;
+
+  /// No description provided for @loadSyncSettingsFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load sync settings: {error}'**
+  String loadSyncSettingsFailed(String error);
+
+  /// No description provided for @saveSyncSettingsFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save sync settings: {error}'**
+  String saveSyncSettingsFailed(String error);
+
+  /// No description provided for @pleaseCompleteConnectionInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Please complete the connection information'**
+  String get pleaseCompleteConnectionInfo;
+
+  /// No description provided for @connectionTestFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection test failed: {error}'**
+  String connectionTestFailed(String error);
+
+  /// No description provided for @comment9.
+  ///
+  /// In en, this message translates to:
+  /// **'providers/theme_provider.dart'**
+  String get comment9;
+
+  /// No description provided for @colorPurple.
+  ///
+  /// In en, this message translates to:
+  /// **'Purple'**
+  String get colorPurple;
+
+  /// No description provided for @colorBlue.
+  ///
+  /// In en, this message translates to:
+  /// **'Blue'**
+  String get colorBlue;
+
+  /// No description provided for @colorGreen.
+  ///
+  /// In en, this message translates to:
+  /// **'Green'**
+  String get colorGreen;
+
+  /// No description provided for @colorOrange.
+  ///
+  /// In en, this message translates to:
+  /// **'Orange'**
+  String get colorOrange;
+
+  /// No description provided for @colorRed.
+  ///
+  /// In en, this message translates to:
+  /// **'Red'**
+  String get colorRed;
+
+  /// No description provided for @colorPink.
+  ///
+  /// In en, this message translates to:
+  /// **'Pink'**
+  String get colorPink;
+
+  /// No description provided for @colorCyan.
+  ///
+  /// In en, this message translates to:
+  /// **'Cyan'**
+  String get colorCyan;
+
+  /// No description provided for @colorYellow.
+  ///
+  /// In en, this message translates to:
+  /// **'Yellow'**
+  String get colorYellow;
+
+  /// No description provided for @colorBrown.
+  ///
+  /// In en, this message translates to:
+  /// **'Brown'**
+  String get colorBrown;
+
+  /// No description provided for @colorBlueGray.
+  ///
+  /// In en, this message translates to:
+  /// **'Blue Gray'**
+  String get colorBlueGray;
+
+  /// No description provided for @colorCustom.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get colorCustom;
+
+  /// No description provided for @comment10.
+  ///
+  /// In en, this message translates to:
+  /// **'providers/todo_provider.dart'**
+  String get comment10;
+
+  /// No description provided for @initDataFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to initialize data'**
+  String get initDataFailed;
+
+  /// No description provided for @deleteTodoFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to delete todo item'**
+  String get deleteTodoFailed;
+
+  /// No description provided for @batchDeleteTodoFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to batch delete todo items'**
+  String get batchDeleteTodoFailed;
+
+  /// No description provided for @updatePriorityFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to update priority'**
+  String get updatePriorityFailed;
+
+  /// No description provided for @reorderFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to reorder'**
+  String get reorderFailed;
+
+  /// No description provided for @updateCompletionStatusFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to update completion status'**
+  String get updateCompletionStatusFailed;
+
+  /// No description provided for @updateCategoryFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to update category'**
+  String get updateCategoryFailed;
+
+  /// No description provided for @addCategoryFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to add category'**
+  String get addCategoryFailed;
+
+  /// No description provided for @todoTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get todoTitle;
+
+  /// No description provided for @deleteCategoryFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to delete category'**
+  String get deleteCategoryFailed;
+
+  /// No description provided for @silentSortFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Silent sort failed'**
+  String get silentSortFailed;
+
+  /// No description provided for @comment11.
+  ///
+  /// In en, this message translates to:
+  /// **'services/sync/data_refresh.dart'**
+  String get comment11;
+
+  /// No description provided for @syncCompletedWithConflicts.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync completed, but data conflicts found'**
+  String get syncCompletedWithConflicts;
+
+  /// No description provided for @todoConflictsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Todo conflicts: {count} items'**
+  String todoConflictsCount(int count);
+
+  /// No description provided for @categoryConflictsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Category conflicts: {count} items'**
+  String categoryConflictsCount(int count);
+
+  /// No description provided for @autoSelectedLatestVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Latest version automatically selected, please check data'**
+  String get autoSelectedLatestVersion;
+
+  /// No description provided for @viewDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'View Details'**
+  String get viewDetails;
+
+  /// No description provided for @dataSyncSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Data sync successful'**
+  String get dataSyncSuccess;
+
+  /// No description provided for @syncFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync failed'**
+  String get syncFailed;
+
+  /// No description provided for @webdavConnectionFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'WebDAV connection failed: {message}'**
+  String webdavConnectionFailed(String message);
+
+  /// No description provided for @dataSyncFailedWithMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Data sync failed: {message}'**
+  String dataSyncFailedWithMessage(String message);
+
+  /// No description provided for @syncFailedWithError.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync failed: {error}'**
+  String syncFailedWithError(String error);
+
+  /// No description provided for @localDataRefreshFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Local data refresh also failed: {error}'**
+  String localDataRefreshFailed(String error);
+
+  /// No description provided for @dataConflictDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Data Conflict Details'**
+  String get dataConflictDetails;
+
+  /// No description provided for @todoConflictsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Todo Conflicts:'**
+  String get todoConflictsLabel;
+
+  /// No description provided for @categoryConflictsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Category Conflicts:'**
+  String get categoryConflictsLabel;
+
+  /// No description provided for @selectedLatestVersionSuffix.
+  ///
+  /// In en, this message translates to:
+  /// **' (latest version selected)'**
+  String get selectedLatestVersionSuffix;
+
+  /// No description provided for @conflictResolutionStrategy.
+  ///
+  /// In en, this message translates to:
+  /// **'Conflict resolution strategy: automatically select the version with the latest modification time. If the data is incorrect, please adjust manually.'**
+  String get conflictResolutionStrategy;
+
+  /// No description provided for @localDataRefreshSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Local data refresh successful'**
+  String get localDataRefreshSuccess;
+
+  /// No description provided for @syncConfigIncorrectLocalOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync configuration is incorrect, using local data refresh only'**
+  String get syncConfigIncorrectLocalOnly;
+
+  /// No description provided for @syncingData.
+  ///
+  /// In en, this message translates to:
+  /// **'Syncing data...'**
+  String get syncingData;
+
+  /// No description provided for @comment12.
+  ///
+  /// In en, this message translates to:
+  /// **'widget/shared_end_drawer.dart'**
+  String get comment12;
+
+  /// No description provided for @todoAppName.
+  ///
+  /// In en, this message translates to:
+  /// **'Todo'**
+  String get todoAppName;
+
+  /// No description provided for @niceDay.
+  ///
+  /// In en, this message translates to:
+  /// **'A nice day meets you!'**
+  String get niceDay;
+
+  /// No description provided for @uncategorize.
+  ///
+  /// In en, this message translates to:
+  /// **'Uncategorize'**
+  String get uncategorize;
+
+  /// No description provided for @addCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a category'**
+  String get addCategory;
+
+  /// No description provided for @comment13.
+  ///
+  /// In en, this message translates to:
+  /// **'widget/show_dialog.dart'**
+  String get comment13;
+
+  /// No description provided for @introduction1.
+  ///
+  /// In en, this message translates to:
+  /// **'A todo manager software aiming at brief and safe experience.'**
+  String get introduction1;
+
+  /// No description provided for @introduction2.
+  ///
+  /// In en, this message translates to:
+  /// **'Powered by Flutter and Material You.'**
+  String get introduction2;
+
+  /// No description provided for @confirmDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Delete'**
+  String get confirmDelete;
+
+  /// No description provided for @comment14.
+  ///
+  /// In en, this message translates to:
+  /// **'widget/todo_tile.dart'**
+  String get comment14;
+
+  /// No description provided for @createAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Create at'**
+  String get createAt;
+
+  /// No description provided for @finishAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish at'**
+  String get finishAt;
+
+  /// No description provided for @categoryNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Category not found'**
+  String get categoryNotFound;
+
+  /// No description provided for @comment15.
+  ///
+  /// In en, this message translates to:
+  /// **'main.dart'**
+  String get comment15;
+
+  /// No description provided for @home.
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get home;
+
+  /// No description provided for @categoryNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Category Name'**
+  String get categoryNameLabel;
+
+  /// No description provided for @today.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get today;
+
+  /// No description provided for @yesterday.
+  ///
+  /// In en, this message translates to:
+  /// **'Yesterday'**
+  String get yesterday;
+
+  /// No description provided for @comment16.
+  ///
+  /// In en, this message translates to:
+  /// **'main.dart'**
+  String get comment16;
+
+  /// No description provided for @appTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'ToDo Aeo'**
+  String get appTitle;
+
+  /// No description provided for @webdavStartedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'WebDAV service started successfully'**
+  String get webdavStartedSuccessfully;
+
+  /// No description provided for @webdavInitializationFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'WebDAV initialization failed'**
+  String get webdavInitializationFailed;
+
+  /// No description provided for @comment_show_dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'widgets/show_dialog.dart'**
+  String get comment_show_dialog;
+
+  /// No description provided for @editCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Category'**
+  String get editCategory;
+
+  /// No description provided for @addNewCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Add New Category'**
+  String get addNewCategory;
+
+  /// No description provided for @categoryName.
+  ///
+  /// In en, this message translates to:
+  /// **'Category Name'**
+  String get categoryName;
+
+  /// No description provided for @categoryNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter category name'**
+  String get categoryNameRequired;
+
+  /// No description provided for @selectColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Color'**
+  String get selectColor;
+
+  /// No description provided for @categoryUpdateSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Category updated successfully'**
+  String get categoryUpdateSuccess;
+
+  /// No description provided for @categoryAddSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Category added successfully'**
+  String get categoryAddSuccess;
+
+  /// No description provided for @confirmDeleteTodo.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this todo?'**
+  String get confirmDeleteTodo;
+
+  /// No description provided for @confirmDeleteCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this category?'**
+  String get confirmDeleteCategory;
+
+  /// No description provided for @todoNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Todo not found'**
+  String get todoNotFound;
+
+  /// No description provided for @description.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get description;
+
+  /// No description provided for @createTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Time'**
+  String get createTime;
+
+  /// No description provided for @finishTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish Time'**
+  String get finishTime;
+
+  /// No description provided for @edit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get edit;
+
+  /// No description provided for @todoCountInCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Number of todos in this category'**
+  String get todoCountInCategory;
 }
 
 class _AppLocalizationsDelegate
@@ -932,7 +1264,7 @@ class _AppLocalizationsDelegate
 
   @override
   bool isSupported(Locale locale) =>
-      <String>['en', 'zh'].contains(locale.languageCode);
+      <String>['en'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
@@ -943,8 +1275,6 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
   switch (locale.languageCode) {
     case 'en':
       return AppLocalizationsEn();
-    case 'zh':
-      return AppLocalizationsZh();
   }
 
   throw FlutterError(

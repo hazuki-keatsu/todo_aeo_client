@@ -12,6 +12,8 @@ import 'package:todo_aeo/providers/scaffold_elements_notifier.dart';
 import 'package:todo_aeo/modules/category.dart';
 import 'package:flutter/foundation.dart' show debugPrint, kDebugMode;
 
+import 'package:todo_aeo/l10n/app_localizations.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -21,10 +23,12 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int? selectedCategoryId; // null表示显示所有todos
-  String selectedCategoryName = "全部";
+  late String selectedCategoryName;
   bool _hasInitialized = false;
   List<Todo>? _localSortedTodos; // 本地排序状态
   bool _showCompleted = false; // 是否显示已完成的todo
+
+  late AppLocalizations l10n;
 
   // 用于比较provider数据是否变化
   List<Todo>? _lastTodos;
@@ -43,6 +47,8 @@ class _HomePageState extends State<HomePage> {
         _hasInitialized = true;
       }
     });
+    l10n = AppLocalizations.of(context)!;
+    selectedCategoryName = l10n.all;
   }
 
   @override
@@ -63,7 +69,7 @@ class _HomePageState extends State<HomePage> {
         // 如果分类不存在，则重置为“全部”视图
         if (!categoryExists) {
           selectedCategoryId = null;
-          selectedCategoryName = "全部";
+          selectedCategoryName = l10n.all;
         }
       }
 
@@ -121,6 +127,8 @@ class _HomePageState extends State<HomePage> {
           });
         }*/
 
+        final l10n = AppLocalizations.of(context)!;
+
         if (todoProvider.isLoading) {
           return Center(child: CircularProgressIndicator());
         }
@@ -130,14 +138,14 @@ class _HomePageState extends State<HomePage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text('加载失败: ${todoProvider.error}'),
+                Text('${l10n.loadFailed}: ${todoProvider.error}'),
                 SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: () {
                     todoProvider.clearError();
                     todoProvider.refresh();
                   },
-                  child: Text('重试'),
+                  child: Text(l10n.retry),
                 ),
               ],
             ),
@@ -204,10 +212,10 @@ class _HomePageState extends State<HomePage> {
             });
             _updateScaffoldElements();
           },
-          tooltip: '退出多选',
+          tooltip: l10n.quitMultiselectionMode,
         ),
         title: Text(
-          '已选择 ${_selectedTodoIds.length} 项',
+          l10n.selectedTodos(_selectedTodoIds.length),
           style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
         ),
         centerTitle: false,
@@ -219,7 +227,7 @@ class _HomePageState extends State<HomePage> {
               color: Theme.of(context).colorScheme.onPrimary,
             ),
             onPressed: _toggleSelectAll,
-            tooltip: _areAllTodosSelected() ? '取消全选' : '全选',
+            tooltip: _areAllTodosSelected() ? l10n.cancelSelectAll : l10n.selectAll,
           ),
           // 删除按钮
           IconButton(
@@ -228,7 +236,7 @@ class _HomePageState extends State<HomePage> {
               color: Theme.of(context).colorScheme.onPrimary,
             ),
             onPressed: _selectedTodoIds.isEmpty ? null : _deleteSelectedTodos,
-            tooltip: '删除所选项',
+            tooltip: l10n.deleteAllTodosSelected,
           ),
         ],
         backgroundColor: Theme.of(context).colorScheme.primary,
@@ -258,7 +266,7 @@ class _HomePageState extends State<HomePage> {
       automaticallyImplyLeading: false,
       actions: <Widget>[
         Tooltip(
-          message: "刷新",
+          message: l10n.refresh,
           child: IconButton(
             onPressed: () {
               dataRefresh(provider, context, () => mounted);
@@ -270,7 +278,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         Tooltip(
-          message: "Todo 分组",
+          message: l10n.categories,
           child: IconButton(
             onPressed: () {
               Scaffold.of(context).openEndDrawer();
@@ -316,14 +324,14 @@ class _HomePageState extends State<HomePage> {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              _buildToggleButton(context, "进行中", !_showCompleted, () {
+              _buildToggleButton(context, l10n.uncompleted, !_showCompleted, () {
                 setState(() {
                   _showCompleted = false;
                   _localSortedTodos = null; // 清空本地状态以强制重新排序
                 });
                 _updateScaffoldElements(); // 手动更新AppBar
               }),
-              _buildToggleButton(context, "已完成", _showCompleted, () {
+              _buildToggleButton(context, l10n.completed, _showCompleted, () {
                 setState(() {
                   _showCompleted = true;
                   _localSortedTodos = null; // 清空本地状态以强制重新排序
@@ -432,7 +440,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   SizedBox(height: 16),
                   Text(
-                    _showCompleted ? '暂无已完成事项' : '暂无待办事项',
+                    _showCompleted ? l10n.noTodoCompleted : l10n.noTodoToComplete,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       color: Theme.of(context).colorScheme.outline,
                     ),
@@ -657,17 +665,17 @@ class _HomePageState extends State<HomePage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('确认删除'),
-          content: Text('您确定要删除选中的 ${selectedTodos.length} 项待办事项吗？'),
+          title: Text(l10n.confirmToDelete),
+          content: Text(l10n.areYouShouldDelete(selectedTodos.length)),
           actions: <Widget>[
             TextButton(
-              child: Text('取消'),
+              child: Text(l10n.cancel),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: Text('删除', style: TextStyle(color: Colors.red)),
+              child: Text(l10n.delete, style: TextStyle(color: Colors.red)),
               onPressed: () {
                 Navigator.of(context).pop();
                 // 执行删除操作

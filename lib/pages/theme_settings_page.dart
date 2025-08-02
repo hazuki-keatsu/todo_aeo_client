@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:todo_aeo/l10n/app_localizations.dart';
 import 'package:todo_aeo/providers/theme_provider.dart';
 
 class ThemePage extends StatelessWidget {
@@ -9,6 +10,7 @@ class ThemePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<ThemeProvider>(
       builder: (context, themeProvider, child) {
+        final l10n = AppLocalizations.of(context)!;
         return Scaffold(
           appBar: AppBar(
             backgroundColor: Theme.of(context).colorScheme.primary,
@@ -19,7 +21,7 @@ class ThemePage extends StatelessWidget {
               },
               icon: Icon(Icons.arrow_back),
             ),
-            title: Text("主题设置"),
+            title: Text(l10n.themeSettings),
           ),
           body: ListView(
             padding: EdgeInsets.all(8),
@@ -27,8 +29,8 @@ class ThemePage extends StatelessWidget {
               // 深色模式开关
               Card(
                 child: SwitchListTile(
-                  title: Text('深色模式'),
-                  subtitle: Text('开启深色主题'),
+                  title: Text(l10n.darkMode),
+                  subtitle: Text(l10n.enableDarkMode),
                   value: themeProvider.isDarkMode,
                   onChanged: (value) async {
                     await themeProvider.setDarkMode(value);
@@ -44,8 +46,8 @@ class ThemePage extends StatelessWidget {
               // 动态取色开关
               Card(
                 child: SwitchListTile(
-                  title: Text('动态取色'),
-                  subtitle: Text('根据壁纸自动选择主题色 (Android 12 以上)'),
+                  title: Text(l10n.dynamicColor),
+                  subtitle: Text(l10n.dynamicColorHint),
                   value: themeProvider.useDynamicColor,
                   onChanged: (value) async {
                     await themeProvider.setUseDynamicColor(value);
@@ -64,7 +66,7 @@ class ThemePage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '主题颜色',
+                        l10n.mainColor,
                         style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
@@ -72,8 +74,8 @@ class ThemePage extends StatelessWidget {
                       SizedBox(height: 8),
                       Text(
                         themeProvider.useDynamicColor 
-                          ? '当前使用动态取色' 
-                          : '当前: ${themeProvider.getColorName(themeProvider.seedColor)}',
+                          ? l10n.currentColorDC
+                          : l10n.currentColor(themeProvider.getColorName(themeProvider.seedColor, AppLocalizations.of(context)!)),
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
@@ -132,90 +134,6 @@ class ThemePage extends StatelessWidget {
                             ),
                           );
                         },
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              
-              SizedBox(height: 16),
-              
-              // 预览卡片
-              Card(
-                child: Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '主题预览',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: 16),
-                      
-                      // 预览内容
-                      Container(
-                        padding: EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Column(
-                          children: [
-                            Row(
-                              children: [
-                                Container(
-                                  width: 40,
-                                  height: 40,
-                                  decoration: BoxDecoration(
-                                    color: Theme.of(context).colorScheme.primary,
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: Icon(
-                                    Icons.palette,
-                                    color: Theme.of(context).colorScheme.onPrimary,
-                                  ),
-                                ),
-                                SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        '主题预览',
-                                        style: Theme.of(context).textTheme.titleSmall,
-                                      ),
-                                      Text(
-                                        '这是应用的主题色效果',
-                                        style: Theme.of(context).textTheme.bodySmall,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 12),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: FilledButton(
-                                    onPressed: () {},
-                                    child: Text('主要按钮'),
-                                  ),
-                                ),
-                                SizedBox(width: 8),
-                                Expanded(
-                                  child: OutlinedButton(
-                                    onPressed: () {},
-                                    child: Text('次要按钮'),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
                       ),
                     ],
                   ),

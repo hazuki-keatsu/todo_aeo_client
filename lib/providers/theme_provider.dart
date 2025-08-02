@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:todo_aeo/services/database_query.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
+import 'package:todo_aeo/l10n/app_localizations.dart';
 
 class ThemeProvider extends ChangeNotifier {
   // 预定义颜色
@@ -17,18 +18,21 @@ class ThemeProvider extends ChangeNotifier {
     Color(0xFF607D8B), // 蓝灰色
   ];
 
-  static const List<String> colorNames = [
-    '紫色',
-    '蓝色', 
-    '绿色',
-    '橙色',
-    '红色',
-    '紫红色',
-    '青色',
-    '黄色',
-    '棕色',
-    '蓝灰色',
-  ];
+  // 获取本地化的颜色名称
+  static List<String> getLocalizedColorNames(AppLocalizations localizations) {
+    return [
+      localizations.colorPurple,
+      localizations.colorBlue,
+      localizations.colorGreen,
+      localizations.colorOrange,
+      localizations.colorRed,
+      localizations.colorPink,
+      localizations.colorCyan,
+      localizations.colorYellow,
+      localizations.colorBrown,
+      localizations.colorBlueGray,
+    ];
+  }
 
   Color _seedColor = predefinedColors[0];
   bool _useDynamicColor = false; // 默认不使用动态取色，因为可能需要额外权限
@@ -132,8 +136,8 @@ class ThemeProvider extends ChangeNotifier {
   }
 
   // 获取颜色名称
-  String getColorName(Color color) {
+  String getColorName(Color color, AppLocalizations localizations) {
     final index = predefinedColors.indexOf(color);
-    return index >= 0 ? colorNames[index] : '自定义';
+    return index >= 0 ? getLocalizedColorNames(localizations)[index] : localizations.colorCustom;
   }
 }

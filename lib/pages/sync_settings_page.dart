@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:todo_aeo/l10n/app_localizations.dart';
 import 'package:todo_aeo/providers/sync_settings_provider.dart';
 import 'package:todo_aeo/modules/sync_settings.dart';
 
@@ -91,9 +92,10 @@ class _SyncSettingsPageState extends State<SyncSettingsPage> {
   Widget build(BuildContext context) {
     return Consumer<SyncSettingsProvider>(
       builder: (context, syncProvider, child) {
+        final l10n = AppLocalizations.of(context)!;
         return Scaffold(
           appBar: AppBar(
-            title: const Text('同步设置'),
+            title: Text(l10n.syncSettings),
             backgroundColor: Theme.of(context).colorScheme.primary,
             foregroundColor: Theme.of(context).colorScheme.onPrimary,
           ),
@@ -124,16 +126,16 @@ class _SyncSettingsPageState extends State<SyncSettingsPage> {
                                 ),
                                 const SizedBox(width: 8),
                                 Text(
-                                  'WebDAV 同步配置',
+                                  l10n.webDAVSyncSettings,
                                   style: Theme.of(context).textTheme.titleLarge,
                                 ),
                               ],
                             ),
                             const SizedBox(height: 8),
                             SwitchListTile(
-                              title: const Text('启用同步'),
+                              title: Text(l10n.enableSync),
                               subtitle: Text(
-                                _isEnabled ? '已启用 WebDAV 同步' : '同步已禁用',
+                                _isEnabled ? l10n.haveEnabledSync : l10n.syncUnenabled,
                               ),
                               value: _isEnabled,
                               onChanged: (value) {
@@ -152,7 +154,7 @@ class _SyncSettingsPageState extends State<SyncSettingsPage> {
                             const Icon(Icons.storage),
                             const SizedBox(width: 8),
                             Text(
-                              '服务器配置',
+                              l10n.serverConfiguration,
                               style: Theme.of(context).textTheme.titleLarge,
                             ),
                           ],
@@ -162,19 +164,19 @@ class _SyncSettingsPageState extends State<SyncSettingsPage> {
                         // 服务器地址
                         TextFormField(
                           controller: _hostController,
-                          decoration: const InputDecoration(
-                            labelText: '服务器地址',
+                          decoration: InputDecoration(
+                            labelText: l10n.host,
                             hintText: 'https://example.com/dav',
                             prefixIcon: Icon(Icons.link),
                             border: OutlineInputBorder(),
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return '请输入服务器地址';
+                              return l10n.plsInputHost;
                             }
                             if (!value.startsWith('http://') &&
                                 !value.startsWith('https://')) {
-                              return '请输入有效的URL (http:// 或 https://)';
+                              return l10n.plsInputValidURL;
                             }
                             return null;
                           },
@@ -185,15 +187,15 @@ class _SyncSettingsPageState extends State<SyncSettingsPage> {
                         // 用户名
                         TextFormField(
                           controller: _usernameController,
-                          decoration: const InputDecoration(
-                            labelText: '用户名',
-                            hintText: '输入您的用户名',
+                          decoration: InputDecoration(
+                            labelText: l10n.userName,
+                            hintText: l10n.plsInputUserName,
                             prefixIcon: Icon(Icons.person),
                             border: OutlineInputBorder(),
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return '请输入用户名';
+                              return l10n.plsInputUserName;
                             }
                             return null;
                           },
@@ -206,8 +208,8 @@ class _SyncSettingsPageState extends State<SyncSettingsPage> {
                           controller: _passwordController,
                           obscureText: _obscurePassword,
                           decoration: InputDecoration(
-                            labelText: '密码',
-                            hintText: '输入您的密码',
+                            labelText: l10n.password,
+                            hintText: l10n.plsInputPassword,
                             prefixIcon: const Icon(Icons.lock),
                             suffixIcon: IconButton(
                               icon: Icon(
@@ -225,7 +227,7 @@ class _SyncSettingsPageState extends State<SyncSettingsPage> {
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return '请输入密码';
+                              return l10n.plsInputPassword;
                             }
                             return null;
                           },
@@ -253,8 +255,8 @@ class _SyncSettingsPageState extends State<SyncSettingsPage> {
                                   : const Icon(Icons.wifi_tethering),
                               label: Text(
                                 syncProvider.isTestingConnection
-                                    ? '测试中...'
-                                    : '测试连接',
+                                    ? l10n.testing
+                                    : l10n.connectionTest,
                               ),
                               style: ElevatedButton.styleFrom(
                                 padding: const EdgeInsets.symmetric(
@@ -309,38 +311,6 @@ class _SyncSettingsPageState extends State<SyncSettingsPage> {
                     ),
                   ),
                 ],
-
-                const SizedBox(height: 16),
-
-                // 帮助信息卡片
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            const Icon(Icons.help_outline),
-                            const SizedBox(width: 8),
-                            Text(
-                              '帮助信息',
-                              style: Theme.of(context).textTheme.titleLarge,
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          '• WebDAV 是一种基于 HTTP 的协议，用于远程文件管理\n'
-                          '• 支持 坚果云 等服务\n'
-                          '• 服务器地址示例：http://dav.jianguoyun.com/dav/\n'
-                          '• 请确保您的服务器支持 WebDAV 协议',
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
               ],
             ),
           ),
@@ -355,6 +325,7 @@ class _SyncSettingsPageState extends State<SyncSettingsPage> {
     }
 
     final provider = Provider.of<SyncSettingsProvider>(context, listen: false);
+    final l10n = AppLocalizations.of(context)!;
 
     // 临时更新设置用于测试
     provider.updateHost(_hostController.text.trim());
@@ -366,7 +337,7 @@ class _SyncSettingsPageState extends State<SyncSettingsPage> {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(success ? '连接测试成功！' : '连接测试失败，请检查设置'),
+          content: Text(success ? l10n.connectionSuccess : l10n.connectionFailure),
           backgroundColor: success ? Colors.green : Colors.red,
         ),
       );

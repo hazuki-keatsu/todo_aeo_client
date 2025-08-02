@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:todo_aeo/l10n/app_localizations.dart';
 import 'package:todo_aeo/providers/todo_provider.dart';
 import 'package:todo_aeo/utils/app_routes.dart';
 
@@ -11,7 +12,7 @@ class SharedFAB {
       onPressed: () {
         AppRoutes.pushTodoPage(context, provider);
       },
-      tooltip: "添加一个Todo",
+      tooltip: AppLocalizations.of(context)!.addNewTodo,
       child: const Icon(Icons.add),
     );
   }

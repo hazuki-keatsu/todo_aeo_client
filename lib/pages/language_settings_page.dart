@@ -68,9 +68,9 @@ class _LanguageSettingsPageState extends State<LanguageSettingsPage> {
       onTap: () async {
         // 在异步操作前获取本地化对象
         final l10n = AppLocalizations.of(context)!;
-
+        
         await languageProvider.changeLanguage(languageCode);
-
+        
         if (mounted) {
           // 显示切换成功的提示
           ScaffoldMessenger.of(context).showSnackBar(

@@ -3,14 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:todo_aeo/services/database_query.dart';
 import 'package:todo_aeo/modules/todo.dart';
 import 'package:todo_aeo/modules/category.dart';
+import 'package:todo_aeo/l10n/app_localizations.dart';
 
 class TodoProvider extends ChangeNotifier {
   final DatabaseQuery _dq = DatabaseQuery.instance;
+  final BuildContext context;
 
   List<Todo>? _todos;
   List<Category>? _categories;
   bool _isLoading = false;
   String? _error;
+
+  TodoProvider(this.context);
 
   // Getters
   List<Todo>? get todos => _todos;
@@ -28,12 +32,9 @@ class TodoProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await Future.wait([
-        _loadTodos(),
-        _loadCategories(),
-      ]);
+      await Future.wait([_loadTodos(), _loadCategories()]);
     } catch (e) {
-      _error = '初始化数据失败: $e';
+      _error = '${AppLocalizations.of(context)!.initDataFailed}: $e';
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -78,10 +79,9 @@ class TodoProvider extends ChangeNotifier {
       // 获取当前最大的优先级值，新Todo的优先级 = 最大值 + 1
       int maxPriority = 0;
       if (_todos != null && _todos!.isNotEmpty) {
-        maxPriority = _todos!.map((todo) => todo.priority).reduce((a, b) =>
-        a > b
-            ? a
-            : b);
+        maxPriority = _todos!
+            .map((todo) => todo.priority)
+            .reduce((a, b) => a > b ? a : b);
       }
       todoData['priority'] = maxPriority + 1;
 
@@ -89,7 +89,7 @@ class TodoProvider extends ChangeNotifier {
       await _loadTodos();
       notifyListeners();
     } catch (e) {
-      _error = '添加待办事项失败: $e';
+      _error = AppLocalizations.of(context)!.addTodoFailed(e.toString());
       notifyListeners();
       rethrow;
     }
@@ -102,7 +102,7 @@ class TodoProvider extends ChangeNotifier {
       await _loadTodos();
       notifyListeners();
     } catch (e) {
-      _error = '更新待办事项失败: $e';
+      _error = AppLocalizations.of(context)!.updateTodoFailed(e.toString());
       notifyListeners();
       rethrow;
     }
@@ -115,7 +115,7 @@ class TodoProvider extends ChangeNotifier {
       await _loadTodos();
       notifyListeners();
     } catch (e) {
-      _error = '删除待办事项失败: $e';
+      _error = '${AppLocalizations.of(context)!.deleteTodoFailed}: $e';
       notifyListeners();
       rethrow;
     }
@@ -129,7 +129,7 @@ class TodoProvider extends ChangeNotifier {
       await _loadTodos();
       notifyListeners();
     } catch (e) {
-      _error = '批量删除待办事项失败: $e';
+      _error = '${AppLocalizations.of(context)!.batchDeleteTodoFailed}: $e';
       notifyListeners();
       rethrow;
     }
@@ -142,7 +142,7 @@ class TodoProvider extends ChangeNotifier {
       await _loadTodos();
       notifyListeners();
     } catch (e) {
-      _error = '更新优先级失败: $e';
+      _error = '${AppLocalizations.of(context)!.updatePriorityFailed}: $e';
       notifyListeners();
       rethrow;
     }
@@ -155,15 +155,18 @@ class TodoProvider extends ChangeNotifier {
       await _loadTodos();
       notifyListeners();
     } catch (e) {
-      _error = '更新优先级失败: $e';
+      _error = '${AppLocalizations.of(context)!.updatePriorityFailed}: $e';
       notifyListeners();
       rethrow;
     }
   }
 
   // Reorder todos by dragging - 处理拖动排序
-  Future<void> reorderTodos(List<Todo> todos, int oldIndex,
-      int newIndex) async {
+  Future<void> reorderTodos(
+    List<Todo> todos,
+    int oldIndex,
+    int newIndex,
+  ) async {
     try {
       // 创建一个新的列表避免修改原列表
       List<Todo> reorderedTodos = List.from(todos);
@@ -179,8 +182,11 @@ class TodoProvider extends ChangeNotifier {
 
       // 重新分配优先级，使用大优先级在上的逻辑
       // 获取当前最大优先级作为起始值
-      int maxPriority = _todos?.map((todo) => todo.priority).reduce((a,
-          b) => a > b ? a : b) ?? 0;
+      int maxPriority =
+          _todos
+              ?.map((todo) => todo.priority)
+              .reduce((a, b) => a > b ? a : b) ??
+          0;
       int startPriority = maxPriority + reorderedTodos.length;
 
       // 批量更新数据库中的优先级
@@ -191,15 +197,17 @@ class TodoProvider extends ChangeNotifier {
       await _loadTodos();
       notifyListeners();
     } catch (e) {
-      _error = '重新排序失败: $e';
+      _error = '${AppLocalizations.of(context)!.reorderFailed}: $e';
       notifyListeners();
       rethrow;
     }
   }
 
   // 静默重新排序todos，不触发UI更新
-  Future<void> reorderTodosSilently(List<int> todoIds,
-      int startPriority) async {
+  Future<void> reorderTodosSilently(
+    List<int> todoIds,
+    int startPriority,
+  ) async {
     try {
       // 批量更新数据库中的优先级
       await _dq.updateTodosPriorityBatch(todoIds, startPriority);
@@ -208,7 +216,7 @@ class TodoProvider extends ChangeNotifier {
       await _loadTodos();
     } catch (e) {
       if (kDebugMode) {
-        print('静默排序失败: $e');
+        print('${AppLocalizations.of(context)!.silentSortFailed}: $e');
         // 静默失败，不设置错误状态
       }
     }
@@ -231,14 +239,12 @@ class TodoProvider extends ChangeNotifier {
       final todo = _todos?.firstWhere((t) => t.id == todoId);
       if (todo == null) return;
 
-      final updatedTodo = {
-        'id': todoId,
-        'isCompleted': !todo.isCompleted,
-      };
+      final updatedTodo = {'id': todoId, 'isCompleted': !todo.isCompleted};
 
       await updateTodo(updatedTodo);
     } catch (e) {
-      _error = '更新完成状态失败: $e';
+      _error =
+          '${AppLocalizations.of(context)!.updateCompletionStatusFailed}: $e';
       notifyListeners();
       rethrow;
     }
@@ -251,7 +257,7 @@ class TodoProvider extends ChangeNotifier {
       await _loadCategories();
       notifyListeners();
     } catch (e) {
-      _error = '添加分类失败: $e';
+      _error = '${AppLocalizations.of(context)!.addCategoryFailed}: $e';
       notifyListeners();
       rethrow;
     }
@@ -264,7 +270,7 @@ class TodoProvider extends ChangeNotifier {
       await _loadCategories();
       notifyListeners();
     } catch (e) {
-      _error = '更新分类失败: $e';
+      _error = '${AppLocalizations.of(context)!.updateCategoryFailed}: $e';
       notifyListeners();
       rethrow;
     }
@@ -278,7 +284,7 @@ class TodoProvider extends ChangeNotifier {
       await _loadTodos(); // Reload todos as they might be affected
       notifyListeners();
     } catch (e) {
-      _error = '删除分类失败: $e';
+      _error = '${AppLocalizations.of(context)!.deleteCategoryFailed}: $e';
       notifyListeners();
       rethrow;
     }

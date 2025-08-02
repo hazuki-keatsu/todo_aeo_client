@@ -20,7 +20,7 @@ void main() {
 
   Widget createTestApp() {
     return ChangeNotifierProvider(
-      create: (context) => TodoProvider()..init(),
+      create: (context) => TodoProvider(context)..init(),
       child: MaterialApp(
         home: ToDoHomeFrame(title: "ToDo Aeo"),
       ),

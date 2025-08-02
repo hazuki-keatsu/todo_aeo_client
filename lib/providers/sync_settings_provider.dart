@@ -2,21 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:todo_aeo/modules/sync_settings.dart';
 import 'package:todo_aeo/services/database_query.dart';
 import 'package:todo_aeo/services/sync/weddav_sync.dart';
+import 'package:todo_aeo/l10n/app_localizations.dart';
 
 class SyncSettingsProvider extends ChangeNotifier {
   SyncSettings _settings = SyncSettings();
   bool _isLoading = false;
   String? _error;
   bool _isTestingConnection = false;
+  BuildContext? _context;
 
   // Getters
   SyncSettings get settings => _settings;
-
   bool get isLoading => _isLoading;
-
   String? get error => _error;
-
   bool get isTestingConnection => _isTestingConnection;
+
+  // 设置上下文以获取本地化字符串
+  void setContext(BuildContext context) {
+    _context = context;
+  }
 
   // 从数据库加载设置
   Future<void> loadSettings() async {
@@ -42,7 +46,8 @@ class SyncSettingsProvider extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     } catch (e) {
-      _error = '加载同步设置失败: $e';
+      final localizations = _context != null ? AppLocalizations.of(_context!) : null;
+      _error = localizations?.loadSyncSettingsFailed(e.toString()) ?? '加载同步设置失败: $e';
       _isLoading = false;
       notifyListeners();
     }
@@ -77,7 +82,8 @@ class SyncSettingsProvider extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     } catch (e) {
-      _error = '保存同步设置失败: $e';
+      final localizations = _context != null ? AppLocalizations.of(_context!) : null;
+      _error = localizations?.saveSyncSettingsFailed(e.toString()) ?? '保存同步设置失败: $e';
       _isLoading = false;
       notifyListeners();
     }
@@ -86,7 +92,8 @@ class SyncSettingsProvider extends ChangeNotifier {
   // 测试连接
   Future<bool> testConnection() async {
     if (!_settings.isValid) {
-      _error = '请填写完整的连接信息';
+      final localizations = _context != null ? AppLocalizations.of(_context!) : null;
+      _error = localizations?.pleaseCompleteConnectionInfo ?? '请填写完整的连接信息';
       notifyListeners();
       return false;
     }
@@ -107,7 +114,8 @@ class SyncSettingsProvider extends ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
-      _error = '连接测试失败: $e';
+      final localizations = _context != null ? AppLocalizations.of(_context!) : null;
+      _error = localizations?.connectionTestFailed(e.toString()) ?? '连接测试失败: $e';
       _isTestingConnection = false;
       notifyListeners();
       return false;

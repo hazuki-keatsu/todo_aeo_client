@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:todo_aeo/l10n/app_localizations.dart';
 import 'package:todo_aeo/providers/settings_provider.dart';
 import 'package:todo_aeo/providers/todo_provider.dart';
 import 'package:todo_aeo/utils/app_routes.dart';
@@ -17,6 +18,7 @@ class ShowDialog {
 
     // 保存主页面的context
     final scaffoldContext = context;
+    final l10n = AppLocalizations.of(context)!;
 
     final isEditMode = categoryId != null;
 
@@ -49,7 +51,7 @@ class ShowDialog {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              title: Text(isEditMode ? '编辑分类' : '添加新的分类'),
+              title: Text(isEditMode ? l10n.editCategory : l10n.addNewCategory),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -57,9 +59,9 @@ class ShowDialog {
                   // 分类名称输入框
                   TextField(
                     decoration: InputDecoration(
-                      labelText: '分类名称',
+                      labelText: l10n.categoryName,
                       border: OutlineInputBorder(),
-                      hintText: '请输入分类名称',
+                      hintText: l10n.categoryNameRequired,
                     ),
                     controller: TextEditingController(text: categoryName),
                     onChanged: (value) {
@@ -68,7 +70,7 @@ class ShowDialog {
                   ),
                   SizedBox(height: 16),
                   // 颜色选择
-                  Text('选择颜色', style: Theme.of(context).textTheme.titleSmall),
+                  Text(l10n.selectColor, style: Theme.of(context).textTheme.titleSmall),
                   SizedBox(height: 8),
                   Wrap(
                     spacing: 8,
@@ -107,18 +109,18 @@ class ShowDialog {
               ),
               actions: <Widget>[
                 TextButton(
-                  child: Text('取消'),
+                  child: Text(l10n.cancel),
                   onPressed: () {
                     Navigator.pop(dialogContext, false);
                   },
                 ),
                 TextButton(
-                  child: Text('确定'),
+                  child: Text(l10n.confirm),
                   onPressed: () async {
                     if (categoryName.trim().isEmpty) {
                       ScaffoldMessenger.of(dialogContext).showSnackBar(
                         SnackBar(
-                          content: Text('请输入分类名称'),
+                          content: Text(l10n.categoryNameRequired),
                           duration: Duration(seconds: 3),
                         ),
                       );
@@ -149,7 +151,7 @@ class ShowDialog {
                       if (scaffoldContext.mounted) {
                         ScaffoldMessenger.of(scaffoldContext).showSnackBar(
                           SnackBar(
-                            content: Text(isEditMode ? '分类更新成功' : '分类添加成功'),
+                            content: Text(isEditMode ? l10n.categoryUpdateSuccess : l10n.categoryAddSuccess),
                             duration: Duration(seconds: 3),
                           ),
                         );
@@ -162,7 +164,7 @@ class ShowDialog {
                         ScaffoldMessenger.of(scaffoldContext).showSnackBar(
                           SnackBar(
                             content: Text(
-                              isEditMode ? '更新分类失败: $e' : '添加分类失败: $e',
+                              isEditMode ? '${l10n.updateCategoryFailed}: $e' : '${l10n.addCategoryFailed}: $e',
                             ),
                             duration: Duration(seconds: 3),
                           ),
@@ -187,21 +189,22 @@ class ShowDialog {
     TodoProvider provider,
     OperationMode mode,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('确认删除'),
+          title: Text(l10n.confirmDelete),
           content: mode == OperationMode.todo
-              ? Text('确定要删除这个待办事项吗？')
-              : Text('确定要删除这个分类吗？'),
+              ? Text(l10n.confirmDeleteTodo)
+              : Text(l10n.confirmDeleteCategory),
           actions: [
             TextButton(
-              child: Text('取消'),
+              child: Text(l10n.cancel),
               onPressed: () => Navigator.pop(context),
             ),
             TextButton(
-              child: Text('删除', style: TextStyle(color: Colors.red)),
+              child: Text(l10n.delete, style: TextStyle(color: Colors.red)),
               onPressed: () {
                 if (mode == OperationMode.todo) {
                   Navigator.pop(context);
@@ -227,6 +230,7 @@ class ShowDialog {
     BuildContext context,
     OperationMode mode,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     // 根据模式查找对应的数据
     if (mode == OperationMode.todo) {
       final todos = provider.todos;
@@ -234,7 +238,7 @@ class ShowDialog {
 
       if (todo == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('未找到对应的待办事项'), duration: Duration(seconds: 3)),
+          SnackBar(content: Text(l10n.todoNotFound), duration: Duration(seconds: 3)),
         );
         return;
       }
@@ -246,7 +250,7 @@ class ShowDialog {
 
       if (category == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('未找到对应的分类'), duration: Duration(seconds: 3)),
+          SnackBar(content: Text(l10n.categoryNotFound), duration: Duration(seconds: 3)),
         );
         return;
       }
@@ -262,6 +266,7 @@ class ShowDialog {
     TodoProvider provider,
     OperationMode mode,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -329,7 +334,7 @@ class ShowDialog {
                             ),
                             SizedBox(width: 8),
                             Text(
-                              '标题',
+                              l10n.todoTitle,
                               style: Theme.of(context).textTheme.labelMedium
                                   ?.copyWith(
                                     color: Theme.of(
@@ -368,7 +373,7 @@ class ShowDialog {
                               ),
                               SizedBox(width: 8),
                               Text(
-                                '描述',
+                                l10n.description,
                                 style: Theme.of(context).textTheme.labelMedium
                                     ?.copyWith(
                                       color: Theme.of(
@@ -414,7 +419,7 @@ class ShowDialog {
                                       ),
                                       SizedBox(width: 4),
                                       Text(
-                                        '创建时间',
+                                        l10n.createTime,
                                         style: Theme.of(context)
                                             .textTheme
                                             .labelSmall
@@ -428,7 +433,7 @@ class ShowDialog {
                                   ),
                                   SizedBox(height: 4),
                                   Text(
-                                    _formatDateTime(todo.createdAt),
+                                    _formatDateTime(todo.createdAt, l10n),
                                     style: Theme.of(
                                       context,
                                     ).textTheme.bodySmall,
@@ -452,7 +457,7 @@ class ShowDialog {
                                         ),
                                         SizedBox(width: 4),
                                         Text(
-                                          '完成时间',
+                                          l10n.finishTime,
                                           style: Theme.of(context)
                                               .textTheme
                                               .labelSmall
@@ -466,7 +471,7 @@ class ShowDialog {
                                     ),
                                     SizedBox(height: 4),
                                     Text(
-                                      _formatDateTime(todo.finishingAt!),
+                                      _formatDateTime(todo.finishingAt!, l10n),
                                       style: Theme.of(
                                         context,
                                       ).textTheme.bodySmall,
@@ -494,7 +499,7 @@ class ShowDialog {
                               AppRoutes.pushTodoEditPage(context, id, provider);
                             },
                             icon: Icon(Icons.edit),
-                            label: Text('编辑'),
+                            label: Text(l10n.edit),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Theme.of(
                                 context,
@@ -528,7 +533,7 @@ class ShowDialog {
                               );
                             },
                             icon: Icon(Icons.delete_outline),
-                            label: Text('删除'),
+                            label: Text(l10n.delete),
                             style: OutlinedButton.styleFrom(
                               foregroundColor: Theme.of(
                                 context,
@@ -564,6 +569,7 @@ class ShowDialog {
     TodoProvider provider,
     OperationMode mode,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -636,7 +642,7 @@ class ShowDialog {
                             ),
                             SizedBox(width: 12),
                             Text(
-                              '分类名称',
+                              l10n.categoryNameLabel,
                               style: Theme.of(context).textTheme.labelMedium
                                   ?.copyWith(
                                     color: Theme.of(
@@ -674,7 +680,7 @@ class ShowDialog {
                             ),
                             SizedBox(width: 4),
                             Text(
-                              '该分类下的待办事项数量: ${provider.todos?.where((todo) => todo.categoryId == id).length ?? 0}',
+                              '${l10n.todoCountInCategory}: ${provider.todos?.where((todo) => todo.categoryId == id).length ?? 0}',
                               style: Theme.of(context).textTheme.bodySmall
                                   ?.copyWith(
                                     color: Theme.of(
@@ -706,7 +712,7 @@ class ShowDialog {
                               );
                             },
                             icon: Icon(Icons.edit),
-                            label: Text('编辑'),
+                            label: Text(l10n.edit),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Theme.of(
                                 context,
@@ -740,7 +746,7 @@ class ShowDialog {
                               );
                             },
                             icon: Icon(Icons.delete_outline),
-                            label: Text('删除'),
+                            label: Text(l10n.delete),
                             style: OutlinedButton.styleFrom(
                               foregroundColor: Theme.of(
                                 context,
@@ -770,16 +776,16 @@ class ShowDialog {
   }
 
   // 格式化日期时间的辅助方法
-  static String _formatDateTime(DateTime dateTime) {
+  static String _formatDateTime(DateTime dateTime, AppLocalizations l10n) {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final yesterday = today.subtract(Duration(days: 1));
     final targetDate = DateTime(dateTime.year, dateTime.month, dateTime.day);
 
     if (targetDate == today) {
-      return '今天 ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
+      return '${l10n.today} ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
     } else if (targetDate == yesterday) {
-      return '昨天 ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
+      return '${l10n.yesterday} ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
     } else {
       return '${dateTime.month}/${dateTime.day} ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
     }
@@ -792,7 +798,7 @@ class ShowDialog {
     return showAboutDialog(
       context: context,
       applicationName: 'Todo AEO',
-      applicationVersion: settingsProvider.version,
+      applicationVersion: settingsProvider.packageInfo?.version,
       applicationIcon: Container(
         width: 48,
         height: 48,
@@ -806,9 +812,9 @@ class ShowDialog {
         ),
       ),
       children: [
-        Text('一个主打简洁和安全的待办事项管理应用'),
+        Text(AppLocalizations.of(context)!.introduction1),
         SizedBox(height: 8),
-        Text('使用 Flutter 和 Material You 设计。'),
+        Text(AppLocalizations.of(context)!.introduction2),
       ],
     );
   }
