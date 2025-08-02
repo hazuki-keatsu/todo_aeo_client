@@ -6,7 +6,7 @@ import 'package:todo_aeo/modules/category.dart';
 
 class TodoProvider extends ChangeNotifier {
   final DatabaseQuery _dq = DatabaseQuery.instance;
-  
+
   List<Todo>? _todos;
   List<Category>? _categories;
   bool _isLoading = false;
@@ -14,8 +14,11 @@ class TodoProvider extends ChangeNotifier {
 
   // Getters
   List<Todo>? get todos => _todos;
+
   List<Category>? get categories => _categories;
+
   bool get isLoading => _isLoading;
+
   String? get error => _error;
 
   // Initialize data
@@ -63,9 +66,9 @@ class TodoProvider extends ChangeNotifier {
     return _todos!.where((todo) {
       if (todo.finishingAt == null) return false;
       final finishDate = todo.finishingAt!;
-      return finishDate.year == time.year && 
-             finishDate.month == time.month && 
-             finishDate.day == time.day;
+      return finishDate.year == time.year &&
+          finishDate.month == time.month &&
+          finishDate.day == time.day;
     }).toList();
   }
 
@@ -75,10 +78,13 @@ class TodoProvider extends ChangeNotifier {
       // 获取当前最大的优先级值，新Todo的优先级 = 最大值 + 1
       int maxPriority = 0;
       if (_todos != null && _todos!.isNotEmpty) {
-        maxPriority = _todos!.map((todo) => todo.priority).reduce((a, b) => a > b ? a : b);
+        maxPriority = _todos!.map((todo) => todo.priority).reduce((a, b) =>
+        a > b
+            ? a
+            : b);
       }
       todoData['priority'] = maxPriority + 1;
-      
+
       await _dq.insertTodo(todoData);
       await _loadTodos();
       notifyListeners();
@@ -156,29 +162,31 @@ class TodoProvider extends ChangeNotifier {
   }
 
   // Reorder todos by dragging - 处理拖动排序
-  Future<void> reorderTodos(List<Todo> todos, int oldIndex, int newIndex) async {
+  Future<void> reorderTodos(List<Todo> todos, int oldIndex,
+      int newIndex) async {
     try {
       // 创建一个新的列表避免修改原列表
       List<Todo> reorderedTodos = List.from(todos);
-      
+
       // 调整newIndex，如果向后移动需要减1
       if (oldIndex < newIndex) {
         newIndex -= 1;
       }
-      
+
       // 移动元素
       final Todo movedTodo = reorderedTodos.removeAt(oldIndex);
       reorderedTodos.insert(newIndex, movedTodo);
-      
+
       // 重新分配优先级，使用大优先级在上的逻辑
       // 获取当前最大优先级作为起始值
-      int maxPriority = _todos?.map((todo) => todo.priority).reduce((a, b) => a > b ? a : b) ?? 0;
+      int maxPriority = _todos?.map((todo) => todo.priority).reduce((a,
+          b) => a > b ? a : b) ?? 0;
       int startPriority = maxPriority + reorderedTodos.length;
-      
+
       // 批量更新数据库中的优先级
       List<int> todoIds = reorderedTodos.map((todo) => todo.id).toList();
       await _dq.updateTodosPriorityBatch(todoIds, startPriority);
-      
+
       // 重新加载数据
       await _loadTodos();
       notifyListeners();
@@ -190,17 +198,19 @@ class TodoProvider extends ChangeNotifier {
   }
 
   // 静默重新排序todos，不触发UI更新
-  Future<void> reorderTodosSilently(List<int> todoIds, int startPriority) async {
+  Future<void> reorderTodosSilently(List<int> todoIds,
+      int startPriority) async {
     try {
       // 批量更新数据库中的优先级
       await _dq.updateTodosPriorityBatch(todoIds, startPriority);
-      
+
       // 静默重新加载数据，不触发notifyListeners
       await _loadTodos();
-    } catch (e) { {
+    } catch (e) {
       if (kDebugMode) {
         print('静默排序失败: $e');
-      // 静默失败，不设置错误状态
+        // 静默失败，不设置错误状态
+      }
     }
   }
 
