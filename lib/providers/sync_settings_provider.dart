@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:todo_aeo/modules/sync_settings.dart';
 import 'package:todo_aeo/services/database_query.dart';
-import 'package:todo_aeo/services/weddav_sync.dart';
+import 'package:todo_aeo/services/sync/weddav_sync.dart';
 
 class SyncSettingsProvider extends ChangeNotifier {
   SyncSettings _settings = SyncSettings();
@@ -91,22 +91,16 @@ class SyncSettingsProvider extends ChangeNotifier {
       return false;
     }
 
-    try {
-      _isTestingConnection = true;
-      _error = null;
-      notifyListeners();
+    _isTestingConnection = true;
+    _error = null;
+    notifyListeners();
 
+    try {
       // 创建临时客户端进行测试
-      WebdavSyncService.instance.init(
+      await WebdavSyncService.instance.init(
         host: _settings.host!,
         user: _settings.username!,
         password: _settings.password!,
-      );
-
-      // 尝试同步空数据来测试连接
-      await WebdavSyncService.instance.sync(
-        localTodos: [],
-        localCategories: [],
       );
 
       _isTestingConnection = false;

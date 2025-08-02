@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:todo_aeo/services/data_refresh.dart';
+import 'package:todo_aeo/services/sync/data_refresh.dart';
 import 'package:todo_aeo/utils/todos_sort.dart';
 import 'package:provider/provider.dart';
 import 'package:todo_aeo/utils/parse_color.dart';
@@ -10,6 +10,7 @@ import 'package:todo_aeo/modules/todo.dart';
 import 'package:todo_aeo/providers/todo_provider.dart';
 import 'package:todo_aeo/providers/scaffold_elements_notifier.dart';
 import 'package:todo_aeo/modules/category.dart';
+import 'package:flutter/foundation.dart' show debugPrint, kDebugMode;
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -260,10 +261,10 @@ class _HomePageState extends State<HomePage> {
           message: "刷新",
           child: IconButton(
             onPressed: () {
-              dataRefresh(provider, context);
+              dataRefresh(provider, context, () => mounted);
             },
             icon: Icon(
-              Icons.refresh,
+              Icons.sync,
               color: Theme.of(context).colorScheme.onPrimary,
             ),
           ),
@@ -560,7 +561,10 @@ class _HomePageState extends State<HomePage> {
       List<int> todoIds = reorderedTodos.map((todo) => todo.id).toList();
       await provider.reorderTodosSilently(todoIds, startPriority);
     } catch (e) {
-      print('静默更新数据库失败: $e');
+      if (kDebugMode) {
+        debugPrint('静默更新数据库失败: $e');
+      }
+
     }
   }
 

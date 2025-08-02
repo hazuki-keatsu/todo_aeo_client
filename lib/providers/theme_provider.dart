@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:todo_aeo/services/database_query.dart';
+import 'package:flutter/foundation.dart' show kDebugMode;
 
 class ThemeProvider extends ChangeNotifier {
   // 预定义颜色
@@ -67,7 +68,9 @@ class ThemeProvider extends ChangeNotifier {
       _isInitialized = true;
       notifyListeners();
     } catch (e) {
-      print('Failed to load theme settings: $e');
+      if (kDebugMode) {
+        print('Failed to load theme settings: $e');
+      }
       _isInitialized = true;
     }
   }
@@ -81,7 +84,9 @@ class ThemeProvider extends ChangeNotifier {
       final db = DatabaseQuery.instance;
       await db.setSetting('theme_seed_color', color.toString());
     } catch (e) {
-      print('Failed to save seed color: $e');
+      if (kDebugMode) {
+        print('Failed to save seed color: $e');
+      }
     }
   }
 
@@ -94,7 +99,9 @@ class ThemeProvider extends ChangeNotifier {
       final db = DatabaseQuery.instance;
       await db.setSetting('theme_use_dynamic_color', value.toString());
     } catch (e) {
-      print('Failed to save dynamic color setting: $e');
+      if (kDebugMode) {
+        print('Failed to save dynamic color setting: $e');
+      }
     }
   }
 
@@ -107,7 +114,9 @@ class ThemeProvider extends ChangeNotifier {
       final db = DatabaseQuery.instance;
       await db.setSetting('theme_is_dark_mode', value.toString());
     } catch (e) {
-      print('Failed to save dark mode setting: $e');
+      if (kDebugMode) {
+        print('Failed to save dark mode setting: $e');
+      }
     }
   }
 

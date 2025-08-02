@@ -66,6 +66,10 @@ class _TodoPageState extends State<TodoPage> {
       return Future.value();
     }
 
+    // 在异步操作前获取 Navigator 和 ScaffoldMessenger
+    final navigator = Navigator.of(context);
+    final lastPageScaffoldMessenger = ScaffoldMessenger.of(lastPageContext);
+
     try {
       // 准备数据
       final todoData = {
@@ -88,27 +92,27 @@ class _TodoPageState extends State<TodoPage> {
         await provider.addTodo(todoData);
       }
 
-      // 显示成功消息并返回
-      if (mounted) {
-        Navigator.pop(context);
+      // 检查当前页面和前一个页面是否仍然挂载
+      if (!mounted || !lastPageContext.mounted) return;
 
-        await Future.delayed(Duration(milliseconds: 200));
+      navigator.pop();
 
-        if (lastPageContext.mounted) {
-          ScaffoldMessenger.of(lastPageContext).showSnackBar(
-            SnackBar(
-              content: Text(isEditMode ? '待办事项更新成功' : '待办事项添加成功'),
-              duration: Duration(seconds: 3),
-            ),
-          );
-        }
+      await Future.delayed(const Duration(milliseconds: 200));
+
+      if (lastPageContext.mounted) {
+        lastPageScaffoldMessenger.showSnackBar(
+          SnackBar(
+            content: Text(isEditMode ? '待办事项更新成功' : '待办事项添加成功'),
+            duration: const Duration(seconds: 3),
+          ),
+        );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(isEditMode ? '更新待办事项失败: $e' : '添加待办事项失败: $e'),
-            duration: Duration(seconds: 3),
+            duration: const Duration(seconds: 3),
           ),
         );
       }

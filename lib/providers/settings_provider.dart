@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:flutter/foundation.dart' show debugPrint, kDebugMode;
 
 class SettingsProvider extends ChangeNotifier {
   PackageInfo? _packageInfo;
@@ -40,7 +41,10 @@ class SettingsProvider extends ChangeNotifier {
       _error = '加载应用信息失败: $e';
       _isLoading = false;
       notifyListeners();
-      print('Failed to load package info: $e');
+      if (kDebugMode) {
+        debugPrint('Failed to load package info: $e');
+      }
+
     }
   }
 

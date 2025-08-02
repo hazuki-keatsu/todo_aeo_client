@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:todo_aeo/services/database_query.dart';
 
 class DatabaseInitializer {
@@ -7,7 +8,9 @@ class DatabaseInitializer {
     // 检查是否已有数据
     final existingTodos = await db.getAllTodos();
     if (existingTodos.isNotEmpty) {
-      print('数据库已有数据，进行覆盖');
+      if (kDebugMode) {
+        print('数据库已有数据，进行覆盖');
+      }
       db.clearTodos();
       db.clearCategories();
     }
@@ -112,6 +115,8 @@ class DatabaseInitializer {
       await db.insertTodo(todoData);
     }
 
-    print('已添加 ${sampleTodos.length} 条示例数据');
+    if (kDebugMode) {
+      print('已添加 ${sampleTodos.length} 条示例数据');
+    }
   }
 }

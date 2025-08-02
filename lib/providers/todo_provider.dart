@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:todo_aeo/services/database_query.dart';
 import 'package:todo_aeo/modules/todo.dart';
@@ -196,8 +197,9 @@ class TodoProvider extends ChangeNotifier {
       
       // 静默重新加载数据，不触发notifyListeners
       await _loadTodos();
-    } catch (e) {
-      print('静默排序失败: $e');
+    } catch (e) { {
+      if (kDebugMode) {
+        print('静默排序失败: $e');
       // 静默失败，不设置错误状态
     }
   }

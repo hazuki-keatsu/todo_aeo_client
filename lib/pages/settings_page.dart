@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:todo_aeo/services/sync/data_refresh.dart';
 import 'package:todo_aeo/widgets/show_dialog.dart';
 import 'package:todo_aeo/providers/todo_provider.dart';
 import 'package:todo_aeo/providers/scaffold_elements_notifier.dart';
@@ -114,11 +115,12 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                   Divider(height: 1),
                   ListTile(
-                    enabled: false,
                     leading: Icon(Icons.sync),
                     title: Text('立即同步'),
-                    subtitle: Text('立即通过您指定的方式同步（开发中）'),
-                    onTap: () {},
+                    subtitle: Text('立即通过您配置的方式同步）'),
+                    onTap: () {
+                      dataRefresh(todoProvider, context, () => mounted);
+                    },
                   ),
                 ],
               ),

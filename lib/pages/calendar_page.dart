@@ -1,6 +1,7 @@
+import 'package:flutter/foundation.dart' show debugPrint, kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:todo_aeo/services/data_refresh.dart';
+import 'package:todo_aeo/services/sync/data_refresh.dart';
 import 'package:todo_aeo/utils/todos_sort.dart';
 import 'package:todo_aeo/modules/todo.dart';
 import 'package:todo_aeo/providers/todo_provider.dart';
@@ -124,11 +125,11 @@ class _CalendarPageState extends State<CalendarPage>
           Tooltip(
             message: "刷新",
             child: IconButton(
-              onPressed: () {
-                dataRefresh(provider, context);
+              onPressed: () async {
+                dataRefresh(provider, context, () => mounted);
               },
               icon: Icon(
-                Icons.refresh,
+                Icons.sync,
                 color: Theme.of(context).colorScheme.onPrimary,
               ),
             ),
@@ -212,7 +213,10 @@ class _CalendarPageState extends State<CalendarPage>
       final category = categories.firstWhere((cat) => cat.id == categoryId);
       return category.name;
     } catch (e) {
-      print("Can not find out the category id.");
+      if (kDebugMode) {
+        debugPrint("Can not find out the category id.");
+      }
+
       return null; // 如果找不到分类，返回 null
     }
   }
@@ -227,7 +231,10 @@ class _CalendarPageState extends State<CalendarPage>
           ? parseColor(category.color!, context)
           : null;
     } catch (e) {
-      print("Can not find out the category color.");
+      if (kDebugMode) {
+        debugPrint("Can not find out the category color.");
+      }
+
       return null; // 如果找不到分类，返回 null
     }
   }
